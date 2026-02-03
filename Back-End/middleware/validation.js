@@ -1,0 +1,101 @@
+import { body, validationResult } from 'express-validator';
+
+/**
+ * Middleware للتحقق من نتائج الـ Validation
+ */
+export const validate = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const formattedErrors = errors.array().map((err) => ({
+      field: err.path || err.param,
+      message: err.msg
+    }));
+
+    return res.status(400).json({
+      success: false,
+      message: 'خطأ في البيانات المدخلة',
+      errors: formattedErrors
+    });
+  }
+
+  next();
+};
+
+/**
+ * Validation للتسجيل
+ */
+export const registerValidation = [
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('الاسم مطلوب')
+    .isLength({ min: 3 })
+    .withMessage('الاسم يجب أن يكون 3 أحرف على الأقل'),
+
+  body('email').trim().notEmpty().withMessage('البريد الإلكتروني مطلوب').isEmail().withMessage('البريد الإلكتروني غير صالح'),
+
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('رقم الهاتف مطلوب')
+    .matches(/^01[0125][0-9]{8}$/)
+    .withMessage('رقم الهاتف يجب أن يكون 11 رقم مصري صحيح'),
+
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('كلمة المرور مطلوبة')
+    .isLength({ min: 6 })
+    .withMessage('كلمة المرور يجب أن تكون 6 أحرف على الأقل')
+];
+
+/**
+ * Validation لتسجيل الدخول
+ */
+export const loginValidation = [
+  body('email').trim().notEmpty().withMessage('البريد الإلكتروني مطلوب').isEmail().withMessage('البريد الإلكتروني غير صالح'),
+
+  body('password').trim().notEmpty().withMessage('كلمة المرور مطلوبة')
+];
+
+/**
+ * Validation لإنشاء كورس
+ */
+export const createCourseValidation = [
+  body('title').trim().notEmpty().withMessage('عنوان الكورس مطلوب').isLength({ min: 5 }).withMessage('العنوان يجب أن يكون 5 أحرف على الأقل'),
+
+  body('description').trim().notEmpty().withMessage('وصف الكورس مطلوب').isLength({ min: 20 }).withMessage('الوصف يجب أن يكون 20 حرف على الأقل'),
+
+  body('price').notEmpty().withMessage('السعر مطلوب').isNumeric().withMessage('السعر يجب أن يكون رقم').custom((value) => value >= 0).withMessage('السعر لا يمكن أن يكون سالباً'),
+
+  body('thumbnail').trim().notEmpty().withMessage('صورة الكورس مطلوبة').isURL().withMessage('رابط الصورة غير صحيح'),
+
+  body('category').trim().notEmpty().withMessage('تصنيف الكورس مطلوب')
+];
+
+/**
+ * Validation لإضافة فيديو
+ */
+export const addVideoValidation = [
+  body('courseId').trim().notEmpty().withMessage('معرف الكورس مطلوب').isMongoId().withMessage('معرف الكورس غير صحيح'),
+
+  body('title').trim().notEmpty().withMessage('عنوان الفيديو مطلوب'),
+
+  body('bunnyVideoId').trim().notEmpty().withMessage('معرف فيديو Bunny مطلوب'),
+
+  body('duration').notEmpty().withMessage('مدة الفيديو مطلوبة').isNumeric().withMessage('المدة يجب أن تكون رقم'),
+
+  body('order').notEmpty().withMessage('ترتيب الفيديو مطلوب').isNumeric().withMessage('الترتيب يجب أن يكون رقم')
+];
+
+/**
+ * Validation لإنشاء طلب
+ */
+export const createOrderValidation = [
+  body('courseId').trim().notEmpty().withMessage('معرف الكورس مطلوب').isMongoId().withMessage('معرف الكورس غير صحيح'),
+
+  body('paymentMethod').trim().notEmpty().withMessage('طريقة الدفع مطلوبة').isIn(['vodafone_cash', 'instapay', 'bank_transfer']).withMessage('طريقة الدفع غير صحيحة'),
+
+  body('screenshotUrl').trim().notEmpty().withMessage('صورة التحويل مطلوبة').isURL().withMessage('رابط الصورة غير صحيح')
+];
