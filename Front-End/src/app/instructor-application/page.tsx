@@ -112,7 +112,7 @@ export default function InstructorApplicationPage() {
                         setFormData({ ...formData, firstName: e.target.value })
                       }
                       className="block w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
-                      placeholder="أحمد"
+                      placeholder="الاسم الأول"
                     />
                   </div>
                 </div>
@@ -128,7 +128,7 @@ export default function InstructorApplicationPage() {
                       setFormData({ ...formData, lastName: e.target.value })
                     }
                     className="block w-full px-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
-                    placeholder="محمد"
+                    placeholder="الاسم الأخير"
                   />
                 </div>
               </div>

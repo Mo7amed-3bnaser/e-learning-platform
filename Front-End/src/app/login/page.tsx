@@ -17,8 +17,39 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Handle login logic here
-    setTimeout(() => setIsLoading(false), 2000);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'فشل تسجيل الدخول');
+      }
+
+      // حفظ التوكن
+      localStorage.setItem('token', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      // عرض رسالة نجاح
+      alert(data.message || 'تم تسجيل الدخول بنجاح!');
+      
+      // التوجيه للصفحة الرئيسية
+      window.location.href = '/';
+    } catch (error: any) {
+      alert(error.message || 'حدث خطأ أثناء تسجيل الدخول');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

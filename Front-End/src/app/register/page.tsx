@@ -35,9 +35,49 @@ export default function RegisterPage() {
       setCurrentStep(2);
       return;
     }
+    
+    // التحقق من تطابق كلمة المرور
+    if (formData.password !== formData.confirmPassword) {
+      alert('كلمة المرور غير متطابقة');
+      return;
+    }
+    
     setIsLoading(true);
-    // Handle registration logic here
-    setTimeout(() => setIsLoading(false), 2000);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'فشل إنشاء الحساب');
+      }
+
+      // حفظ التوكن
+      localStorage.setItem('token', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      // عرض رسالة نجاح
+      alert(data.message || 'تم إنشاء الحساب بنجاح!');
+      
+      // التوجيه للصفحة الرئيسية
+      window.location.href = '/';
+    } catch (error: any) {
+      alert(error.message || 'حدث خطأ أثناء إنشاء الحساب');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const passwordStrength = (password: string) => {
@@ -164,7 +204,7 @@ export default function RegisterPage() {
                           setFormData({ ...formData, firstName: e.target.value })
                         }
                         className="block w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
-                        placeholder="أحمد"
+                        placeholder="الاسم الأول"
                       />
                     </div>
                   </div>
@@ -180,7 +220,7 @@ export default function RegisterPage() {
                         setFormData({ ...formData, lastName: e.target.value })
                       }
                       className="block w-full px-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
-                      placeholder="محمد"
+                      placeholder="الاسم الأخير"
                     />
                   </div>
                 </div>
