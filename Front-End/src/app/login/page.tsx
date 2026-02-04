@@ -34,8 +34,10 @@ export default function LoginPage() {
     };
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     setIsLoading(true);
     
     try {
@@ -63,6 +65,7 @@ export default function LoginPage() {
         email: data.email,
         phone: data.phone,
         role: data.role,
+        avatar: data.avatar || null,
       };
       
       // حفظ البيانات في Store
@@ -71,14 +74,19 @@ export default function LoginPage() {
       // عرض رسالة نجاح
       showSuccess(response.data.message || 'تم تسجيل الدخول بنجاح!');
       
+      // انتظار قليل لضمان حفظ البيانات في localStorage
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // التوجيه حسب نوع المستخدم
-      if (data.user?.role === 'admin') {
-        router.push('/admin');
+      if (data.role === 'admin') {
+        window.location.href = '/admin';
       } else {
-        router.push('/');
+        window.location.href = '/';
       }
     } catch (error: unknown) {
       handleApiError(error);
+      // في حالة الخطأ، نحتفظ بالبيانات في النموذج
+      // لا نعمل reset للـ form
     } finally {
       setIsLoading(false);
     }

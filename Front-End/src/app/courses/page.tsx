@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FiSearch, FiFilter, FiGrid, FiList } from 'react-icons/fi';
-import { coursesAPI } from '@/lib/api';
+import { coursesAPI, ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import CourseCard from '@/components/CourseCard';
 import CourseSkeleton from '@/components/CourseSkeleton';
@@ -29,6 +29,7 @@ interface Course {
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [purchasedCourseIds, setPurchasedCourseIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -36,6 +37,7 @@ export default function CoursesPage() {
 
   useEffect(() => {
     fetchCourses();
+    fetchPurchasedCourses();
   }, []);
 
   useEffect(() => {
@@ -53,6 +55,30 @@ export default function CoursesPage() {
       handleApiError(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchPurchasedCourses = async () => {
+    try {
+      const response = await ordersAPI.getMyOrders();
+      const orders = response.data.data || [];
+      console.log('📦 Orders from API:', orders); // للتأكد من البيانات
+      // استخراج IDs الكورسات المشتراة والمقبولة فقط
+      const purchasedIds = orders
+        .filter((order: any) => order.status === 'approved')
+        .map((order: any) => {
+          // courseId قد يكون string أو object بعد populate
+          const id = typeof order.courseId === 'string' 
+            ? order.courseId 
+            : order.courseId?._id;
+          return id;
+        })
+        .filter(Boolean);
+      console.log('✅ Purchased Course IDs:', purchasedIds); // للتأكد من الـ IDs
+      setPurchasedCourseIds(purchasedIds);
+    } catch (error) {
+      // في حالة عدم وجود مستخدم مسجل دخول، نتجاهل الخطأ
+      console.log('No user logged in or error fetching purchased courses');
     }
   };
 
@@ -219,7 +245,11 @@ export default function CoursesPage() {
             }`}
           >
             {filteredCourses.map((course) => (
-              <CourseCard key={course._id} course={course} />
+              <CourseCard 
+                key={course._id} 
+                course={course}
+                isPurchased={purchasedCourseIds.includes(course._id)}
+              />
             ))}
           </div>
         )}

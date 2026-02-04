@@ -8,10 +8,15 @@ import {
   rejectOrder,
   deleteOrder
 } from '../controllers/orderController.js';
+import { sandboxPayment, checkEnrollment } from '../controllers/sandboxController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 import { createOrderValidation, validate } from '../middleware/validation.js';
 
 const router = express.Router();
+
+// 🎮 Sandbox/Simulation routes (للتجربة فقط)
+router.post('/sandbox/pay', protect, sandboxPayment);
+router.get('/enrollment/:courseId', protect, checkEnrollment);
 
 // Student routes
 router.post('/', protect, createOrderValidation, validate, createOrder);

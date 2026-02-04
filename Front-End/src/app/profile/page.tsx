@@ -147,7 +147,7 @@ function ProfileContent() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="أحمد محمد"
                   required
                 />
@@ -169,8 +169,9 @@ function ProfileContent() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="example@email.com"
+                  dir="ltr"
                   required
                 />
               </div>
@@ -191,8 +192,9 @@ function ProfileContent() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="01012345678"
+                  dir="ltr"
                   required
                 />
               </div>
@@ -218,7 +220,7 @@ function ProfileContent() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="اتركه فارغاً إذا لم ترد التغيير"
                   minLength={6}
                 />
@@ -240,7 +242,7 @@ function ProfileContent() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="أعد كتابة كلمة المرور"
                   minLength={6}
                 />

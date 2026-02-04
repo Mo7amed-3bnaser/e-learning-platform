@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
-import { FiUser, FiLogOut, FiGrid } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiGrid, FiBook } from 'react-icons/fi';
 import Logo from './Logo';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -11,7 +11,13 @@ export default function Header() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // انتظار تحميل البيانات من localStorage
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // إغلاق القائمة عند الضغط خارجها
   useEffect(() => {
@@ -46,7 +52,13 @@ export default function Header() {
             الكورسات
           </Link>
 
-          {isAuthenticated ? (
+          {!isHydrated ? (
+            // Loading skeleton أثناء التحميل
+            <div className="flex items-center gap-3">
+              <div className="w-24 h-10 bg-slate-200 rounded-xl animate-pulse"></div>
+              <div className="w-28 h-10 bg-slate-200 rounded-xl animate-pulse"></div>
+            </div>
+          ) : isAuthenticated ? (
             // المستخدم مسجل دخول
             <div className="flex items-center gap-3" ref={menuRef}>
               <Link
@@ -101,6 +113,15 @@ export default function Header() {
                     </div>
 
                     <div className="py-1">
+                      <Link
+                        href="/my-courses"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors"
+                      >
+                        <FiBook className="w-4 h-4 text-slate-600" />
+                        <span className="text-sm text-slate-700">كورساتي</span>
+                      </Link>
+
                       <Link
                         href="/profile"
                         onClick={() => setShowUserMenu(false)}

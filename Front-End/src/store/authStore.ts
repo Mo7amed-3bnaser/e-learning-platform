@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface User {
   id: string;
@@ -14,20 +14,22 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  _hasHydrated: boolean;
   
   // Actions
   login: (token: string, user: User) => void;
   logout: () => void;
   updateUser: (user: User) => void;
-  initializeAuth: () => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
+      _hasHydrated: false,
 
       login: (token: string, user: User) => {
         set({
@@ -43,27 +45,40 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           isAuthenticated: false,
         });
+        // مسح localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-storage');
+          localStorage.removeItem('remembered-login');
+        }
       },
 
       updateUser: (user: User) => {
         set({ user });
       },
 
-      initializeAuth: () => {
-        // هذه الدالة تُستدعى عند تحميل التطبيق
-        // للتأكد من صحة البيانات المحفوظة
-        const state = useAuthStore.getState();
-        if (state.token && state.user) {
-          set({ isAuthenticated: true });
-        }
+      setHasHydrated: (state: boolean) => {
+        set({ _hasHydrated: state });
       },
     }),
     {
       name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      // حفظ البيانات المهمة فقط
       partialize: (state) => ({
         token: state.token,
         user: state.user,
+        isAuthenticated: state.isAuthenticated,
       }),
+      // عند انتهاء تحميل البيانات من localStorage
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // التأكد من أن isAuthenticated متزامن مع وجود token و user
+          if (state.token && state.user) {
+            state.isAuthenticated = true;
+          }
+          state._hasHydrated = true;
+        }
+      },
     }
   )
 );

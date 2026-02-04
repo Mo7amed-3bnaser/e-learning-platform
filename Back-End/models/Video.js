@@ -16,10 +16,19 @@ const videoSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
+    // Support for both YouTube and Bunny.net
+    videoProvider: {
+      type: String,
+      enum: ['youtube', 'bunny'],
+      default: 'youtube'
+    },
+    youtubeVideoId: {
+      type: String,
+      sparse: true // Allows null values, unique only if not null
+    },
     bunnyVideoId: {
       type: String,
-      required: [true, 'معرف فيديو Bunny مطلوب'],
-      unique: true
+      sparse: true // Made optional for YouTube videos
     },
     duration: {
       type: Number, // in seconds

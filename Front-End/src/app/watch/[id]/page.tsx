@@ -1,0 +1,308 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { FiArrowRight, FiPlay, FiClock, FiCheck, FiLock, FiList } from 'react-icons/fi';
+import Header from '@/components/Header';
+import YouTubePlayer from '@/components/YouTubePlayer';
+import { coursesAPI, videosAPI, ordersAPI } from '@/lib/api';
+import { handleApiError, showToast } from '@/lib/toast';
+import { useAuthStore } from '@/store/authStore';
+
+interface Video {
+  _id: string;
+  title: string;
+  description?: string;
+  youtubeVideoId: string;
+  duration: number;
+  order: number;
+  isFreePreview: boolean;
+  thumbnail?: string;
+}
+
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  instructor: {
+    name: string;
+    avatar?: string;
+  };
+}
+
+export default function WatchCoursePage() {
+  const params = useParams();
+  const router = useRouter();
+  const courseId = params.id as string;
+  const { isAuthenticated } = useAuthStore();
+
+  const [course, setCourse] = useState<Course | null>(null);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(true);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      showToast('يجب تسجيل الدخول أولاً', 'error');
+      router.push(`/login?redirect=/watch/${courseId}`);
+      return;
+    }
+
+    if (courseId) {
+      checkEnrollmentAndFetch();
+    }
+  }, [courseId, isAuthenticated]);
+
+  const checkEnrollmentAndFetch = async () => {
+    try {
+      setIsLoading(true);
+
+      // التحقق من التسجيل في الكورس
+      const enrollmentRes = await ordersAPI.checkEnrollment(courseId);
+      const enrolled = enrollmentRes.data.data.isEnrolled;
+      setIsEnrolled(enrolled);
+
+      if (!enrolled) {
+        showToast('يجب شراء الكورس أولاً للمشاهدة', 'error');
+        router.push(`/courses/${courseId}`);
+        return;
+      }
+
+      // جلب بيانات الكورس
+      const courseRes = await coursesAPI.getCourseById(courseId);
+      setCourse(courseRes.data.data);
+
+      // جلب الفيديوهات
+      const videosRes = await videosAPI.getCourseVideos(courseId);
+      const sortedVideos = (videosRes.data.data || []).sort(
+        (a: Video, b: Video) => a.order - b.order
+      );
+      setVideos(sortedVideos);
+
+      // تشغيل أول فيديو
+      if (sortedVideos.length > 0) {
+        setCurrentVideo(sortedVideos[0]);
+      }
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        showToast('يجب شراء الكورس أولاً', 'error');
+        router.push(`/courses/${courseId}`);
+      } else {
+        handleApiError(error, 'فشل في تحميل الكورس');
+        router.push('/courses');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleVideoSelect = (video: Video) => {
+    setCurrentVideo(video);
+    // على الموبايل، إخفاء الـ playlist بعد الاختيار
+    if (window.innerWidth < 1024) {
+      setShowPlaylist(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-slate-900 pt-20">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse space-y-6">
+              <div className="h-96 bg-slate-800 rounded-2xl"></div>
+              <div className="h-10 bg-slate-800 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!course || !currentVideo) {
+    return null;
+  }
+
+  return (
+    <>
+      <Header />
+      <div className="min-h-screen bg-slate-900 pt-20">
+        <div className="flex flex-col lg:flex-row">
+          {/* منطقة الفيديو */}
+          <div className={`flex-1 ${showPlaylist ? 'lg:mr-80' : ''}`}>
+            {/* التنقل */}
+            <div className="bg-slate-800 border-b border-slate-700 px-4 py-3">
+              <div className="container mx-auto flex items-center justify-between">
+                <button
+                  onClick={() => router.push(`/courses/${courseId}`)}
+                  className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  <FiArrowRight className="w-5 h-5" />
+                  <span>رجوع للكورس</span>
+                </button>
+
+                <button
+                  onClick={() => setShowPlaylist(!showPlaylist)}
+                  className="lg:hidden flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  <FiList className="w-5 h-5" />
+                  <span>{showPlaylist ? 'إخفاء' : 'القائمة'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* مشغل الفيديو */}
+            <div className="bg-black">
+              <div className="container mx-auto">
+                <YouTubePlayer
+                  videoId={currentVideo.youtubeVideoId}
+                  title={currentVideo.title}
+                  autoplay={true}
+                  className="max-w-5xl mx-auto"
+                />
+              </div>
+            </div>
+
+            {/* معلومات الفيديو */}
+            <div className="container mx-auto px-4 py-6">
+              <div className="max-w-5xl mx-auto">
+                <h1 className="text-2xl font-bold text-white mb-2">{currentVideo.title}</h1>
+                
+                <div className="flex items-center gap-4 text-slate-400 mb-4">
+                  <span className="flex items-center gap-1">
+                    <FiClock className="w-4 h-4" />
+                    {formatDuration(currentVideo.duration)}
+                  </span>
+                  <span>الدرس {currentVideo.order} من {videos.length}</span>
+                </div>
+
+                {currentVideo.description && (
+                  <p className="text-slate-300">{currentVideo.description}</p>
+                )}
+
+                {/* التنقل بين الفيديوهات */}
+                <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
+                  <button
+                    onClick={() => {
+                      const prevIndex = videos.findIndex(v => v._id === currentVideo._id) - 1;
+                      if (prevIndex >= 0) {
+                        setCurrentVideo(videos[prevIndex]);
+                      }
+                    }}
+                    disabled={videos.findIndex(v => v._id === currentVideo._id) === 0}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <FiArrowRight className="w-4 h-4" />
+                    <span>الدرس السابق</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const nextIndex = videos.findIndex(v => v._id === currentVideo._id) + 1;
+                      if (nextIndex < videos.length) {
+                        setCurrentVideo(videos[nextIndex]);
+                      }
+                    }}
+                    disabled={videos.findIndex(v => v._id === currentVideo._id) === videos.length - 1}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <span>الدرس التالي</span>
+                    <FiArrowRight className="w-4 h-4 rotate-180" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* قائمة الفيديوهات (Sidebar) */}
+          <div
+            className={`fixed lg:fixed top-16 left-0 h-[calc(100vh-4rem)] w-80 bg-slate-800 border-r border-slate-700 overflow-hidden transform transition-transform duration-300 z-40 ${
+              showPlaylist ? 'translate-x-0' : '-translate-x-full lg:-translate-x-full'
+            }`}
+          >
+            {/* Header */}
+            <div className="bg-slate-900 px-4 py-4 border-b border-slate-700">
+              <h2 className="font-bold text-white text-lg truncate">{course.title}</h2>
+              <p className="text-sm text-slate-400 mt-1">
+                {videos.length} درس • {course.instructor.name}
+              </p>
+            </div>
+
+            {/* قائمة الدروس */}
+            <div className="overflow-y-auto h-[calc(100%-5rem)]">
+              {videos.map((video, index) => {
+                const isActive = currentVideo._id === video._id;
+                
+                return (
+                  <button
+                    key={video._id}
+                    onClick={() => handleVideoSelect(video)}
+                    className={`w-full text-right px-4 py-3 flex items-start gap-3 border-b border-slate-700/50 transition-colors ${
+                      isActive
+                        ? 'bg-primary/20 border-r-4 border-r-primary'
+                        : 'hover:bg-slate-700/50'
+                    }`}
+                  >
+                    {/* رقم الدرس أو أيقونة */}
+                    <div
+                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                        isActive
+                          ? 'bg-primary text-white'
+                          : 'bg-slate-700 text-slate-400'
+                      }`}
+                    >
+                      {isActive ? (
+                        <FiPlay className="w-4 h-4" />
+                      ) : (
+                        video.order
+                      )}
+                    </div>
+
+                    {/* معلومات الدرس */}
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`font-medium truncate ${
+                          isActive ? 'text-white' : 'text-slate-300'
+                        }`}
+                      >
+                        {video.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                          <FiClock className="w-3 h-3" />
+                          {formatDuration(video.duration)}
+                        </span>
+                        {video.isFreePreview && (
+                          <span className="text-xs bg-green-600/20 text-green-400 px-2 py-0.5 rounded">
+                            مجاني
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Overlay للموبايل */}
+          {showPlaylist && (
+            <div
+              className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+              onClick={() => setShowPlaylist(false)}
+            />
+          )}
+        </div>
+      </div>
+    </>
+  );
+}

@@ -127,13 +127,25 @@ export default function RegisterPage() {
       const { data } = response.data;
       
       // حفظ البيانات في Store
-      login(data.token, data.user);
+      const userData = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        avatar: data.avatar || null,
+      };
+      
+      login(data.token, userData);
       
       // عرض رسالة نجاح
       showSuccess(response.data.message || 'تم إنشاء الحساب بنجاح!');
       
+      // انتظار قليل لضمان حفظ البيانات في localStorage
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // التوجيه للصفحة الرئيسية
-      router.push('/');
+      window.location.href = '/';
     } catch (error: any) {
       handleApiError(error);
     } finally {

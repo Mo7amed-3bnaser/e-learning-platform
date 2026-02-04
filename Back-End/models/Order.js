@@ -14,12 +14,15 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['vodafone_cash', 'instapay', 'bank_transfer'],
+      enum: ['vodafone_cash', 'instapay', 'bank_transfer', 'sandbox'],
       required: [true, 'طريقة الدفع مطلوبة']
     },
     screenshotUrl: {
       type: String,
-      required: [true, 'صورة إثبات التحويل مطلوبة']
+      required: function() {
+        // الـ screenshot مش مطلوب في الـ sandbox mode
+        return this.paymentMethod !== 'sandbox';
+      }
     },
     status: {
       type: String,

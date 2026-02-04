@@ -2,7 +2,6 @@
 node_modules/
 package-lock.json
 yarn.lock
-
 # Environment Variables
 .env
 
@@ -23,3 +22,5 @@ Thumbs.db
 
 # Uploads (if storing locally)
 uploads/
+
+COMPLETE_GUIDE.md

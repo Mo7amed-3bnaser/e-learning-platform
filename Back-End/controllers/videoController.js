@@ -8,8 +8,18 @@ import Course from '../models/Course.js';
  * @access  Private/Admin
  */
 export const addVideo = asyncHandler(async (req, res) => {
-  const { courseId, title, description, bunnyVideoId, duration, order, isFreePreview, thumbnail } =
-    req.body;
+  const { 
+    courseId, 
+    title, 
+    description, 
+    videoProvider = 'youtube', 
+    youtubeVideoId, 
+    bunnyVideoId, 
+    duration, 
+    order, 
+    isFreePreview, 
+    thumbnail 
+  } = req.body;
 
   // التحقق من وجود الكورس
   const course = await Course.findById(courseId);
@@ -18,10 +28,22 @@ export const addVideo = asyncHandler(async (req, res) => {
     throw new Error('الكورس غير موجود');
   }
 
+  // التحقق من وجود Video ID حسب النوع
+  if (videoProvider === 'youtube' && !youtubeVideoId) {
+    res.status(400);
+    throw new Error('معرف فيديو YouTube مطلوب');
+  }
+  if (videoProvider === 'bunny' && !bunnyVideoId) {
+    res.status(400);
+    throw new Error('معرف فيديو Bunny مطلوب');
+  }
+
   const video = await Video.create({
     courseId,
     title,
     description,
+    videoProvider,
+    youtubeVideoId,
     bunnyVideoId,
     duration,
     order,
@@ -61,13 +83,24 @@ export const getCourseVideos = asyncHandler(async (req, res) => {
     throw new Error('يجب شراء الكورس أولاً لمشاهدة الفيديوهات');
   }
 
-  // جلب الفيديوهات مع Bunny IDs
+  // جلب الفيديوهات (YouTube أو Bunny)
   const videos = await Video.find({ courseId }).sort('order');
 
   res.json({
     success: true,
     message: 'تم جلب فيديوهات الكورس بنجاح',
-    data: videos
+    data: videos.map(v => ({
+      _id: v._id,
+      title: v.title,
+      description: v.description,
+      videoProvider: v.videoProvider,
+      youtubeVideoId: v.youtubeVideoId,
+      bunnyVideoId: v.bunnyVideoId,
+      duration: v.duration,
+      order: v.order,
+      isFreePreview: v.isFreePreview,
+      thumbnail: v.thumbnail
+    }))
   });
 });
 

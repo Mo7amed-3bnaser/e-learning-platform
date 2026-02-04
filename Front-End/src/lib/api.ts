@@ -27,10 +27,29 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // لو التوكن منتهي أو غير صالح
+    // لو السيرفر مش متاح أصلاً - لا نسجل خروج
+    if (!error.response) {
+      // السيرفر مش متاح أو مشكلة في الشبكة
+      console.warn('Server is not available or network error');
+      return Promise.reject(error);
+    }
+    
+    // لو التوكن منتهي أو غير صالح فقط في طلبات محمية
+    // نتحقق من رسالة الخطأ للتأكد أنها مشكلة توكن وليس مشكلة أخرى
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      const errorMessage = error.response?.data?.message || '';
+      const isTokenError = 
+        errorMessage.includes('توكن') || 
+        errorMessage.includes('token') ||
+        errorMessage.includes('مصرح') ||
+        errorMessage.includes('unauthorized');
+      
+      // فقط نسجل خروج لو المشكلة فعلاً في التوكن
+      // ولو كان في توكن محفوظ (يعني المستخدم كان مسجل دخول)
+      if (isTokenError && useAuthStore.getState().token) {
+        useAuthStore.getState().logout();
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -92,10 +111,10 @@ export const coursesAPI = {
 // ============================================
 export const videosAPI = {
   // Enrolled students only - جلب فيديوهات الكورس
-  getCourseVideos: (courseId: string) => api.get(`/videos/course/${courseId}`),
+  getCourseVideos: (courseId: string) => api.get(`/videos/${courseId}`),
 
   // Enrolled/Free preview - مشاهدة فيديو محدد
-  getVideoById: (videoId: string) => api.get(`/videos/${videoId}`),
+  getVideoById: (videoId: string) => api.get(`/videos/watch/${videoId}`),
 
   // Admin only - إضافة فيديو جديد
   createVideo: (data: {
@@ -134,6 +153,14 @@ export const ordersAPI = {
 
   // Student - جلب طلبات المستخدم
   getMyOrders: () => api.get('/orders/my-orders'),
+
+  // 🎮 Sandbox Payment - دفع تجريبي فوري
+  sandboxPayment: (courseId: string) => 
+    api.post('/orders/sandbox/pay', { courseId }),
+
+  // Student - التحقق من التسجيل في كورس
+  checkEnrollment: (courseId: string) => 
+    api.get(`/orders/enrollment/${courseId}`),
 
   // Admin - جلب الطلبات المعلقة
   getPendingOrders: () => api.get('/orders/pending'),

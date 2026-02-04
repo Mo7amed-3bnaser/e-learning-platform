@@ -37,7 +37,7 @@ export const getCourseById = asyncHandler(async (req, res) => {
 
   // جلب الفيديوهات (بدون Bunny IDs للأمان)
   const videos = await Video.find({ courseId: course._id })
-    .select('title description duration order isFreePreview thumbnail')
+    .select('title description duration order isFreePreview thumbnail youtubeVideoId')
     .sort('order');
 
   // التحقق من تسجيل الطالب
@@ -60,7 +60,9 @@ export const getCourseById = asyncHandler(async (req, res) => {
         duration: v.duration,
         order: v.order,
         isFreePreview: v.isFreePreview,
-        thumbnail: v.thumbnail
+        thumbnail: v.thumbnail,
+        // إرسال youtubeVideoId للفيديوهات المجانية فقط
+        ...(v.isFreePreview ? { youtubeVideoId: v.youtubeVideoId } : {})
       })),
       isEnrolled
     }

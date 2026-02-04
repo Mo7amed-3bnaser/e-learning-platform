@@ -49,6 +49,26 @@ export const showLoading = (message: string) => {
   return toast.loading(message, toastStyles);
 };
 
+// دالة عامة للـ toast (مع أنواع مختلفة)
+export const showToast = (
+  message: string,
+  type: 'success' | 'error' | 'info' | 'warning' = 'info'
+) => {
+  switch (type) {
+    case 'success':
+      showSuccess(message);
+      break;
+    case 'error':
+      showError(message);
+      break;
+    case 'warning':
+      showWarning(message);
+      break;
+    default:
+      showInfo(message);
+  }
+};
+
 export const dismissToast = (toastId: string) => {
   toast.dismiss(toastId);
 };

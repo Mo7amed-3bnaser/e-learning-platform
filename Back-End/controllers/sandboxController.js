@@ -1,0 +1,87 @@
+import asyncHandler from 'express-async-handler';
+import Order from '../models/Order.js';
+import Course from '../models/Course.js';
+import User from '../models/User.js';
+
+/**
+ * @desc    محاكاة دفع فوري (Sandbox Payment Gateway)
+ * @route   POST /api/orders/sandbox/pay
+ * @access  Private
+ * @note    هذا الـ endpoint للتجربة فقط - يقبل الدفع تلقائياً بدون تحقق حقيقي
+ */
+export const sandboxPayment = asyncHandler(async (req, res) => {
+  const { courseId, paymentMethod = 'sandbox' } = req.body;
+
+  // التحقق من وجود الكورس
+  const course = await Course.findById(courseId);
+  if (!course) {
+    res.status(404);
+    throw new Error('الكورس غير موجود');
+  }
+
+  // التحقق من عدم التسجيل المسبق
+  const user = await User.findById(req.user._id);
+  const isAlreadyEnrolled = user.enrolledCourses.some(
+    (id) => id.toString() === courseId.toString()
+  );
+
+  if (isAlreadyEnrolled) {
+    res.status(400);
+    throw new Error('أنت مسجل في هذا الكورس بالفعل');
+  }
+
+  // إنشاء Order وهمي مع الموافقة التلقائية
+  const order = await Order.create({
+    userId: req.user._id,
+    courseId,
+    paymentMethod: 'sandbox', // تحديد أنه sandbox
+    screenshotUrl: 'https://placehold.co/600x400/png?text=Sandbox+Payment', // صورة وهمية
+    status: 'approved', // موافقة تلقائية
+    price: course.price,
+    approvedBy: req.user._id, // المستخدم نفسه (simulation)
+    approvedAt: new Date()
+  });
+
+  // إضافة الكورس للمستخدم
+  user.enrolledCourses.push(courseId);
+  await user.save();
+
+  // تحديث عدد الطلاب
+  course.enrolledStudents += 1;
+  await course.save();
+
+  res.status(201).json({
+    success: true,
+    message: '✅ تم التسجيل في الكورس بنجاح (Sandbox Mode)',
+    data: {
+      order,
+      isEnrolled: true,
+      sandboxMode: true,
+      note: 'هذا دفع تجريبي - لن يتم خصم أي مبلغ حقيقي'
+    }
+  });
+});
+
+/**
+ * @desc    الحصول على حالة التسجيل في الكورس
+ * @route   GET /api/orders/enrollment/:courseId
+ * @access  Private
+ */
+export const checkEnrollment = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+
+  const user = await User.findById(req.user._id);
+  const isEnrolled = user.enrolledCourses.some(
+    (id) => id.toString() === courseId.toString()
+  );
+
+  res.json({
+    success: true,
+    data: {
+      isEnrolled,
+      courseId
+    }
+  });
+});
+
+export default { sandboxPayment, checkEnrollment };
