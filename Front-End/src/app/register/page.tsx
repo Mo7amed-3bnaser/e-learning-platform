@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FiUser,
   FiMail,
@@ -13,8 +14,13 @@ import {
   FiHome,
 } from "react-icons/fi";
 import Logo from "@/components/Logo";
+import { useAuthStore } from "@/store/authStore";
+import { authAPI } from "@/lib/api";
+import { showSuccess, showError, handleApiError } from "@/lib/toast";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,52 +35,107 @@ export default function RegisterPage() {
     agreeTerms: false,
   });
 
+  const validateStep1 = () => {
+    // التحقق من الاسم الأول
+    if (!formData.firstName.trim()) {
+      showError('برجاء إدخال الاسم الأول');
+      return false;
+    }
+    
+    // التحقق من الاسم الأخير
+    if (!formData.lastName.trim()) {
+      showError('برجاء إدخال الاسم الأخير');
+      return false;
+    }
+    
+    // التحقق من البريد الإلكتروني
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      showError('برجاء إدخال البريد الإلكتروني');
+      return false;
+    }
+    if (!emailRegex.test(formData.email)) {
+      showError('البريد الإلكتروني غير صحيح');
+      return false;
+    }
+    
+    // التحقق من رقم الموبايل
+    if (!formData.phone.trim()) {
+      showError('برجاء إدخال رقم الموبايل');
+      return false;
+    }
+    
+    // التأكد من أن الرقم يحتوي على 11 رقم فقط
+    const phoneRegex = /^01[0-2,5]{1}[0-9]{8}$/;
+    if (formData.phone.length !== 11) {
+      showError('رقم الموبايل يجب أن يكون 11 رقم');
+      return false;
+    }
+    if (!phoneRegex.test(formData.phone)) {
+      showError('رقم الموبايل غير صحيح (يجب أن يبدأ بـ 010, 011, 012, أو 015)');
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (currentStep === 1) {
+      // التحقق من البيانات قبل الانتقال للخطوة الثانية
+      if (!validateStep1()) {
+        return;
+      }
       setCurrentStep(2);
+      return;
+    }
+    
+    // التحقق من كلمة المرور
+    if (!formData.password) {
+      showError('برجاء إدخال كلمة المرور');
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
       return;
     }
     
     // التحقق من تطابق كلمة المرور
     if (formData.password !== formData.confirmPassword) {
-      alert('كلمة المرور غير متطابقة');
+      showError('كلمة المرور غير متطابقة');
+      return;
+    }
+    
+    // التحقق من الموافقة على الشروط
+    if (!formData.agreeTerms) {
+      showError('برجاء الموافقة على الشروط والأحكام');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password,
-        }),
+      const response = await authAPI.register({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'فشل إنشاء الحساب');
-      }
-
-      // حفظ التوكن
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('user', JSON.stringify(data.data.user));
+      const { data } = response.data;
+      
+      // حفظ البيانات في Store
+      login(data.token, data.user);
       
       // عرض رسالة نجاح
-      alert(data.message || 'تم إنشاء الحساب بنجاح!');
+      showSuccess(response.data.message || 'تم إنشاء الحساب بنجاح!');
       
       // التوجيه للصفحة الرئيسية
-      window.location.href = '/';
+      router.push('/');
     } catch (error: any) {
-      alert(error.message || 'حدث خطأ أثناء إنشاء الحساب');
+      handleApiError(error);
     } finally {
       setIsLoading(false);
     }
@@ -252,6 +313,9 @@ export default function RegisterPage() {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">
                     رقم الهاتف
+                    <span className="text-xs text-slate-500 mr-2">
+                      (11 رقم)
+                    </span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -261,14 +325,37 @@ export default function RegisterPage() {
                       type="tel"
                       required
                       value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      className="block w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
+                      onChange={(e) => {
+                        // السماح بالأرقام فقط
+                        const value = e.target.value.replace(/\D/g, '');
+                        // تحديد الطول بـ 11 رقم
+                        if (value.length <= 11) {
+                          setFormData({ ...formData, phone: value });
+                        }
+                      }}
+                      className={`block w-full pr-10 pl-4 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 bg-slate-50 hover:bg-white ${
+                        formData.phone && formData.phone.length === 11
+                          ? 'border-green-500 focus:ring-green-500 focus:border-transparent'
+                          : formData.phone && formData.phone.length > 0
+                          ? 'border-orange-500 focus:ring-orange-500 focus:border-transparent'
+                          : 'border-slate-200 focus:ring-primary focus:border-transparent'
+                      }`}
                       placeholder="01xxxxxxxxx"
                       dir="ltr"
+                      maxLength={11}
                     />
                   </div>
+                  {formData.phone && formData.phone.length < 11 && (
+                    <p className="text-xs text-orange-600 mt-1">
+                      برجاء إدخال 11 رقم (متبقي {11 - formData.phone.length} رقم)
+                    </p>
+                  )}
+                  {formData.phone && formData.phone.length === 11 && (
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <FiCheck className="w-3 h-3" />
+                      رقم الموبايل صحيح
+                    </p>
+                  )}
                 </div>
               </>
             ) : (

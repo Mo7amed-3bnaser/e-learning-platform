@@ -2,16 +2,36 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiHome } from "react-icons/fi";
 import Logo from "@/components/Logo";
+import { useAuthStore } from "@/store/authStore";
+import { authAPI } from "@/lib/api";
+import { showSuccess, showError, handleApiError } from "@/lib/toast";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
+  const [formData, setFormData] = useState(() => {
+    // تحميل البيانات المحفوظة لو موجودة
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('remembered-login');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          email: parsed.email || '',
+          password: parsed.password || '',
+          rememberMe: true,
+        };
+      }
+    }
+    return {
+      email: '',
+      password: '',
+      rememberMe: false,
+    };
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,34 +39,46 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
+      const response = await authAPI.login({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'فشل تسجيل الدخول');
+      const { data } = response.data;
+      
+      // حفظ البيانات للمرة القادمة إذا كان "تذكرني" مفعل
+      if (formData.rememberMe) {
+        localStorage.setItem('remembered-login', JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }));
+      } else {
+        localStorage.removeItem('remembered-login');
       }
-
-      // حفظ التوكن
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      // حفظ بيانات المستخدم في Store
+      const userData = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+      };
+      
+      // حفظ البيانات في Store
+      login(data.token, userData);
       
       // عرض رسالة نجاح
-      alert(data.message || 'تم تسجيل الدخول بنجاح!');
+      showSuccess(response.data.message || 'تم تسجيل الدخول بنجاح!');
       
-      // التوجيه للصفحة الرئيسية
-      window.location.href = '/';
-    } catch (error: any) {
-      alert(error.message || 'حدث خطأ أثناء تسجيل الدخول');
+      // التوجيه حسب نوع المستخدم
+      if (data.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
+    } catch (error: unknown) {
+      handleApiError(error);
     } finally {
       setIsLoading(false);
     }

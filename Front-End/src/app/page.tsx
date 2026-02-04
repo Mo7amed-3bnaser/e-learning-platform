@@ -1,32 +1,18 @@
+"use client";
+
 import Link from "next/link";
+import Header from "@/components/Header";
 import Logo from "@/components/Logo";
 import { FiArrowLeft, FiBook, FiAward, FiUsers, FiTrendingUp } from "react-icons/fi";
+import { useAuthStore } from "@/store/authStore";
 
 export default function Home() {
+  const { isAuthenticated } = useAuthStore();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/">
-            <Logo size="md" />
-          </Link>
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="px-6 py-2.5 text-slate-700 hover:text-primary font-medium transition-colors"
-            >
-              تسجيل الدخول
-            </Link>
-            <Link
-              href="/register"
-              className="px-6 py-2.5 bg-gradient-to-l from-primary to-primary-dark text-white rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-sm hover:shadow-md"
-            >
-              إنشاء حساب
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20">
@@ -50,18 +36,20 @@ export default function Home() {
 
               <div className="flex gap-4 pt-4">
                 <Link
-                  href="/register"
+                  href="/courses"
                   className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-l from-primary to-primary-dark text-white rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-xl font-semibold"
                 >
-                  ابدأ الآن مجاناً
+                  تصفح الكورسات
                   <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
                 </Link>
-                <Link
-                  href="/login"
-                  className="flex items-center gap-3 px-8 py-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-primary hover:text-primary transition-all font-semibold"
-                >
-                  تسجيل الدخول
-                </Link>
+                {!isAuthenticated && (
+                  <Link
+                    href="/register"
+                    className="flex items-center gap-3 px-8 py-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-primary hover:text-primary transition-all font-semibold"
+                  >
+                    إنشاء حساب
+                  </Link>
+                )}
               </div>
             </div>
 
