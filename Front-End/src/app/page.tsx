@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Logo from "@/components/Logo";
+import TypingEffect from "@/components/TypingEffect";
 import { FiArrowLeft, FiBook, FiAward, FiUsers, FiTrendingUp } from "react-icons/fi";
 import { useAuthStore } from "@/store/authStore";
 
@@ -19,15 +20,17 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
-            <div className="space-y-6 text-right">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium">
+            <div className="space-y-6 text-right animate-fadeIn">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium badge-pulse">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
                 منصة التعلم الإلكتروني الأولى
               </div>
               
               <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                 ابدأ رحلتك نحو
-                <span className="text-primary block mt-2">النجاح والتميز</span>
+                <span className="text-primary block mt-2">
+                  <TypingEffect text="النجاح والتميز" speed={150} className="inline-block" />
+                </span>
               </h1>
               
               <p className="text-xl text-slate-600 leading-relaxed">
@@ -37,7 +40,7 @@ export default function Home() {
               <div className="flex gap-4 pt-4">
                 <Link
                   href="/courses"
-                  className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-l from-primary to-primary-dark text-white rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-xl font-semibold"
+                  className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-l from-primary to-primary-dark text-white rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-xl font-semibold hover-lift"
                 >
                   تصفح الكورسات
                   <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
@@ -45,7 +48,7 @@ export default function Home() {
                 {!isAuthenticated && (
                   <Link
                     href="/register"
-                    className="flex items-center gap-3 px-8 py-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-primary hover:text-primary transition-all font-semibold"
+                    className="flex items-center gap-3 px-8 py-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-primary hover:text-primary transition-all font-semibold hover-scale"
                   >
                     إنشاء حساب
                   </Link>
@@ -54,13 +57,13 @@ export default function Home() {
             </div>
 
             {/* Image/Illustration */}
-            <div className="relative">
+            <div className="relative animate-slideInUp">
               <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 rounded-3xl p-8 backdrop-blur-sm border border-primary/20">
                 {/* Stats Cards */}
                 <div className="space-y-4">
-                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover-lift animate-fadeIn">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center hover-scale">
                         <FiBook className="w-7 h-7 text-primary" />
                       </div>
                       <div className="text-right">
@@ -70,9 +73,9 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow mr-8">
+                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all mr-8 hover-lift animate-fadeIn" style={{ animationDelay: '0.1s' }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center">
+                      <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center hover-scale">
                         <FiUsers className="w-7 h-7 text-accent" />
                       </div>
                       <div className="text-right">
@@ -82,9 +85,9 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover-lift animate-fadeIn" style={{ animationDelay: '0.2s' }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center hover-scale">
                         <FiAward className="w-7 h-7 text-primary" />
                       </div>
                       <div className="text-right">
@@ -138,9 +141,10 @@ export default function Home() {
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className="group p-6 rounded-2xl border-2 border-slate-100 hover:border-primary/50 hover:shadow-lg transition-all text-center"
+                  className="group p-6 rounded-2xl border-2 border-slate-100 hover:border-primary/50 hover:shadow-lg transition-all text-center hover-lift animate-fadeIn"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform hover-glow">
                     <feature.icon className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{feature.title}</h3>
@@ -153,27 +157,47 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary via-primary-dark to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-10 right-10 w-64 h-64 bg-accent/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl"></div>
+      <section className="py-20 gradient-animated relative overflow-hidden">
+        <div className="absolute inset-0 opacity-90">
+          <div className="absolute top-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
         </div>
         
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-              جاهز لبدء رحلتك التعليمية؟
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              انضم إلى مجتمع مسار اليوم واحصل على وصول فوري لجميع الدورات
-            </p>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-3 px-10 py-4 bg-white text-primary rounded-xl hover:bg-slate-50 transition-all shadow-xl hover:shadow-2xl font-bold text-lg"
-            >
-              إنشاء حساب مجاني
-              <FiArrowLeft />
-            </Link>
+          <div className="max-w-3xl mx-auto text-center animate-fadeIn">
+            {isAuthenticated ? (
+              <>
+                <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+                  استكشف المزيد من الدورات
+                </h2>
+                <p className="text-xl text-white/80 mb-8">
+                  اكتشف مجموعة واسعة من الدورات التعليمية وطور مهاراتك اليوم
+                </p>
+                <Link
+                  href="/courses"
+                  className="inline-flex items-center gap-3 px-10 py-4 bg-white text-primary rounded-xl hover:bg-slate-50 transition-all shadow-xl hover:shadow-2xl font-bold text-lg hover-lift"
+                >
+                  استكشف الدورات
+                  <FiArrowLeft />
+                </Link>
+              </>
+            ) : (
+              <>
+                <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+                  جاهز لبدء رحلتك التعليمية؟
+                </h2>
+                <p className="text-xl text-white/80 mb-8">
+                  انضم إلى مجتمع مسار اليوم واحصل على وصول فوري لجميع الدورات
+                </p>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-3 px-10 py-4 bg-white text-primary rounded-xl hover:bg-slate-50 transition-all shadow-xl hover:shadow-2xl font-bold text-lg hover-lift animate-pulse-slow"
+                >
+                  إنشاء حساب مجاني
+                  <FiArrowLeft />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
