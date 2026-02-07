@@ -136,13 +136,13 @@ export default function WatchCoursePage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-slate-900 pt-20">
+      <div className="min-h-screen bg-slate-900 pt-[72px]">
         <div className="flex flex-col lg:flex-row">
           {/* منطقة الفيديو */}
-          <div className={`flex-1 ${showPlaylist ? 'lg:mr-80' : ''}`}>
+          <div className={`flex-1 transition-all duration-300 ${showPlaylist ? 'lg:mr-[340px]' : 'lg:mr-0'}`}>
             {/* التنقل */}
             <div className="bg-slate-800 border-b border-slate-700 px-4 py-3">
-              <div className="container mx-auto flex items-center justify-between">
+              <div className="container mx-auto flex items-center justify-between max-w-6xl">
                 <button
                   onClick={() => router.push(`/courses/${courseId}`)}
                   className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
@@ -162,20 +162,20 @@ export default function WatchCoursePage() {
             </div>
 
             {/* مشغل الفيديو */}
-            <div className="bg-black">
-              <div className="container mx-auto">
+            <div className="bg-slate-900 py-4">
+              <div className="container mx-auto px-4 max-w-6xl">
                 <YouTubePlayer
                   videoId={currentVideo.youtubeVideoId}
                   title={currentVideo.title}
                   autoplay={true}
-                  className="max-w-5xl mx-auto"
+                  className="w-full"
                 />
               </div>
             </div>
 
             {/* معلومات الفيديو */}
             <div className="container mx-auto px-4 py-6">
-              <div className="max-w-5xl mx-auto">
+              <div className="max-w-6xl mx-auto">
                 <h1 className="text-2xl font-bold text-white mb-2">{currentVideo.title}</h1>
                 
                 <div className="flex items-center gap-4 text-slate-400 mb-4">
@@ -229,43 +229,48 @@ export default function WatchCoursePage() {
 
           {/* قائمة الفيديوهات (Sidebar) */}
           <div
-            className={`fixed lg:fixed top-16 left-0 h-[calc(100vh-4rem)] w-80 bg-slate-800 border-r border-slate-700 overflow-hidden transform transition-transform duration-300 z-40 ${
+            className={`fixed lg:fixed top-[72px] left-0 h-[calc(100vh-72px)] w-80 bg-slate-800/95 backdrop-blur-sm border-r border-slate-700 overflow-hidden transform transition-transform duration-300 z-40 shadow-2xl ${
               showPlaylist ? 'translate-x-0' : '-translate-x-full lg:-translate-x-full'
             }`}
           >
             {/* Header */}
-            <div className="bg-slate-900 px-4 py-4 border-b border-slate-700">
+            <div className="bg-gradient-to-b from-slate-900 to-slate-800 px-4 py-4 border-b border-slate-700/50 shadow-lg">
               <h2 className="font-bold text-white text-lg truncate">{course.title}</h2>
-              <p className="text-sm text-slate-400 mt-1">
-                {videos.length} درس • {course.instructor.name}
+              <p className="text-sm text-slate-400 mt-1.5 flex items-center gap-2">
+                <span className="flex items-center gap-1 bg-primary/20 px-2 py-0.5 rounded text-primary font-medium">
+                  <FiPlay className="w-3 h-3" />
+                  {videos.length} درس
+                </span>
+                <span className="text-slate-500">•</span>
+                <span>{course.instructor.name}</span>
               </p>
             </div>
 
             {/* قائمة الدروس */}
-            <div className="overflow-y-auto h-[calc(100%-5rem)]">
+            <div className="overflow-y-auto h-[calc(100%-88px)] custom-scrollbar">
               {videos.map((video, index) => {
                 const isActive = currentVideo._id === video._id;
-                
+
                 return (
                   <button
                     key={video._id}
                     onClick={() => handleVideoSelect(video)}
-                    className={`w-full text-right px-4 py-3 flex items-start gap-3 border-b border-slate-700/50 transition-colors ${
+                    className={`w-full text-right px-4 py-4 flex items-start gap-3 border-b border-slate-700/30 transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary/20 border-r-4 border-r-primary'
-                        : 'hover:bg-slate-700/50'
+                        ? 'bg-gradient-to-r from-primary/20 to-transparent border-r-4 border-r-primary shadow-lg shadow-primary/10'
+                        : 'hover:bg-slate-700/50 hover:border-r-2 hover:border-r-slate-600'
                     }`}
                   >
                     {/* رقم الدرس أو أيقونة */}
                     <div
-                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                      className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-all ${
                         isActive
-                          ? 'bg-primary text-white'
-                          : 'bg-slate-700 text-slate-400'
+                          ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-md'
+                          : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'
                       }`}
                     >
                       {isActive ? (
-                        <FiPlay className="w-4 h-4" />
+                        <FiPlay className="w-5 h-5" />
                       ) : (
                         video.order
                       )}
@@ -274,20 +279,20 @@ export default function WatchCoursePage() {
                     {/* معلومات الدرس */}
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`font-medium truncate ${
+                        className={`font-medium text-sm leading-snug mb-1.5 ${
                           isActive ? 'text-white' : 'text-slate-300'
                         }`}
                       >
                         {video.title}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-500 flex items-center gap-1 bg-slate-700/50 px-2 py-1 rounded">
                           <FiClock className="w-3 h-3" />
                           {formatDuration(video.duration)}
                         </span>
                         {video.isFreePreview && (
-                          <span className="text-xs bg-green-600/20 text-green-400 px-2 py-0.5 rounded">
-                            مجاني
+                          <span className="text-xs bg-green-600/20 text-green-400 px-2 py-1 rounded font-medium">
+                            معاينة
                           </span>
                         )}
                       </div>
