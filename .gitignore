@@ -1,0 +1,11 @@
+
+# Temporary Claude files
+tmpclaude-*
+nul
+
+# Scripts folder
+Back-End/scripts/
+
+# Markdown documentation files
+*.md
+!README.md
