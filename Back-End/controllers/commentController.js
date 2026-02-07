@@ -1,0 +1,179 @@
+import Comment from '../models/Comment.js';
+import Video from '../models/Video.js';
+import User from '../models/User.js';
+
+/**
+ * @desc    إضافة تعليق جديد على فيديو
+ * @route   POST /api/comments
+ * @access  Private (للمستخدمين المسجلين فقط)
+ */
+export const addComment = async (req, res) => {
+  try {
+    const { videoId, content } = req.body;
+    const userId = req.user._id;
+
+    // التحقق من وجود الفيديو
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: 'الفيديو غير موجود'
+      });
+    }
+
+    // الحصول على بيانات المستخدم
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'المستخدم غير موجود'
+      });
+    }
+
+    // إنشاء التعليق
+    const comment = await Comment.create({
+      videoId,
+      userId,
+      content,
+      userName: user.name,
+      userAvatar: user.avatar
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'تم إضافة التعليق بنجاح',
+      data: comment
+    });
+  } catch (error) {
+    console.error('خطأ في إضافة التعليق:', error);
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ أثناء إضافة التعليق',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * @desc    الحصول على تعليقات فيديو معين
+ * @route   GET /api/comments/:videoId
+ * @access  Public (يمكن لأي شخص رؤية التعليقات)
+ */
+export const getVideoComments = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+
+    // التحقق من وجود الفيديو
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: 'الفيديو غير موجود'
+      });
+    }
+
+    // الحصول على التعليقات مرتبة من الأحدث للأقدم
+    const comments = await Comment.find({ videoId })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'name avatar');
+
+    res.status(200).json({
+      success: true,
+      data: comments
+    });
+  } catch (error) {
+    console.error('خطأ في جلب التعليقات:', error);
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ أثناء جلب التعليقات',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * @desc    حذف تعليق
+ * @route   DELETE /api/comments/:commentId
+ * @access  Private (صاحب التعليق أو الأدمن فقط)
+ */
+export const deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.user._id;
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: 'التعليق غير موجود'
+      });
+    }
+
+    // التحقق من أن المستخدم هو صاحب التعليق أو أدمن
+    if (comment.userId.toString() !== userId.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'غير مصرح لك بحذف هذا التعليق'
+      });
+    }
+
+    await Comment.findByIdAndDelete(commentId);
+
+    res.status(200).json({
+      success: true,
+      message: 'تم حذف التعليق بنجاح'
+    });
+  } catch (error) {
+    console.error('خطأ في حذف التعليق:', error);
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ أثناء حذف التعليق',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * @desc    تحديث تعليق
+ * @route   PUT /api/comments/:commentId
+ * @access  Private (صاحب التعليق فقط)
+ */
+export const updateComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { content } = req.body;
+    const userId = req.user._id;
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: 'التعليق غير موجود'
+      });
+    }
+
+    // التحقق من أن المستخدم هو صاحب التعليق
+    if (comment.userId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'غير مصرح لك بتعديل هذا التعليق'
+      });
+    }
+
+    comment.content = content;
+    await comment.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'تم تحديث التعليق بنجاح',
+      data: comment
+    });
+  } catch (error) {
+    console.error('خطأ في تحديث التعليق:', error);
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ أثناء تحديث التعليق',
+      error: error.message
+    });
+  }
+};

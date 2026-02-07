@@ -9,3 +9,4 @@ Back-End/scripts/
 # Markdown documentation files
 *.md
 !README.md
+.vscode/mcp.json

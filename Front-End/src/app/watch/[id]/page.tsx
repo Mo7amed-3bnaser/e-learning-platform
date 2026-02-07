@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { FiArrowRight, FiPlay, FiClock, FiCheck, FiLock, FiList } from 'react-icons/fi';
 import Header from '@/components/Header';
 import YouTubePlayer from '@/components/YouTubePlayer';
+import VideoComments from '@/components/VideoComments';
 import { coursesAPI, videosAPI, ordersAPI } from '@/lib/api';
 import { handleApiError, showToast } from '@/lib/toast';
 import { useAuthStore } from '@/store/authStore';
@@ -219,6 +220,9 @@ export default function WatchCoursePage() {
                     <FiArrowRight className="w-4 h-4 rotate-180" />
                   </button>
                 </div>
+
+                {/* قسم التعليقات */}
+                <VideoComments videoId={currentVideo._id} />
               </div>
             </div>
           </div>

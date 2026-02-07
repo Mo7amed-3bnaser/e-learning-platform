@@ -214,4 +214,23 @@ export const uploadAPI = {
   },
 };
 
+// ============================================
+// Comments APIs
+// ============================================
+export const commentsAPI = {
+  // Public - جلب تعليقات فيديو معين
+  getVideoComments: (videoId: string) => api.get(`/comments/${videoId}`),
+
+  // Protected - إضافة تعليق جديد
+  addComment: (data: { videoId: string; content: string }) =>
+    api.post('/comments', data),
+
+  // Protected - تعديل تعليق
+  updateComment: (commentId: string, content: string) =>
+    api.put(`/comments/${commentId}`, { content }),
+
+  // Protected - حذف تعليق
+  deleteComment: (commentId: string) => api.delete(`/comments/${commentId}`),
+};
+
 export default api;
