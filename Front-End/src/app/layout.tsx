@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import AuthInitializer from "@/components/AuthInitializer";
+import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
         <AuthInitializer>
           {children}
         </AuthInitializer>
+        <ScrollToTop />
         <Toaster
           position="top-center"
           reverseOrder={false}

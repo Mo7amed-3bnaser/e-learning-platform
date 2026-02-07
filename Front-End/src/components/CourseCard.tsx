@@ -44,14 +44,14 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
   };
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-primary/20 hover:-translate-y-1">
+    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-primary/20 hover:-translate-y-1 hover-lift">
         {/* صورة الكورس */}
-        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10">
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 image-zoom-container">
           {course.thumbnail ? (
             <img
               src={course.thumbnail}
               alt={course.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover image-zoom"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -61,7 +61,7 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
           
           {/* Category Badge */}
           <div className="absolute top-3 right-3">
-            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary">
+            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary badge-pulse">
               {course.category || 'عام'}
             </span>
           </div>
@@ -178,7 +178,7 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
                 {/* زر اشتر الآن */}
                 <button
                   onClick={handleBuyNow}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-l from-primary to-primary-dark text-white py-2.5 rounded-xl font-medium hover:shadow-lg transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-l from-primary to-primary-dark text-white py-2.5 rounded-xl font-medium hover:shadow-lg transition-all animate-pulse-slow hover:scale-105"
                 >
                   <FiShoppingCart className="w-4 h-4" />
                   <span>اشتر الآن</span>
