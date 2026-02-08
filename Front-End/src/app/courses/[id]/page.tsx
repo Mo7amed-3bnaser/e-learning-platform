@@ -74,7 +74,7 @@ export default function CourseDetailsPage() {
         }
       }
     } catch (error) {
-      handleApiError(error, 'فشل في تحميل تفاصيل الكورس');
+      handleApiError(error);
       router.push('/courses');
     } finally {
       setIsLoading(false);

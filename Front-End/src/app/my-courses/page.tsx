@@ -31,16 +31,16 @@ interface Order {
 
 export default function MyCoursesPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (!isAuthenticated) {
       router.push('/login');
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -67,7 +67,7 @@ export default function MyCoursesPage() {
     router.push(`/watch/${courseId}`);
   };
 
-  if (authLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>

@@ -49,7 +49,7 @@ export default function CheckoutPage() {
       const response = await coursesAPI.getCourseById(courseId);
       setCourse(response.data.data);
     } catch (error) {
-      handleApiError(error, 'فشل في تحميل بيانات الكورس');
+      handleApiError(error);
       router.push('/courses');
     } finally {
       setIsLoading(false);
@@ -80,7 +80,7 @@ export default function CheckoutPage() {
         showToast('أنت مسجل في هذا الكورس بالفعل', 'info');
         router.push(`/watch/${courseId}`);
       } else {
-        handleApiError(error, 'فشل في إتمام عملية الشراء');
+        handleApiError(error);
       }
     } finally {
       setIsProcessing(false);

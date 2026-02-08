@@ -233,4 +233,25 @@ export const commentsAPI = {
   deleteComment: (commentId: string) => api.delete(`/comments/${commentId}`),
 };
 
+// ============================================
+// Progress Tracking APIs
+// ============================================
+export const progressAPI = {
+  // Mark video as complete
+  markComplete: (data: { videoId: string; courseId: string; watchDuration?: number }) =>
+    api.post('/progress/mark-complete', data),
+
+  // Update watch duration
+  updateWatchDuration: (data: { videoId: string; courseId: string; watchDuration: number }) =>
+    api.post('/progress/update-watch-duration', data),
+
+  // Get course progress
+  getCourseProgress: (courseId: string) =>
+    api.get(`/progress/course/${courseId}`),
+
+  // Update last watched video
+  updateLastWatched: (data: { courseId: string; videoId: string }) =>
+    api.post('/progress/update-last-watched', data),
+};
+
 export default api;

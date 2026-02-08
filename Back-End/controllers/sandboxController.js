@@ -1,7 +1,7 @@
-import asyncHandler from 'express-async-handler';
-import Order from '../models/Order.js';
-import Course from '../models/Course.js';
-import User from '../models/User.js';
+import asyncHandler from "express-async-handler";
+import Order from "../models/Order.js";
+import Course from "../models/Course.js";
+import User from "../models/User.js";
 
 /**
  * @desc    محاكاة دفع فوري (Sandbox Payment Gateway)
@@ -10,40 +10,51 @@ import User from '../models/User.js';
  * @note    هذا الـ endpoint للتجربة فقط - يقبل الدفع تلقائياً بدون تحقق حقيقي
  */
 export const sandboxPayment = asyncHandler(async (req, res) => {
-  const { courseId, paymentMethod = 'sandbox' } = req.body;
+  const { courseId, paymentMethod = "sandbox" } = req.body;
 
   // التحقق من وجود الكورس
   const course = await Course.findById(courseId);
   if (!course) {
     res.status(404);
-    throw new Error('الكورس غير موجود');
+    throw new Error("الكورس غير موجود");
   }
 
   // التحقق من عدم التسجيل المسبق
   const user = await User.findById(req.user._id);
-  const isAlreadyEnrolled = user.enrolledCourses.some(
-    (id) => id.toString() === courseId.toString()
-  );
+
+  // Support both old format (ObjectId array) and new format (objects array)
+  const isAlreadyEnrolled = user.enrolledCourses.some((enrollment) => {
+    // New format: { course: ObjectId, ... }
+    if (enrollment.course) {
+      return enrollment.course.toString() === courseId.toString();
+    }
+    // Old format: ObjectId directly
+    return enrollment.toString() === courseId.toString();
+  });
 
   if (isAlreadyEnrolled) {
     res.status(400);
-    throw new Error('أنت مسجل في هذا الكورس بالفعل');
+    throw new Error("أنت مسجل في هذا الكورس بالفعل");
   }
 
   // إنشاء Order وهمي مع الموافقة التلقائية
   const order = await Order.create({
     userId: req.user._id,
     courseId,
-    paymentMethod: 'sandbox', // تحديد أنه sandbox
-    screenshotUrl: 'https://placehold.co/600x400/png?text=Sandbox+Payment', // صورة وهمية
-    status: 'approved', // موافقة تلقائية
+    paymentMethod: "sandbox", // تحديد أنه sandbox
+    screenshotUrl: "https://placehold.co/600x400/png?text=Sandbox+Payment", // صورة وهمية
+    status: "approved", // موافقة تلقائية
     price: course.price,
     approvedBy: req.user._id, // المستخدم نفسه (simulation)
-    approvedAt: new Date()
+    approvedAt: new Date(),
   });
 
   // إضافة الكورس للمستخدم
-  user.enrolledCourses.push(courseId);
+  user.enrolledCourses.push({
+    course: courseId,
+    enrolledAt: new Date(),
+    videoProgress: [],
+  });
   await user.save();
 
   // تحديث عدد الطلاب
@@ -52,13 +63,13 @@ export const sandboxPayment = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: '✅ تم التسجيل في الكورس بنجاح (Sandbox Mode)',
+    message: "✅ تم التسجيل في الكورس بنجاح (Sandbox Mode)",
     data: {
       order,
       isEnrolled: true,
       sandboxMode: true,
-      note: 'هذا دفع تجريبي - لن يتم خصم أي مبلغ حقيقي'
-    }
+      note: "هذا دفع تجريبي - لن يتم خصم أي مبلغ حقيقي",
+    },
   });
 });
 
@@ -71,16 +82,23 @@ export const checkEnrollment = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
 
   const user = await User.findById(req.user._id);
-  const isEnrolled = user.enrolledCourses.some(
-    (id) => id.toString() === courseId.toString()
-  );
+
+  // Support both old format (ObjectId array) and new format (objects array)
+  const isEnrolled = user.enrolledCourses.some((enrollment) => {
+    // New format: { course: ObjectId, ... }
+    if (enrollment.course) {
+      return enrollment.course.toString() === courseId.toString();
+    }
+    // Old format: ObjectId directly
+    return enrollment.toString() === courseId.toString();
+  });
 
   res.json({
     success: true,
     data: {
       isEnrolled,
-      courseId
-    }
+      courseId,
+    },
   });
 });
 

@@ -6,9 +6,13 @@ import { FiArrowRight, FiPlay, FiClock, FiCheck, FiLock, FiList } from 'react-ic
 import Header from '@/components/Header';
 import YouTubePlayer from '@/components/YouTubePlayer';
 import VideoComments from '@/components/VideoComments';
+import CourseProgressBar from '@/components/CourseProgressBar';
+import VideoCompletionButton from '@/components/VideoCompletionButton';
+import VideoProgressIndicator from '@/components/VideoProgressIndicator';
 import { coursesAPI, videosAPI, ordersAPI } from '@/lib/api';
 import { handleApiError, showToast } from '@/lib/toast';
 import { useAuthStore } from '@/store/authStore';
+import { useProgressStore } from '@/store/progressStore';
 
 interface Video {
   _id: string;
@@ -36,6 +40,14 @@ export default function WatchCoursePage() {
   const router = useRouter();
   const courseId = params.id as string;
   const { isAuthenticated } = useAuthStore();
+  const {
+    fetchCourseProgress,
+    markVideoComplete,
+    updateWatchDuration,
+    updateLastWatched,
+    getVideoProgress,
+    courseProgress
+  } = useProgressStore();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
@@ -43,6 +55,7 @@ export default function WatchCoursePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(true);
+  const [watchDuration, setWatchDuration] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -55,6 +68,42 @@ export default function WatchCoursePage() {
       checkEnrollmentAndFetch();
     }
   }, [courseId, isAuthenticated]);
+
+  // Fetch progress on mount and when enrolled
+  useEffect(() => {
+    if (courseId && isEnrolled) {
+      fetchCourseProgress(courseId);
+    }
+  }, [courseId, isEnrolled]);
+
+  // Track watch duration
+  useEffect(() => {
+    if (!currentVideo || !courseId) return;
+
+    const interval = setInterval(() => {
+      setWatchDuration((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [currentVideo?._id, courseId]);
+
+  // Auto-save watch duration every 10 seconds
+  useEffect(() => {
+    if (!currentVideo || !courseId || watchDuration === 0) return;
+
+    if (watchDuration % 10 === 0) {
+      updateWatchDuration(courseId, currentVideo._id, watchDuration);
+    }
+  }, [watchDuration, currentVideo?._id, courseId]);
+
+  // Update last watched when video changes
+  useEffect(() => {
+    if (currentVideo && courseId && isEnrolled) {
+      updateLastWatched(courseId, currentVideo._id);
+      // Reset watch duration when changing videos
+      setWatchDuration(0);
+    }
+  }, [currentVideo?._id, courseId, isEnrolled]);
 
   const checkEnrollmentAndFetch = async () => {
     try {
@@ -77,7 +126,8 @@ export default function WatchCoursePage() {
 
       // جلب الفيديوهات
       const videosRes = await videosAPI.getCourseVideos(courseId);
-      const sortedVideos = (videosRes.data.data || []).sort(
+      const videosData = videosRes.data.data.videos || [];
+      const sortedVideos = videosData.sort(
         (a: Video, b: Video) => a.order - b.order
       );
       setVideos(sortedVideos);
@@ -91,7 +141,7 @@ export default function WatchCoursePage() {
         showToast('يجب شراء الكورس أولاً', 'error');
         router.push(`/courses/${courseId}`);
       } else {
-        handleApiError(error, 'فشل في تحميل الكورس');
+        handleApiError(error);
         router.push('/courses');
       }
     } finally {
@@ -161,6 +211,19 @@ export default function WatchCoursePage() {
               </div>
             </div>
 
+            {/* Progress Bar - ثابت على مستوى الكورس */}
+            <div className="bg-slate-800/50 border-b border-slate-700">
+              <div className="container mx-auto px-4 py-4 max-w-6xl">
+                {courseProgress[courseId] && (
+                  <CourseProgressBar
+                    progress={courseProgress[courseId].overallProgress}
+                    totalVideos={courseProgress[courseId].totalVideos}
+                    completedVideos={courseProgress[courseId].completedVideos}
+                  />
+                )}
+              </div>
+            </div>
+
             {/* مشغل الفيديو */}
             <div className="bg-slate-900 py-4">
               <div className="container mx-auto px-4 max-w-6xl">
@@ -177,7 +240,7 @@ export default function WatchCoursePage() {
             <div className="container mx-auto px-4 py-6">
               <div className="max-w-6xl mx-auto">
                 <h1 className="text-2xl font-bold text-white mb-2">{currentVideo.title}</h1>
-                
+
                 <div className="flex items-center gap-4 text-slate-400 mb-4">
                   <span className="flex items-center gap-1">
                     <FiClock className="w-4 h-4" />
@@ -187,8 +250,20 @@ export default function WatchCoursePage() {
                 </div>
 
                 {currentVideo.description && (
-                  <p className="text-slate-300">{currentVideo.description}</p>
+                  <p className="text-slate-300 mb-6">{currentVideo.description}</p>
                 )}
+
+                {/* Completion Button */}
+                <div className="mb-6">
+                  <VideoCompletionButton
+                    videoId={currentVideo._id}
+                    courseId={courseId}
+                    isCompleted={getVideoProgress(courseId, currentVideo._id)?.completed || false}
+                    onComplete={async () => {
+                      await markVideoComplete(courseId, currentVideo._id, watchDuration);
+                    }}
+                  />
+                </div>
 
                 {/* التنقل بين الفيديوهات */}
                 <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
@@ -261,18 +336,26 @@ export default function WatchCoursePage() {
                         : 'hover:bg-slate-700/50 hover:border-r-2 hover:border-r-slate-600'
                     }`}
                   >
-                    {/* رقم الدرس أو أيقونة */}
-                    <div
-                      className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-all ${
-                        isActive
-                          ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-md'
-                          : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'
-                      }`}
-                    >
+                    {/* Progress Indicator أو رقم الدرس */}
+                    <div className="flex-shrink-0">
                       {isActive ? (
-                        <FiPlay className="w-5 h-5" />
+                        <div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-primary to-primary-dark text-white shadow-md"
+                        >
+                          <FiPlay className="w-5 h-5" />
+                        </div>
                       ) : (
-                        video.order
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-700/50 border border-slate-600/50">
+                          {courseProgress[courseId] ? (
+                            <VideoProgressIndicator
+                              completed={getVideoProgress(courseId, video._id)?.completed || false}
+                              watchDuration={getVideoProgress(courseId, video._id)?.watchDuration}
+                              totalDuration={video.duration}
+                            />
+                          ) : (
+                            <span className="text-sm font-bold text-slate-400">{video.order}</span>
+                          )}
+                        </div>
                       )}
                     </div>
 

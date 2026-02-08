@@ -55,7 +55,7 @@ export default function VideoComments({ videoId }: VideoCommentsProps) {
       const response = await commentsAPI.getVideoComments(videoId);
       setComments(response.data.data || []);
     } catch (error) {
-      handleApiError(error, 'فشل في تحميل التعليقات');
+      handleApiError(error);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +85,7 @@ export default function VideoComments({ videoId }: VideoCommentsProps) {
       setNewComment('');
       showToast('تم إضافة التعليق بنجاح', 'success');
     } catch (error) {
-      handleApiError(error, 'فشل في إضافة التعليق');
+      handleApiError(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +110,7 @@ export default function VideoComments({ videoId }: VideoCommentsProps) {
       setEditContent('');
       showToast('تم تعديل التعليق بنجاح', 'success');
     } catch (error) {
-      handleApiError(error, 'فشل في تعديل التعليق');
+      handleApiError(error);
     }
   };
 
@@ -124,7 +124,7 @@ export default function VideoComments({ videoId }: VideoCommentsProps) {
       setComments(comments.filter(comment => comment._id !== commentId));
       showToast('تم حذف التعليق بنجاح', 'success');
     } catch (error) {
-      handleApiError(error, 'فشل في حذف التعليق');
+      handleApiError(error);
     }
   };
 

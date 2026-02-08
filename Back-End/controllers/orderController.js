@@ -1,7 +1,7 @@
-import asyncHandler from 'express-async-handler';
-import Order from '../models/Order.js';
-import Course from '../models/Course.js';
-import User from '../models/User.js';
+import asyncHandler from "express-async-handler";
+import Order from "../models/Order.js";
+import Course from "../models/Course.js";
+import User from "../models/User.js";
 
 /**
  * @desc    إنشاء طلب شراء جديد
@@ -14,36 +14,38 @@ export const createOrder = asyncHandler(async (req, res) => {
   // التحقق من البيانات
   if (!courseId || !paymentMethod || !screenshotUrl) {
     res.status(400);
-    throw new Error('برجاء إدخال جميع البيانات المطلوبة');
+    throw new Error("برجاء إدخال جميع البيانات المطلوبة");
   }
 
   // التحقق من وجود الكورس
   const course = await Course.findById(courseId);
   if (!course) {
     res.status(404);
-    throw new Error('الكورس غير موجود');
+    throw new Error("الكورس غير موجود");
   }
 
   // التحقق من عدم شراء الكورس مسبقاً
   const isAlreadyEnrolled = req.user.enrolledCourses.some(
-    (id) => id.toString() === courseId.toString()
+    (id) => id.toString() === courseId.toString(),
   );
 
   if (isAlreadyEnrolled) {
     res.status(400);
-    throw new Error('أنت مسجل في هذا الكورس بالفعل');
+    throw new Error("أنت مسجل في هذا الكورس بالفعل");
   }
 
   // التحقق من عدم وجود طلب معلق بالفعل
   const existingOrder = await Order.findOne({
     userId: req.user._id,
     courseId,
-    status: 'pending'
+    status: "pending",
   });
 
   if (existingOrder) {
     res.status(400);
-    throw new Error('لديك طلب معلق بالفعل لهذا الكورس. انتظر مراجعة الطلب السابق');
+    throw new Error(
+      "لديك طلب معلق بالفعل لهذا الكورس. انتظر مراجعة الطلب السابق",
+    );
   }
 
   // إنشاء الطلب
@@ -53,13 +55,13 @@ export const createOrder = asyncHandler(async (req, res) => {
     paymentMethod,
     screenshotUrl,
     price: course.price,
-    status: 'pending'
+    status: "pending",
   });
 
   res.status(201).json({
     success: true,
-    message: 'تم إرسال طلبك بنجاح! سيتم مراجعته قريباً ✅',
-    data: order
+    message: "تم إرسال طلبك بنجاح! سيتم مراجعته قريباً ✅",
+    data: order,
   });
 });
 
@@ -70,13 +72,13 @@ export const createOrder = asyncHandler(async (req, res) => {
  */
 export const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({ userId: req.user._id })
-    .populate('courseId', 'title thumbnail price')
-    .sort('-createdAt');
+    .populate("courseId", "title thumbnail price")
+    .sort("-createdAt");
 
   res.json({
     success: true,
-    message: 'تم جلب طلباتك بنجاح',
-    data: orders
+    message: "تم جلب طلباتك بنجاح",
+    data: orders,
   });
 });
 
@@ -86,18 +88,18 @@ export const getMyOrders = asyncHandler(async (req, res) => {
  * @access  Private/Admin
  */
 export const getPendingOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ status: 'pending' })
-    .populate('userId', 'name email phone')
-    .populate('courseId', 'title thumbnail price')
-    .sort('-createdAt');
+  const orders = await Order.find({ status: "pending" })
+    .populate("userId", "name email phone")
+    .populate("courseId", "title thumbnail price")
+    .sort("-createdAt");
 
   res.json({
     success: true,
-    message: 'تم جلب الطلبات المعلقة',
+    message: "تم جلب الطلبات المعلقة",
     data: orders,
     pagination: {
-      total: orders.length
-    }
+      total: orders.length,
+    },
   });
 });
 
@@ -112,18 +114,18 @@ export const getAllOrders = asyncHandler(async (req, res) => {
   const filter = status ? { status } : {};
 
   const orders = await Order.find(filter)
-    .populate('userId', 'name email phone')
-    .populate('courseId', 'title thumbnail price')
-    .populate('approvedBy', 'name')
-    .sort('-createdAt');
+    .populate("userId", "name email phone")
+    .populate("courseId", "title thumbnail price")
+    .populate("approvedBy", "name")
+    .sort("-createdAt");
 
   res.json({
     success: true,
-    message: 'تم جلب جميع الطلبات',
+    message: "تم جلب جميع الطلبات",
     data: orders,
     pagination: {
-      total: orders.length
-    }
+      total: orders.length,
+    },
   });
 });
 
@@ -133,28 +135,38 @@ export const getAllOrders = asyncHandler(async (req, res) => {
  * @access  Private/Admin
  */
 export const approveOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate('userId courseId');
+  const order = await Order.findById(req.params.id).populate("userId courseId");
 
   if (!order) {
     res.status(404);
-    throw new Error('الطلب غير موجود');
+    throw new Error("الطلب غير موجود");
   }
 
-  if (order.status !== 'pending') {
+  if (order.status !== "pending") {
     res.status(400);
-    throw new Error('هذا الطلب تم معالجته بالفعل');
+    throw new Error("هذا الطلب تم معالجته بالفعل");
   }
 
   // تحديث حالة الطلب
-  order.status = 'approved';
+  order.status = "approved";
   order.approvedBy = req.user._id;
   order.approvedAt = Date.now();
   await order.save();
 
   // إضافة الكورس لقائمة الطالب
   const user = await User.findById(order.userId._id);
-  if (!user.enrolledCourses.includes(order.courseId._id)) {
-    user.enrolledCourses.push(order.courseId._id);
+  const isAlreadyEnrolled = user.enrolledCourses.some(
+    (enrollment) =>
+      enrollment.course &&
+      enrollment.course.toString() === order.courseId._id.toString(),
+  );
+
+  if (!isAlreadyEnrolled) {
+    user.enrolledCourses.push({
+      course: order.courseId._id,
+      enrolledAt: new Date(),
+      videoProgress: [],
+    });
     await user.save();
   }
 
@@ -165,8 +177,8 @@ export const approveOrder = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'تم الموافقة على الطلب وإضافة الكورس للطالب بنجاح ✅',
-    data: order
+    message: "تم الموافقة على الطلب وإضافة الكورس للطالب بنجاح ✅",
+    data: order,
   });
 });
 
@@ -182,23 +194,23 @@ export const rejectOrder = asyncHandler(async (req, res) => {
 
   if (!order) {
     res.status(404);
-    throw new Error('الطلب غير موجود');
+    throw new Error("الطلب غير موجود");
   }
 
-  if (order.status !== 'pending') {
+  if (order.status !== "pending") {
     res.status(400);
-    throw new Error('هذا الطلب تم معالجته بالفعل');
+    throw new Error("هذا الطلب تم معالجته بالفعل");
   }
 
-  order.status = 'rejected';
-  order.rejectionReason = rejectionReason || 'لم يتم تحديد سبب';
+  order.status = "rejected";
+  order.rejectionReason = rejectionReason || "لم يتم تحديد سبب";
   order.approvedBy = req.user._id;
   await order.save();
 
   res.json({
     success: true,
-    message: 'تم رفض الطلب',
-    data: order
+    message: "تم رفض الطلب",
+    data: order,
   });
 });
 
@@ -212,13 +224,13 @@ export const deleteOrder = asyncHandler(async (req, res) => {
 
   if (!order) {
     res.status(404);
-    throw new Error('الطلب غير موجود');
+    throw new Error("الطلب غير موجود");
   }
 
   await order.deleteOne();
 
   res.json({
     success: true,
-    message: 'تم حذف الطلب بنجاح'
+    message: "تم حذف الطلب بنجاح",
   });
 });
