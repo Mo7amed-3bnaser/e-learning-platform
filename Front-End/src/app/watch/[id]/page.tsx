@@ -139,7 +139,7 @@ export default function WatchCoursePage() {
       <div className="min-h-screen bg-slate-900 pt-[72px]">
         <div className="flex flex-col lg:flex-row">
           {/* منطقة الفيديو */}
-          <div className={`flex-1 transition-all duration-300 ${showPlaylist ? 'lg:mr-[340px]' : 'lg:mr-0'}`}>
+          <div className={`flex-1 transition-all duration-300 ${showPlaylist ? 'lg:pl-[340px]' : 'lg:pl-0'}`}>
             {/* التنقل */}
             <div className="bg-slate-800 border-b border-slate-700 px-4 py-3">
               <div className="container mx-auto flex items-center justify-between max-w-6xl">
