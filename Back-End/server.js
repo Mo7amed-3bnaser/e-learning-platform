@@ -1,5 +1,9 @@
-import express from "express";
 import dotenv from "dotenv";
+
+// Load environment variables FIRST (before any other imports)
+dotenv.config();
+
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import connectDB from "./config/database.js";
@@ -14,9 +18,6 @@ import adminRoutes from "./routes/adminRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import progressRoutes from "./routes/progressRoutes.js";
-
-// Load environment variables
-dotenv.config();
 
 // Connect to MongoDB
 connectDB();

@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 import { generateToken, formatUserResponse } from '../utils/authHelpers.js';
+import { deleteImage } from '../config/cloudinary.js';
 
 /**
  * @desc    تسجيل مستخدم جديد
@@ -164,4 +165,52 @@ export const updateProfile = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('المستخدم غير موجود');
   }
+});
+
+/**
+ * @desc    تحديث صورة البروفايل (مع رفع الملف)
+ * @route   PUT /api/auth/avatar
+ * @access  Private
+ */
+export const updateAvatar = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('المستخدم غير موجود');
+  }
+
+  if (!req.file) {
+    res.status(400);
+    throw new Error('برجاء اختيار صورة');
+  }
+
+  // حذف الصورة القديمة من Cloudinary إذا كانت موجودة
+  if (user.avatar) {
+    try {
+      // Extract public_id from Cloudinary URL
+      const urlParts = user.avatar.split('/');
+      const publicIdWithExt = urlParts[urlParts.length - 1];
+      const publicId = `e-learning/${publicIdWithExt.split('.')[0]}`;
+      await deleteImage(publicId);
+    } catch (error) {
+      console.error('خطأ في حذف الصورة القديمة:', error);
+    }
+  }
+
+  // تحديث صورة البروفايل بالصورة الجديدة من Cloudinary
+  user.avatar = req.file.path;
+  const updatedUser = await user.save();
+
+  res.json({
+    success: true,
+    message: 'تم تحديث صورة البروفايل بنجاح',
+    data: {
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      avatar: updatedUser.avatar,
+      role: updatedUser.role
+    }
+  });
 });

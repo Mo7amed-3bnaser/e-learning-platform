@@ -1,6 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Configure Cloudinary
 cloudinary.config({
@@ -12,10 +16,12 @@ cloudinary.config({
 // Configure Multer Storage for Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'e-learning',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+  params: async (req, file) => {
+    return {
+      folder: 'e-learning',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+      transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+    };
   }
 });
 
