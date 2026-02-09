@@ -20,5 +20,6 @@ router.post('/login', loginValidation, validate, login);
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
 router.put('/avatar', protect, upload.single('avatar'), updateAvatar);
+router.post('/avatar', protect, upload.single('avatar'), updateAvatar);
 
 export default router;
