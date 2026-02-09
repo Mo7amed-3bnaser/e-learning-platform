@@ -73,6 +73,14 @@ export const authAPI = {
 
   updateProfile: (data: { name?: string; email?: string; phone?: string; avatar?: string }) =>
     api.put('/auth/profile', data),
+
+  updateAvatar: (file: File) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return api.put('/auth/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 // ============================================

@@ -45,25 +45,21 @@ export default function AvatarUpload({ currentAvatar, userName, onAvatarUpdate }
       };
       reader.readAsDataURL(file);
 
-      // رفع الصورة
-      const uploadResponse = await uploadAPI.uploadImage(file);
-      const avatarUrl = uploadResponse.data.data.url;
-
-      // تحديث البروفايل
-      const updateResponse = await authAPI.updateProfile({ avatar: avatarUrl });
-      const updatedUser = updateResponse.data.data;
+      // رفع وتحديث الصورة مباشرة - خطوة واحدة
+      const response = await authAPI.updateAvatar(file);
+      const avatarUrl = response.data.data.avatar;
 
       // تحديث الـ Store
       if (user) {
         updateUser({
           ...user,
-          avatar: updatedUser.avatar,
+          avatar: avatarUrl,
         });
       }
 
       setPreviewUrl(avatarUrl);
       showSuccess('تم تحديث الصورة الشخصية بنجاح! ✨');
-      
+
       // استدعاء callback لو موجود
       if (onAvatarUpdate) {
         onAvatarUpdate(avatarUrl);
