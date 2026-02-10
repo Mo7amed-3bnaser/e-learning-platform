@@ -13,6 +13,7 @@ interface CourseCardProps {
     instructor: {
       name: string;
       avatar?: string;
+      channelLogo?: string;
     };
     studentsCount?: number;
     duration?: string;
@@ -109,7 +110,13 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
 
           {/* معلومات المدرس */}
           <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100">
-            {course.instructor.avatar ? (
+            {course.instructor.channelLogo ? (
+              <img
+                src={course.instructor.channelLogo}
+                alt={course.instructor.name}
+                className="w-8 h-8 rounded object-cover"
+              />
+            ) : course.instructor.avatar ? (
               <img
                 src={course.instructor.avatar}
                 alt={course.instructor.name}

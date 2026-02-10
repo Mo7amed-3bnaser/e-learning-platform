@@ -34,6 +34,7 @@ interface Course {
     name: string;
     bio?: string;
     avatar?: string;
+    channelLogo?: string;
   };
   enrolledStudents: number;
   whatYouWillLearn?: string[];
@@ -381,7 +382,13 @@ export default function CourseDetailsPage() {
                 <div className="bg-white rounded-2xl p-6 shadow-sm">
                   <h3 className="font-bold text-slate-800 mb-4">المدرب</h3>
                   <div className="flex items-center gap-3">
-                    {course.instructor.avatar ? (
+                    {course.instructor.channelLogo ? (
+                      <img
+                        src={course.instructor.channelLogo}
+                        alt={course.instructor.name}
+                        className="w-12 h-12 rounded object-cover"
+                      />
+                    ) : course.instructor.avatar ? (
                       <img
                         src={course.instructor.avatar}
                         alt={course.instructor.name}

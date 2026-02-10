@@ -28,7 +28,11 @@ const courseSchema = new mongoose.Schema(
         required: true
       },
       bio: String,
-      avatar: String
+      avatar: String,
+      channelLogo: {
+        type: String,
+        default: 'https://res.cloudinary.com/dq6ftuott/image/upload/v1770764012/e87ff898-bac6-4820-a721-9bc9af59715c.png'
+      }
     },
     category: {
       type: String,
