@@ -262,4 +262,42 @@ export const progressAPI = {
     api.post('/progress/update-last-watched', data),
 };
 
+// ============================================
+// Certificates APIs
+// ============================================
+export const certificatesAPI = {
+  // Get certificate for a course
+  getCertificate: (courseId: string) =>
+    api.get(`/certificates/${courseId}`),
+
+  // Verify certificate by ID
+  verifyCertificate: (certificateId: string) =>
+    api.get(`/certificates/verify/${certificateId}`),
+};
+
+// ============================================
+// Reviews APIs
+// ============================================
+export const reviewsAPI = {
+  // Get all reviews for a course
+  getCourseReviews: (courseId: string) =>
+    api.get(`/reviews/${courseId}`),
+
+  // Add or update review
+  addOrUpdateReview: (data: { courseId: string; rating: number; comment?: string }) =>
+    api.post('/reviews', data),
+
+  // Get my review for a course
+  getMyReview: (courseId: string) =>
+    api.get(`/reviews/my-review/${courseId}`),
+
+  // Check if can review
+  canReview: (courseId: string) =>
+    api.get(`/reviews/can-review/${courseId}`),
+
+  // Delete review
+  deleteReview: (reviewId: string) =>
+    api.delete(`/reviews/${reviewId}`),
+};
+
 export default api;

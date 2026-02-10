@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { FiArrowRight, FiClock, FiUsers, FiBookOpen, FiShoppingCart, FiCheck, FiPlay, FiPlayCircle, FiX, FiLock } from 'react-icons/fi';
+import { FiArrowRight, FiClock, FiUsers, FiBookOpen, FiShoppingCart, FiCheck, FiPlay, FiPlayCircle, FiX, FiLock, FiInfo } from 'react-icons/fi';
 import Header from '@/components/Header';
 import YouTubePlayer from '@/components/YouTubePlayer';
 import { coursesAPI, ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import { useAuthStore } from '@/store/authStore';
+import { useProgressStore } from '@/store/progressStore';
+import ReviewForm from '@/components/ReviewForm';
+import ReviewsList from '@/components/ReviewsList';
 
 interface Video {
   _id: string;
@@ -50,12 +53,22 @@ export default function CourseDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
+  const [reviewRefresh, setReviewRefresh] = useState(0);
+
+  const { fetchCourseProgress, courseProgress } = useProgressStore();
 
   useEffect(() => {
     if (courseId) {
       fetchCourseDetails();
     }
   }, [courseId]);
+
+  // Fetch progress when enrolled
+  useEffect(() => {
+    if (courseId && isEnrolled) {
+      fetchCourseProgress(courseId);
+    }
+  }, [courseId, isEnrolled]);
 
   const fetchCourseDetails = async () => {
     try {
@@ -103,6 +116,13 @@ export default function CourseDetailsPage() {
     router.push(`/watch/${courseId}`);
   };
 
+  const scrollToDetails = () => {
+    const detailsSection = document.getElementById('course-details');
+    if (detailsSection) {
+      detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   if (isLoading) {
     return (
       <>
@@ -140,7 +160,7 @@ export default function CourseDetailsPage() {
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* المحتوى الرئيسي */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6" id="course-details">
               {/* صورة الكورس */}
               <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
                 <img
@@ -251,6 +271,17 @@ export default function CourseDetailsPage() {
                   </ul>
                 </div>
               )}
+
+              {/* نموذج التقييم - يظهر فقط لو الطالب مسجل */}
+              {isEnrolled && (
+                <ReviewForm
+                  courseId={courseId}
+                  onReviewSubmitted={() => setReviewRefresh(prev => prev + 1)}
+                />
+              )}
+
+              {/* قائمة التقييمات - تظهر للجميع */}
+              <ReviewsList courseId={courseId} key={reviewRefresh} />
             </div>
 
             {/* الشريط الجانبي */}
@@ -269,13 +300,23 @@ export default function CourseDetailsPage() {
                         <p className="text-slate-500 text-sm mt-1">يمكنك البدء في المشاهدة الآن</p>
                       </div>
 
-                      <button
-                        onClick={handleStartWatching}
-                        className="w-full bg-gradient-to-l from-green-500 to-green-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-                      >
-                        <FiPlayCircle className="w-5 h-5" />
-                        <span>ابدأ المشاهدة</span>
-                      </button>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleStartWatching}
+                          className="flex-1 bg-gradient-to-l from-green-500 to-green-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          <FiPlayCircle className="w-5 h-5" />
+                          <span>ابدأ المشاهدة</span>
+                        </button>
+
+                        <button
+                          onClick={scrollToDetails}
+                          className="flex-1 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 py-4 rounded-xl font-semibold hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2"
+                        >
+                          <FiInfo className="w-5 h-5" />
+                          <span>تفاصيل الكورس</span>
+                        </button>
+                      </div>
                     </>
                   ) : (
                     // لو الطالب مش مسجل

@@ -99,3 +99,28 @@ export const createOrderValidation = [
 
   body('screenshotUrl').trim().notEmpty().withMessage('صورة التحويل مطلوبة').isURL().withMessage('رابط الصورة غير صحيح')
 ];
+
+/**
+ * Validation for review
+ */
+export const reviewValidation = [
+  body('courseId')
+    .trim()
+    .notEmpty()
+    .withMessage('معرف الكورس مطلوب')
+    .isMongoId()
+    .withMessage('معرف الكورس غير صحيح'),
+
+  body('rating')
+    .notEmpty()
+    .withMessage('التقييم مطلوب')
+    .isInt({ min: 1, max: 5 })
+    .withMessage('التقييم يجب أن يكون بين 1 و 5'),
+
+  body('comment')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('التعليق يجب أن لا يتجاوز 500 حرف')
+];
+

@@ -18,6 +18,8 @@ import adminRoutes from "./routes/adminRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import progressRoutes from "./routes/progressRoutes.js";
+import certificateRoutes from "./routes/certificateRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 // Connect to MongoDB
 connectDB();
@@ -58,6 +60,8 @@ app.get("/", (req, res) => {
         admin: "/api/admin",
         comments: "/api/comments",
         progress: "/api/progress",
+        certificates: "/api/certificates",
+        reviews: "/api/reviews",
       },
     },
   });
@@ -72,6 +76,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/certificates", certificateRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Error Handling
 app.use(notFound);

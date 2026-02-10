@@ -58,7 +58,7 @@ export default function AvatarUpload({ currentAvatar, userName, onAvatarUpdate }
       }
 
       setPreviewUrl(avatarUrl);
-      showSuccess('تم تحديث الصورة الشخصية بنجاح! ✨');
+      showSuccess('تم تحديث الصورة الشخصية بنجاح! ');
 
       // استدعاء callback لو موجود
       if (onAvatarUpdate) {
