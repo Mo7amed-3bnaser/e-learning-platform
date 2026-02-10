@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiPlay, FiClock, FiBookOpen, FiGrid, FiList, FiBook } from 'react-icons/fi';
+import { FiPlay, FiClock, FiBookOpen, FiGrid, FiList, FiBook, FiInfo } from 'react-icons/fi';
 import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import Header from '@/components/Header';
@@ -65,6 +65,10 @@ export default function MyCoursesPage() {
 
   const handleContinueWatching = (courseId: string) => {
     router.push(`/watch/${courseId}`);
+  };
+
+  const handleViewDetails = (courseId: string) => {
+    router.push(`/courses/${courseId}`);
   };
 
   if (isLoading) {
@@ -252,14 +256,24 @@ export default function MyCoursesPage() {
                   {/* Spacer */}
                   <div className="flex-1"></div>
 
-                  {/* زر اكمل المشاهدة */}
-                  <button
-                    onClick={() => handleContinueWatching(order.courseId?._id)}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-l from-green-500 to-emerald-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all hover:from-green-600 hover:to-emerald-700 group"
-                  >
-                    <FiPlay className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    <span>اكمل المشاهدة</span>
-                  </button>
+                  {/* أزرار التنقل */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleContinueWatching(order.courseId?._id)}
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-l from-green-500 to-emerald-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all hover:from-green-600 hover:to-emerald-700 group"
+                    >
+                      <FiPlay className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      <span>اكمل المشاهدة</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleViewDetails(order.courseId?._id)}
+                      className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 py-2.5 rounded-xl font-medium hover:border-primary hover:text-primary transition-all"
+                    >
+                      <FiInfo className="w-4 h-4" />
+                      <span className="text-sm">تفاصيل الكورس</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

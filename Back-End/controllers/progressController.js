@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Video from "../models/Video.js";
 import Course from "../models/Course.js";
+import { generateCertificateForStudent } from "./certificateController.js";
 
 // @desc    Mark video as complete
 // @route   POST /api/progress/mark-complete
@@ -110,6 +111,41 @@ export const markVideoComplete = async (req, res) => {
     ).length;
     const overallProgress =
       totalVideos > 0 ? Math.round((completedVideos / totalVideos) * 100) : 0;
+
+    // Check if course is 100% complete and certificate doesn't exist yet
+    if (overallProgress === 100 && !enrollment.certificateUrl) {
+      try {
+        // Generate certificate asynchronously
+        const certificateData = await generateCertificateForStudent(userId, courseId);
+        console.log('Certificate generated:', certificateData.certificateId);
+
+        // Refresh enrollment data from DB (it was updated in generateCertificateForStudent)
+        const updatedUser = await User.findById(userId);
+        const updatedEnrollment = updatedUser.enrolledCourses.find((e) => {
+          if (e.course) return e.course.toString() === courseId;
+          return e.toString() === courseId;
+        });
+
+        // Include certificate data in response
+        return res.status(200).json({
+          success: true,
+          message: 'تم تحديد الفيديو كمكتمل',
+          data: {
+            videoId,
+            completed: true,
+            completedAt: new Date(),
+            courseProgress: overallProgress,
+            certificateGenerated: true,
+            certificateId: updatedEnrollment.certificateId,
+            certificateUrl: updatedEnrollment.certificateUrl,
+          },
+        });
+      } catch (certError) {
+        // Log error but don't fail the video completion
+        console.error('Failed to generate certificate:', certError);
+        // Continue with normal response
+      }
+    }
 
     res.status(200).json({
       success: true,

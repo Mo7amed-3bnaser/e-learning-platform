@@ -9,6 +9,7 @@ import VideoComments from '@/components/VideoComments';
 import CourseProgressBar from '@/components/CourseProgressBar';
 import VideoCompletionButton from '@/components/VideoCompletionButton';
 import VideoProgressIndicator from '@/components/VideoProgressIndicator';
+import CertificateCard from '@/components/CertificateCard';
 import { coursesAPI, videosAPI, ordersAPI } from '@/lib/api';
 import { handleApiError, showToast } from '@/lib/toast';
 import { useAuthStore } from '@/store/authStore';
@@ -264,6 +265,18 @@ export default function WatchCoursePage() {
                     }}
                   />
                 </div>
+
+                {/* الشهادة - تظهر في آخر فيديو فقط عند الإكمال 100% */}
+                {videos.findIndex(v => v._id === currentVideo._id) === videos.length - 1 &&
+                 courseProgress[courseId]?.overallProgress === 100 && (
+                  <div className="mb-6">
+                    <CertificateCard
+                      courseId={courseId}
+                      courseName={course.title}
+                      courseProgress={courseProgress[courseId].overallProgress}
+                    />
+                  </div>
+                )}
 
                 {/* التنقل بين الفيديوهات */}
                 <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
