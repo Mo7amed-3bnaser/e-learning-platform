@@ -128,10 +128,12 @@ export const videosAPI = {
   createVideo: (data: {
     courseId: string;
     title: string;
-    bunnyVideoId: string;
+    youtubeVideoId: string;
+    videoProvider?: string;
     duration: number;
     order?: number;
     isFreePreview?: boolean;
+    description?: string;
   }) => api.post('/videos', data),
 
   // Admin only - تعديل فيديو
@@ -139,10 +141,11 @@ export const videosAPI = {
     id: string,
     data: {
       title?: string;
-      bunnyVideoId?: string;
+      youtubeVideoId?: string;
       duration?: number;
       order?: number;
       isFreePreview?: boolean;
+      description?: string;
     }
   ) => api.put(`/videos/${id}`, data),
 
@@ -184,8 +187,8 @@ export const ordersAPI = {
   approveOrder: (id: string) => api.patch(`/orders/${id}/approve`),
 
   // Admin - رفض طلب
-  rejectOrder: (id: string, reason: string) =>
-    api.patch(`/orders/${id}/reject`, { reason }),
+  rejectOrder: (id: string, rejectionReason: string) =>
+    api.patch(`/orders/${id}/reject`, { rejectionReason }),
 
   // Admin - حذف طلب
   deleteOrder: (id: string) => api.delete(`/orders/${id}`),
@@ -196,7 +199,7 @@ export const ordersAPI = {
 // ============================================
 export const adminAPI = {
   // Dashboard statistics
-  getDashboardStats: () => api.get('/admin/dashboard'),
+  getDashboardStats: () => api.get('/admin/stats'),
 
   // Students management
   getAllStudents: () => api.get('/admin/students'),
