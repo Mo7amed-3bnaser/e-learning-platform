@@ -69,14 +69,19 @@ export default function DashboardPage() {
         instructor: { name: '' },
         progress: 0,
       }));
-      
-      setEnrolledCourses(enrolledCoursesData);
+
+      // إزالة الكورسات المكررة بناءً على _id
+      const uniqueCourses = enrolledCoursesData.filter((course, index, self) =>
+        index === self.findIndex((c) => c._id === course._id)
+      );
+
+      setEnrolledCourses(uniqueCourses);
       
       // حساب الإحصائيات
       setStats({
-        totalCourses: enrolledCoursesData.length,
+        totalCourses: uniqueCourses.length,
         completedCourses: 0,
-        inProgressCourses: enrolledCoursesData.length,
+        inProgressCourses: uniqueCourses.length,
       });
       
     } catch (error) {

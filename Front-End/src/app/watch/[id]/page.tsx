@@ -33,7 +33,7 @@ interface Course {
   instructor: {
     name: string;
     avatar?: string;
-  };
+  } | null;
 }
 
 export default function WatchCoursePage() {
@@ -329,8 +329,12 @@ export default function WatchCoursePage() {
                   <FiPlay className="w-3 h-3" />
                   {videos.length} درس
                 </span>
-                <span className="text-slate-500">•</span>
-                <span>{course.instructor.name}</span>
+                {course.instructor && (
+                  <>
+                    <span className="text-slate-500">•</span>
+                    <span>{course.instructor.name}</span>
+                  </>
+                )}
               </p>
             </div>
 

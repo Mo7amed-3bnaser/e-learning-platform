@@ -20,6 +20,7 @@ import commentRoutes from "./routes/commentRoutes.js";
 import progressRoutes from "./routes/progressRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import instructorApplicationRoutes from "./routes/instructorApplicationRoutes.js";
 
 // Connect to MongoDB
 connectDB();
@@ -62,6 +63,7 @@ app.get("/", (req, res) => {
         progress: "/api/progress",
         certificates: "/api/certificates",
         reviews: "/api/reviews",
+        instructorApplications: "/api/instructor-applications",
       },
     },
   });
@@ -78,6 +80,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/instructor-applications", instructorApplicationRoutes);
 
 // Error Handling
 app.use(notFound);

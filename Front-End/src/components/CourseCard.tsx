@@ -14,7 +14,7 @@ interface CourseCardProps {
       name: string;
       avatar?: string;
       channelLogo?: string;
-    };
+    } | null;
     studentsCount?: number;
     duration?: string;
     lessonsCount?: number;
@@ -109,31 +109,33 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
           </p>
 
           {/* معلومات المدرس */}
-          <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100">
-            {course.instructor.channelLogo ? (
-              <img
-                src={course.instructor.channelLogo}
-                alt={course.instructor.name}
-                className="w-8 h-8 rounded object-cover"
-              />
-            ) : course.instructor.avatar ? (
-              <img
-                src={course.instructor.avatar}
-                alt={course.instructor.name}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-sm font-bold">
-                {course.instructor.name.charAt(0)}
+          {course.instructor && (
+            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100">
+              {course.instructor.channelLogo ? (
+                <img
+                  src={course.instructor.channelLogo}
+                  alt={course.instructor.name}
+                  className="w-8 h-8 rounded object-cover"
+                />
+              ) : course.instructor.avatar ? (
+                <img
+                  src={course.instructor.avatar}
+                  alt={course.instructor.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-sm font-bold">
+                  {course.instructor.name.charAt(0)}
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-slate-500">المدرس</p>
+                <p className="text-sm font-medium text-slate-700">
+                  {course.instructor.name}
+                </p>
               </div>
-            )}
-            <div>
-              <p className="text-xs text-slate-500">المدرس</p>
-              <p className="text-sm font-medium text-slate-700">
-                {course.instructor.name}
-              </p>
             </div>
-          </div>
+          )}
 
           {/* إحصائيات */}
           <div className="flex items-center justify-between text-xs text-slate-500">

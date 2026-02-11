@@ -10,7 +10,8 @@ import {
     FiUsers,
     FiLogOut,
     FiX,
-    FiChevronLeft
+    FiChevronLeft,
+    FiUserCheck
 } from 'react-icons/fi';
 
 interface AdminSidebarProps {
@@ -23,6 +24,7 @@ const navItems = [
     { href: '/admin/courses', label: 'الكورسات', icon: FiBook },
     { href: '/admin/orders', label: 'الطلبات', icon: FiShoppingCart },
     { href: '/admin/students', label: 'الطلاب', icon: FiUsers },
+    { href: '/admin/instructor-applications', label: 'طلبات المدرسين', icon: FiUserCheck },
 ];
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {

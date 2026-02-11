@@ -8,9 +8,9 @@ import Video from '../models/Video.js';
  * @access  Public
  */
 export const getCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find({ isPublished: true }).select(
-    'title description price thumbnail category level rating enrolledStudents instructor'
-  );
+  const courses = await Course.find({ isPublished: true })
+    .populate('instructor', 'name email avatar instructorProfile')
+    .select('title description price thumbnail category level rating enrolledStudents instructor');
 
   res.json({
     success: true,
@@ -28,7 +28,10 @@ export const getCourses = asyncHandler(async (req, res) => {
  * @access  Public
  */
 export const getCourseById = asyncHandler(async (req, res) => {
-  const course = await Course.findById(req.params.id);
+  const course = await Course.findById(req.params.id).populate(
+    'instructor',
+    'name email avatar instructorProfile'
+  );
 
   if (!course) {
     res.status(404);
@@ -70,9 +73,9 @@ export const getCourseById = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    إنشاء كورس جديد (Admin فقط)
+ * @desc    إنشاء كورس جديد (Instructor/Admin)
  * @route   POST /api/courses
- * @access  Private/Admin
+ * @access  Private/Instructor/Admin
  */
 export const createCourse = asyncHandler(async (req, res) => {
   const {
@@ -80,24 +83,35 @@ export const createCourse = asyncHandler(async (req, res) => {
     description,
     price,
     thumbnail,
-    instructor,
     category,
     level,
     whatYouWillLearn,
     requirements
   } = req.body;
 
+  // Auto-assign instructor based on user role
+  let instructorId;
+  if (req.user.role === 'admin' && req.body.instructor) {
+    // Admin can assign any instructor
+    instructorId = req.body.instructor;
+  } else {
+    // Instructor creates their own course
+    instructorId = req.user.id;
+  }
+
   const course = await Course.create({
     title,
     description,
     price,
     thumbnail,
-    instructor,
+    instructor: instructorId,
     category,
     level,
     whatYouWillLearn,
     requirements
   });
+
+  await course.populate('instructor', 'name email avatar instructorProfile');
 
   res.status(201).json({
     success: true,
@@ -184,11 +198,63 @@ export const togglePublishCourse = asyncHandler(async (req, res) => {
  * @access  Private/Admin
  */
 export const getAllCoursesAdmin = asyncHandler(async (req, res) => {
-  const courses = await Course.find({});
+  const courses = await Course.find({})
+    .populate('instructor', 'name email avatar instructorProfile');
 
   res.json({
     success: true,
     message: 'تم جلب جميع الكورسات',
     data: courses
+  });
+});
+
+/**
+ * @desc    الحصول على كورسات المدرب الحالي
+ * @route   GET /api/courses/instructor/my-courses
+ * @access  Private/Instructor
+ */
+export const getInstructorCourses = asyncHandler(async (req, res) => {
+  const courses = await Course.find({ instructor: req.user.id })
+    .populate('instructor', 'name email avatar instructorProfile')
+    .sort('-createdAt');
+
+  res.json({
+    success: true,
+    message: 'تم جلب كورساتك بنجاح',
+    data: courses,
+    count: courses.length
+  });
+});
+
+/**
+ * @desc    إحصائيات كورس معين للمدرب
+ * @route   GET /api/courses/instructor/:id/stats
+ * @access  Private/Instructor (Owner)
+ */
+export const getCourseStats = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id)
+    .populate('instructor', 'name email');
+
+  if (!course) {
+    res.status(404);
+    throw new Error('الكورس غير موجود');
+  }
+
+  // Verify ownership (middleware already checks this)
+  const videos = await Video.find({ courseId: course._id });
+
+  res.json({
+    success: true,
+    data: {
+      course: {
+        title: course.title,
+        enrolledStudents: course.enrolledStudents,
+        rating: course.rating,
+        isPublished: course.isPublished,
+        price: course.price
+      },
+      videosCount: videos.length,
+      totalDuration: videos.reduce((sum, v) => sum + (v.duration || 0), 0)
+    }
   });
 });

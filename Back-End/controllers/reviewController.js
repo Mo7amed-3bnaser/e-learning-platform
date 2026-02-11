@@ -1,8 +1,8 @@
-import asyncHandler from 'express-async-handler';
-import Review from '../models/Review.js';
-import Course from '../models/Course.js';
-import User from '../models/User.js';
-import Video from '../models/Video.js';
+import asyncHandler from "express-async-handler";
+import Review from "../models/Review.js";
+import Course from "../models/Course.js";
+import User from "../models/User.js";
+import Video from "../models/Video.js";
 
 /**
  * Helper: Check if user completed 100% of course
@@ -22,8 +22,11 @@ const checkCourseCompletion = async (userId, courseId) => {
 
   // Calculate completion
   const totalVideos = await Video.countDocuments({ courseId });
-  const completedVideos = enrollment.videoProgress.filter((vp) => vp.completed).length;
-  const progress = totalVideos > 0 ? Math.round((completedVideos / totalVideos) * 100) : 0;
+  const completedVideos = enrollment.videoProgress.filter(
+    (vp) => vp.completed,
+  ).length;
+  const progress =
+    totalVideos > 0 ? Math.round((completedVideos / totalVideos) * 100) : 0;
 
   return progress === 100;
 };
@@ -36,8 +39,8 @@ const updateCourseRating = async (courseId) => {
 
   if (reviews.length === 0) {
     await Course.findByIdAndUpdate(courseId, {
-      'rating.average': 0,
-      'rating.count': 0
+      "rating.average": 0,
+      "rating.count": 0,
     });
     return;
   }
@@ -46,8 +49,8 @@ const updateCourseRating = async (courseId) => {
   const average = totalRating / reviews.length;
 
   await Course.findByIdAndUpdate(courseId, {
-    'rating.average': Math.round(average * 10) / 10, // Round to 1 decimal
-    'rating.count': reviews.length
+    "rating.average": Math.round(average * 10) / 10, // Round to 1 decimal
+    "rating.count": reviews.length,
   });
 };
 
@@ -63,31 +66,31 @@ export const addOrUpdateReview = asyncHandler(async (req, res) => {
   // Validate input
   if (!courseId || !rating) {
     res.status(400);
-    throw new Error('courseId و rating مطلوبان');
+    throw new Error("courseId و rating مطلوبان");
   }
 
   if (rating < 1 || rating > 5) {
     res.status(400);
-    throw new Error('التقييم يجب أن يكون بين 1 و 5');
+    throw new Error("التقييم يجب أن يكون بين 1 و 5");
   }
 
   if (comment && comment.length > 500) {
     res.status(400);
-    throw new Error('التعليق يجب أن لا يتجاوز 500 حرف');
+    throw new Error("التعليق يجب أن لا يتجاوز 500 حرف");
   }
 
   // Check if course exists
   const course = await Course.findById(courseId);
   if (!course) {
     res.status(404);
-    throw new Error('الكورس غير موجود');
+    throw new Error("الكورس غير موجود");
   }
 
   // Check if user completed the course (100%)
   const isCompleted = await checkCourseCompletion(userId, courseId);
   if (!isCompleted) {
     res.status(403);
-    throw new Error('يجب إتمام الكورس بنسبة 100% قبل إضافة تقييم');
+    throw new Error("يجب إتمام الكورس بنسبة 100% قبل إضافة تقييم");
   }
 
   // Get user data
@@ -109,8 +112,8 @@ export const addOrUpdateReview = asyncHandler(async (req, res) => {
 
     res.json({
       success: true,
-      message: 'تم تحديث التقييم بنجاح',
-      data: review
+      message: "تم تحديث التقييم بنجاح",
+      data: review,
     });
   } else {
     // Create new review
@@ -120,7 +123,7 @@ export const addOrUpdateReview = asyncHandler(async (req, res) => {
       rating,
       comment,
       userName: user.name,
-      userAvatar: user.avatar
+      userAvatar: user.avatar,
     });
 
     // Recalculate course rating
@@ -128,8 +131,8 @@ export const addOrUpdateReview = asyncHandler(async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'تم إضافة التقييم بنجاح',
-      data: review
+      message: "تم إضافة التقييم بنجاح",
+      data: review,
     });
   }
 });
@@ -146,21 +149,21 @@ export const getCourseReviews = asyncHandler(async (req, res) => {
   const course = await Course.findById(courseId);
   if (!course) {
     res.status(404);
-    throw new Error('الكورس غير موجود');
+    throw new Error("الكورس غير موجود");
   }
 
   // Get all reviews for this course
   const reviews = await Review.find({ courseId })
     .sort({ createdAt: -1 })
-    .populate('userId', 'name avatar');
+    .populate("userId", "name avatar");
 
   res.json({
     success: true,
     data: {
       reviews,
       averageRating: course.rating.average,
-      totalReviews: course.rating.count
-    }
+      totalReviews: course.rating.count,
+    },
   });
 });
 
@@ -178,13 +181,13 @@ export const getMyReview = asyncHandler(async (req, res) => {
   if (!review) {
     return res.json({
       success: true,
-      data: null
+      data: null,
     });
   }
 
   res.json({
     success: true,
-    data: review
+    data: review,
   });
 });
 
@@ -201,13 +204,16 @@ export const deleteReview = asyncHandler(async (req, res) => {
 
   if (!review) {
     res.status(404);
-    throw new Error('التقييم غير موجود');
+    throw new Error("التقييم غير موجود");
   }
 
   // Check if user owns this review or is admin
-  if (review.userId.toString() !== userId.toString() && req.user.role !== 'admin') {
+  if (
+    review.userId.toString() !== userId.toString() &&
+    req.user.role !== "admin"
+  ) {
     res.status(403);
-    throw new Error('غير مصرح لك بحذف هذا التقييم');
+    throw new Error("غير مصرح لك بحذف هذا التقييم");
   }
 
   const courseId = review.courseId;
@@ -219,7 +225,7 @@ export const deleteReview = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'تم حذف التقييم بنجاح'
+    message: "تم حذف التقييم بنجاح",
   });
 });
 
@@ -237,7 +243,7 @@ export const canReview = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data: {
-      canReview: isCompleted
-    }
+      canReview: isCompleted,
+    },
   });
 });

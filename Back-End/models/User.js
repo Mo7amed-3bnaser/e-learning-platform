@@ -35,8 +35,30 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "admin"],
+      enum: ["student", "admin", "instructor"],
       default: "student",
+    },
+    instructorProfile: {
+      bio: {
+        type: String,
+        default: "",
+      },
+      specialization: {
+        type: String,
+        default: "",
+      },
+      yearsOfExperience: {
+        type: String,
+        default: "",
+      },
+      linkedin: {
+        type: String,
+        default: "",
+      },
+      website: {
+        type: String,
+        default: "",
+      },
     },
     enrolledCourses: {
       type: [mongoose.Schema.Types.Mixed],

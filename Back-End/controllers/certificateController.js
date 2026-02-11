@@ -1,11 +1,11 @@
-import asyncHandler from 'express-async-handler';
-import User from '../models/User.js';
-import Course from '../models/Course.js';
+import asyncHandler from "express-async-handler";
+import User from "../models/User.js";
+import Course from "../models/Course.js";
 import {
   generateCertificateId,
   generateCertificatePDF,
   uploadCertificateToCloudinary,
-} from '../utils/certificateGenerator.js';
+} from "../utils/certificateGenerator.js";
 
 /**
  * @desc    Download certificate (if student has one)
@@ -19,7 +19,7 @@ export const downloadCertificate = asyncHandler(async (req, res) => {
   const user = await User.findById(userId);
   if (!user) {
     res.status(404);
-    throw new Error('المستخدم غير موجود');
+    throw new Error("المستخدم غير موجود");
   }
 
   // Find enrollment
@@ -30,18 +30,18 @@ export const downloadCertificate = asyncHandler(async (req, res) => {
 
   if (!enrollment) {
     res.status(403);
-    throw new Error('يجب التسجيل في الكورس أولاً');
+    throw new Error("يجب التسجيل في الكورس أولاً");
   }
 
   // Check if certificate exists
   if (!enrollment.certificateUrl || !enrollment.certificateId) {
     res.status(404);
-    throw new Error('لم يتم إنشاء الشهادة بعد. يجب إتمام الكورس بنسبة 100%');
+    throw new Error("لم يتم إنشاء الشهادة بعد. يجب إتمام الكورس بنسبة 100%");
   }
 
   res.json({
     success: true,
-    message: 'تم جلب الشهادة بنجاح',
+    message: "تم جلب الشهادة بنجاح",
     data: {
       certificateUrl: enrollment.certificateUrl,
       certificateId: enrollment.certificateId,
@@ -60,22 +60,22 @@ export const verifyCertificate = asyncHandler(async (req, res) => {
 
   // Find user with this certificate
   const user = await User.findOne({
-    'enrolledCourses.certificateId': certificateId,
-  }).populate('enrolledCourses.course', 'title');
+    "enrolledCourses.certificateId": certificateId,
+  }).populate("enrolledCourses.course", "title");
 
   if (!user) {
     res.status(404);
-    throw new Error('الشهادة غير موجودة');
+    throw new Error("الشهادة غير موجودة");
   }
 
   // Find the specific enrollment with this certificate
   const enrollment = user.enrolledCourses.find(
-    (e) => e.certificateId === certificateId
+    (e) => e.certificateId === certificateId,
   );
 
   if (!enrollment) {
     res.status(404);
-    throw new Error('الشهادة غير موجودة');
+    throw new Error("الشهادة غير موجودة");
   }
 
   // Get course details
@@ -83,7 +83,7 @@ export const verifyCertificate = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'الشهادة صحيحة',
+    message: "الشهادة صحيحة",
     data: {
       certificateId,
       studentName: user.name,
@@ -105,7 +105,7 @@ export const generateCertificateForStudent = async (userId, courseId) => {
     const course = await Course.findById(courseId);
 
     if (!user || !course) {
-      throw new Error('User or Course not found');
+      throw new Error("User or Course not found");
     }
 
     // Generate unique certificate ID
@@ -122,7 +122,7 @@ export const generateCertificateForStudent = async (userId, courseId) => {
     // Upload to Cloudinary
     const certificateUrl = await uploadCertificateToCloudinary(
       pdfBuffer,
-      certificateId
+      certificateId,
     );
 
     // Update user enrollment with certificate data
@@ -136,7 +136,7 @@ export const generateCertificateForStudent = async (userId, courseId) => {
       user.enrolledCourses[enrollmentIndex].certificateUrl = certificateUrl;
       user.enrolledCourses[enrollmentIndex].completedAt = new Date();
 
-      user.markModified('enrolledCourses');
+      user.markModified("enrolledCourses");
       await user.save();
     }
 
@@ -145,7 +145,7 @@ export const generateCertificateForStudent = async (userId, courseId) => {
       certificateUrl,
     };
   } catch (error) {
-    console.error('Error generating certificate:', error);
+    console.error("Error generating certificate:", error);
     throw error;
   }
 };

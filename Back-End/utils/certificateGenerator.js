@@ -1,5 +1,5 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import cloudinary from '../config/cloudinary.js';
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import cloudinary from "../config/cloudinary.js";
 
 /**
  * Generate certificate ID
@@ -48,7 +48,7 @@ export const generateCertificatePDF = async (data) => {
   });
 
   // Title
-  page.drawText('Certificate of Completion', {
+  page.drawText("Certificate of Completion", {
     x: 260,
     y: 460,
     size: 36,
@@ -57,7 +57,7 @@ export const generateCertificatePDF = async (data) => {
   });
 
   // Student name label
-  page.drawText('This is to certify that', {
+  page.drawText("This is to certify that", {
     x: 330,
     y: 380,
     size: 16,
@@ -66,7 +66,7 @@ export const generateCertificatePDF = async (data) => {
 
   // Student name
   page.drawText(studentName, {
-    x: 400 - (studentName.length * 4),
+    x: 400 - studentName.length * 4,
     y: 340,
     size: 24,
     font: boldFont,
@@ -74,7 +74,7 @@ export const generateCertificatePDF = async (data) => {
   });
 
   // Course completion text
-  page.drawText('has successfully completed', {
+  page.drawText("has successfully completed", {
     x: 310,
     y: 290,
     size: 16,
@@ -92,10 +92,10 @@ export const generateCertificatePDF = async (data) => {
   });
 
   // Date
-  const formattedDate = new Date(completionDate).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const formattedDate = new Date(completionDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
   page.drawText(`Completion Date: ${formattedDate}`, {
     x: 300,
@@ -114,7 +114,7 @@ export const generateCertificatePDF = async (data) => {
   });
 
   // Platform name at bottom
-  page.drawText('E-Learning Platform', {
+  page.drawText("E-Learning Platform", {
     x: 350,
     y: 60,
     size: 14,
@@ -133,14 +133,17 @@ export const generateCertificatePDF = async (data) => {
  * @param {String} certificateId - Unique certificate ID
  * @returns {Promise<String>} - Cloudinary URL
  */
-export const uploadCertificateToCloudinary = async (pdfBuffer, certificateId) => {
+export const uploadCertificateToCloudinary = async (
+  pdfBuffer,
+  certificateId,
+) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
-        folder: 'e-learning/certificates',
-        resource_type: 'raw',
+        folder: "e-learning/certificates",
+        resource_type: "raw",
         public_id: certificateId,
-        format: 'pdf',
+        format: "pdf",
       },
       (error, result) => {
         if (error) {
@@ -148,7 +151,7 @@ export const uploadCertificateToCloudinary = async (pdfBuffer, certificateId) =>
         } else {
           resolve(result.secure_url);
         }
-      }
+      },
     );
 
     // Write buffer to stream

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FiUser,
   FiMail,
@@ -13,8 +14,13 @@ import {
   FiGlobe,
 } from "react-icons/fi";
 import Logo from "@/components/Logo";
+import { instructorApplicationApi } from "@/lib/instructorApi";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/store/authStore";
 
 export default function InstructorApplicationPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -33,17 +39,25 @@ export default function InstructorApplicationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      toast.error("يرجى تسجيل الدخول أولاً");
+      router.push("/login");
+      return;
+    }
+
     setIsLoading(true);
-    
-    // Here you would send the data to your backend/admin
-    console.log("Instructor Application Data:", formData);
-    
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      const response = await instructorApplicationApi.submitApplication(formData);
+      toast.success(response.message || "تم إرسال طلبك بنجاح!");
+      router.push("/dashboard");
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إرسال الطلب";
+      toast.error(errorMessage);
+    } finally {
       setIsLoading(false);
-      alert("تم إرسال طلبك بنجاح! سيتم التواصل معك خلال 48 ساعة.");
-      // Reset form or redirect
-    }, 2000);
+    }
   };
 
   return (

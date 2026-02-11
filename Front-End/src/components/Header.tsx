@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
-import { FiUser, FiLogOut, FiGrid, FiBook } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck } from 'react-icons/fi';
 import Logo from './Logo';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -107,7 +107,7 @@ export default function Header() {
                       </div>
                       <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full">
                         <span className="text-xs font-medium text-primary">
-                          {user?.role === 'admin' ? '👨‍💼 مشرف' : '🎓 طالب'}
+                          {user?.role === 'admin' ? '👨‍💼 مشرف' : user?.role === 'instructor' ? '👨‍🏫 مدرب' : '🎓 طالب'}
                         </span>
                       </div>
                     </div>
@@ -139,6 +139,36 @@ export default function Header() {
                         <FiGrid className="w-4 h-4 text-slate-600" />
                         <span className="text-sm text-slate-700">لوحة التحكم</span>
                       </Link>
+
+                      {/* Instructor Application Link - Students Only */}
+                      {user?.role === 'student' && (
+                        <Link
+                          href="/instructor-application"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-accent/5 transition-colors border-t border-slate-100"
+                        >
+                          <FiUserCheck className="w-4 h-4 text-accent" />
+                          <div className="flex flex-col">
+                            <span className="text-sm text-accent font-medium">انضم كمدرب</span>
+                            <span className="text-xs text-slate-500">قدم طلبك الآن</span>
+                          </div>
+                        </Link>
+                      )}
+
+                      {/* Instructor Dashboard Link - Instructors Only */}
+                      {user?.role === 'instructor' && (
+                        <Link
+                          href="/dashboard/instructor"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-accent/5 transition-colors border-t border-slate-100"
+                        >
+                          <FiUserCheck className="w-4 h-4 text-accent" />
+                          <div className="flex flex-col">
+                            <span className="text-sm text-accent font-medium">لوحة المدرب</span>
+                            <span className="text-xs text-slate-500">إدارة كورساتك</span>
+                          </div>
+                        </Link>
+                      )}
 
                       <button
                         onClick={handleLogout}

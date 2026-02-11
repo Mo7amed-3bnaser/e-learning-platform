@@ -116,8 +116,11 @@ export const markVideoComplete = async (req, res) => {
     if (overallProgress === 100 && !enrollment.certificateUrl) {
       try {
         // Generate certificate asynchronously
-        const certificateData = await generateCertificateForStudent(userId, courseId);
-        console.log('Certificate generated:', certificateData.certificateId);
+        const certificateData = await generateCertificateForStudent(
+          userId,
+          courseId,
+        );
+        console.log("Certificate generated:", certificateData.certificateId);
 
         // Refresh enrollment data from DB (it was updated in generateCertificateForStudent)
         const updatedUser = await User.findById(userId);
@@ -129,7 +132,7 @@ export const markVideoComplete = async (req, res) => {
         // Include certificate data in response
         return res.status(200).json({
           success: true,
-          message: 'تم تحديد الفيديو كمكتمل',
+          message: "تم تحديد الفيديو كمكتمل",
           data: {
             videoId,
             completed: true,
@@ -142,7 +145,7 @@ export const markVideoComplete = async (req, res) => {
         });
       } catch (certError) {
         // Log error but don't fail the video completion
-        console.error('Failed to generate certificate:', certError);
+        console.error("Failed to generate certificate:", certError);
         // Continue with normal response
       }
     }

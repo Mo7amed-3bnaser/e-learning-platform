@@ -6,6 +6,10 @@ nul
 # Scripts folder
 Back-End/scripts/
 
+# Log files
+*.log
+dev.log
+
 # Markdown documentation files
 *.md
 !README.md

@@ -23,16 +23,9 @@ const courseSchema = new mongoose.Schema(
       required: [true, 'صورة الكورس مطلوبة']
     },
     instructor: {
-      name: {
-        type: String,
-        required: true
-      },
-      bio: String,
-      avatar: String,
-      channelLogo: {
-        type: String,
-        default: 'https://res.cloudinary.com/dq6ftuott/image/upload/v1770764012/e87ff898-bac6-4820-a721-9bc9af59715c.png'
-      }
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'المدرب مطلوب'],
     },
     category: {
       type: String,

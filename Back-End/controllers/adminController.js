@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 import Course from '../models/Course.js';
 import Order from '../models/Order.js';
+import InstructorApplication from '../models/InstructorApplication.js';
 
 /**
  * @desc    الحصول على إحصائيات الداشبورد
@@ -148,5 +149,69 @@ export const searchStudents = asyncHandler(async (req, res) => {
     success: true,
     message: 'نتائج البحث',
     data: students
+  });
+});
+
+/**
+ * @desc    الحصول على كل المدربين
+ * @route   GET /api/admin/instructors
+ * @access  Private/Admin
+ */
+export const getInstructors = asyncHandler(async (req, res) => {
+  const instructors = await User.find({ role: 'instructor' })
+    .select('-password')
+    .sort('-createdAt');
+
+  // Get course count for each instructor
+  const instructorsWithStats = await Promise.all(
+    instructors.map(async (instructor) => {
+      const coursesCount = await Course.countDocuments({
+        instructor: instructor._id
+      });
+      return {
+        ...instructor.toObject(),
+        coursesCount
+      };
+    })
+  );
+
+  res.json({
+    success: true,
+    data: instructorsWithStats,
+    count: instructorsWithStats.length
+  });
+});
+
+/**
+ * @desc    إزالة صلاحيات المدرب (تحويله لطالب)
+ * @route   PATCH /api/admin/instructors/:id/demote
+ * @access  Private/Admin
+ */
+export const demoteInstructor = asyncHandler(async (req, res) => {
+  const instructor = await User.findById(req.params.id);
+
+  if (!instructor) {
+    res.status(404);
+    throw new Error('المدرب غير موجود');
+  }
+
+  if (instructor.role !== 'instructor') {
+    res.status(400);
+    throw new Error('هذا المستخدم ليس مدرباً');
+  }
+
+  // Change role to student
+  instructor.role = 'student';
+  await instructor.save();
+
+  // Optionally: unpublish all their courses
+  await Course.updateMany(
+    { instructor: instructor._id },
+    { isPublished: false }
+  );
+
+  res.json({
+    success: true,
+    message: 'تم تحويل المدرب إلى طالب وإخفاء كورساته'
   });
 });
