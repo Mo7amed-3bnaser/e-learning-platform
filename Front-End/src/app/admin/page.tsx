@@ -140,7 +140,7 @@ export default function AdminDashboard() {
                             <FiDollarSign />
                         </div>
                     </div>
-                    <p className="admin-stat-value">{stats?.totalRevenue || 0} ج.م</p>
+                    <p className="admin-stat-value">${stats?.totalRevenue || 0}</p>
                     <p className="admin-stat-label">إجمالي الإيرادات</p>
                 </div>
 
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                                     <tr key={order._id}>
                                         <td>{order.userId?.name || 'محذوف'}</td>
                                         <td>{order.courseId?.title || 'محذوف'}</td>
-                                        <td>{order.price} ج.م</td>
+                                        <td>${order.price}</td>
                                         <td>{getPaymentMethod(order.paymentMethod)}</td>
                                         <td>{getStatusBadge(order.status)}</td>
                                         <td>{formatDate(order.createdAt)}</td>

@@ -94,15 +94,11 @@ export const coursesAPI = {
   getCourseById: (id: string) => api.get(`/courses/${id}`),
 
   // Admin only - إنشاء كورس جديد
-  createCourse: (data: FormData) => api.post('/courses', data, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
+  createCourse: (data: Record<string, unknown>) => api.post('/courses', data),
 
   // Admin only - تعديل كورس
-  updateCourse: (id: string, data: FormData) =>
-    api.put(`/courses/${id}`, data, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+  updateCourse: (id: string, data: Record<string, unknown>) =>
+    api.put(`/courses/${id}`, data),
 
   // Admin only - حذف كورس
   deleteCourse: (id: string) => api.delete(`/courses/${id}`),

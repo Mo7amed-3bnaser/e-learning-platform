@@ -163,7 +163,7 @@ export default function AdminCoursesPage() {
                                         </td>
                                         <td>{course.category}</td>
                                         <td>{getLevelLabel(course.level)}</td>
-                                        <td>{course.price === 0 ? 'مجاني' : `${course.price} ج.م`}</td>
+                                        <td>{course.price === 0 ? 'مجاني' : `$${course.price}`}</td>
                                         <td>{course.enrolledStudents || 0}</td>
                                         <td>
                                             {course.rating?.average

@@ -201,7 +201,7 @@ export default function AdminOrdersPage() {
                                         <td style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {order.courseId?.title || 'محذوف'}
                                         </td>
-                                        <td>{order.price} ج.م</td>
+                                        <td>${order.price}</td>
                                         <td>{getPaymentMethod(order.paymentMethod)}</td>
                                         <td>
                                             {order.screenshotUrl ? (

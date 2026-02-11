@@ -103,7 +103,7 @@ export default function NewCoursePage() {
                 requirements: form.requirements.filter((item) => item.trim()),
             };
 
-            await coursesAPI.createCourse(courseData as unknown as FormData);
+            await coursesAPI.createCourse(courseData);
             toast.success('تم إنشاء الكورس بنجاح');
             router.push('/admin/courses');
         } catch {
@@ -160,7 +160,7 @@ export default function NewCoursePage() {
 
                     {/* Price */}
                     <div className="admin-form-group">
-                        <label className="admin-form-label">السعر (ج.م)</label>
+                        <label className="admin-form-label">السعر ($)</label>
                         <input
                             type="number"
                             name="price"

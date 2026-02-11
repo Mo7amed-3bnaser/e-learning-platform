@@ -128,7 +128,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 requirements: form.requirements.filter((item) => item.trim()),
             };
 
-            await coursesAPI.updateCourse(id, courseData as unknown as FormData);
+            await coursesAPI.updateCourse(id, courseData);
             toast.success('تم تحديث الكورس بنجاح');
             router.push('/admin/courses');
         } catch {
@@ -186,7 +186,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                     </div>
 
                     <div className="admin-form-group">
-                        <label className="admin-form-label">السعر (ج.م)</label>
+                        <label className="admin-form-label">السعر ($)</label>
                         <input type="number" name="price" value={form.price} onChange={handleChange} className="admin-form-input" min="0" />
                     </div>
 
