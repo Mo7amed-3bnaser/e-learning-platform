@@ -12,21 +12,26 @@ import {
   FiHome,
   FiLinkedin,
   FiGlobe,
+  FiLock,
+  FiEye,
+  FiEyeOff,
 } from "react-icons/fi";
 import Logo from "@/components/Logo";
 import { instructorApplicationApi } from "@/lib/instructorApi";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/store/authStore";
 
 export default function InstructorApplicationPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
     specialization: "",
     yearsOfExperience: "",
     bio: "",
@@ -40,18 +45,25 @@ export default function InstructorApplicationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isAuthenticated) {
-      toast.error("يرجى تسجيل الدخول أولاً");
-      router.push("/login");
+    // التحقق من كلمة المرور
+    if (formData.password.length < 6) {
+      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("كلمة المرور غير متطابقة");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await instructorApplicationApi.submitApplication(formData);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword, ...submitData } = formData;
+      const response = await instructorApplicationApi.submitApplication(submitData);
       toast.success(response.message || "تم إرسال طلبك بنجاح!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إرسال الطلب";
       toast.error(errorMessage);
@@ -96,6 +108,7 @@ export default function InstructorApplicationPage() {
             <ul className="text-sm text-blue-800 space-y-1 pr-8">
               <li>• سيتم مراجعة طلبك من قبل فريقنا</li>
               <li>• سنتواصل معك عبر البريد الإلكتروني أو الهاتف</li>
+              <li>• لن يتم تفعيل حسابك إلا بعد موافقة الإدارة</li>
               <li>• يرجى ملء جميع الحقول بدقة</li>
             </ul>
           </div>
@@ -190,6 +203,86 @@ export default function InstructorApplicationPage() {
                       dir="ltr"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Password Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    كلمة المرور <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <FiLock className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                      className="block w-full pr-10 pl-12 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
+                      placeholder="••••••••"
+                      dir="ltr"
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <FiEyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                      ) : (
+                        <FiEye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    تأكيد كلمة المرور <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <FiLock className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={formData.confirmPassword}
+                      onChange={(e) =>
+                        setFormData({ ...formData, confirmPassword: e.target.value })
+                      }
+                      className={`block w-full pr-10 pl-12 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white ${formData.confirmPassword &&
+                          formData.password !== formData.confirmPassword
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-slate-200 focus:ring-primary"
+                        }`}
+                      placeholder="••••••••"
+                      dir="ltr"
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                    >
+                      {showConfirmPassword ? (
+                        <FiEyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                      ) : (
+                        <FiEye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                      )}
+                    </button>
+                  </div>
+                  {formData.confirmPassword &&
+                    formData.password !== formData.confirmPassword && (
+                      <p className="text-xs text-red-500">
+                        كلمة المرور غير متطابقة
+                      </p>
+                    )}
                 </div>
               </div>
             </div>

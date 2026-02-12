@@ -6,7 +6,7 @@ interface User {
   name: string;
   email: string;
   phone: string;
-  role: 'student' | 'admin';
+  role: 'student' | 'admin' | 'instructor';
   avatar?: string | null;
 }
 

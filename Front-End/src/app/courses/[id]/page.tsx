@@ -77,7 +77,7 @@ export default function CourseDetailsPage() {
       const response = await coursesAPI.getCourseById(courseId);
       const courseData = response.data.data;
       setCourse(courseData);
-      
+
       // التحقق من التسجيل لو المستخدم مسجل دخول
       if (isAuthenticated) {
         try {
@@ -194,30 +194,28 @@ export default function CourseDetailsPage() {
               {/* محتوى الكورس (أسماء الدروس فقط) */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h2 className="text-2xl font-bold text-slate-800 mb-4">محتوى الكورس</h2>
-                
+
                 {course.videos && course.videos.length > 0 ? (
                   <div className="space-y-2">
                     {course.videos
                       .sort((a, b) => a.order - b.order)
                       .map((video, index) => {
                         const canWatch = video.isFreePreview || isEnrolled;
-                        
+
                         return (
                           <div
                             key={video._id}
                             onClick={() => canWatch && video.isFreePreview && !isEnrolled ? setPreviewVideo(video) : null}
-                            className={`flex items-center justify-between p-4 rounded-xl border border-slate-100 transition-all ${
-                              canWatch && video.isFreePreview && !isEnrolled
+                            className={`flex items-center justify-between p-4 rounded-xl border border-slate-100 transition-all ${canWatch && video.isFreePreview && !isEnrolled
                                 ? 'hover:bg-green-50 hover:border-green-200 cursor-pointer group'
                                 : 'hover:bg-slate-50'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                                video.isFreePreview 
-                                  ? 'bg-green-100 group-hover:bg-green-200' 
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${video.isFreePreview
+                                  ? 'bg-green-100 group-hover:bg-green-200'
                                   : 'bg-primary/10'
-                              }`}>
+                                }`}>
                                 {video.isFreePreview ? (
                                   <FiPlayCircle className="w-5 h-5 text-green-600" />
                                 ) : isEnrolled ? (
@@ -379,34 +377,36 @@ export default function CourseDetailsPage() {
                 </div>
 
                 {/* معلومات المدرس */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <h3 className="font-bold text-slate-800 mb-4">المدرب</h3>
-                  <div className="flex items-center gap-3">
-                    {course.instructor.channelLogo ? (
-                      <img
-                        src={course.instructor.channelLogo}
-                        alt={course.instructor.name}
-                        className="w-12 h-12 rounded object-cover"
-                      />
-                    ) : course.instructor.avatar ? (
-                      <img
-                        src={course.instructor.avatar}
-                        alt={course.instructor.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-xl font-bold">
-                        {course.instructor.name.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium text-slate-800">{course.instructor.name}</p>
-                      {course.instructor.bio && (
-                        <p className="text-sm text-slate-500">{course.instructor.bio}</p>
+                {course.instructor && (
+                  <div className="bg-white rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-slate-800 mb-4">المدرب</h3>
+                    <div className="flex items-center gap-3">
+                      {course.instructor.channelLogo ? (
+                        <img
+                          src={course.instructor.channelLogo}
+                          alt={course.instructor.name}
+                          className="w-12 h-12 rounded object-cover"
+                        />
+                      ) : course.instructor.avatar ? (
+                        <img
+                          src={course.instructor.avatar}
+                          alt={course.instructor.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-xl font-bold">
+                          {course.instructor.name.charAt(0)}
+                        </div>
                       )}
+                      <div>
+                        <p className="font-medium text-slate-800">{course.instructor.name}</p>
+                        {course.instructor.bio && (
+                          <p className="text-sm text-slate-500">{course.instructor.bio}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -415,11 +415,11 @@ export default function CourseDetailsPage() {
 
       {/* Preview Video Modal */}
       {previewVideo && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setPreviewVideo(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl animate-in fade-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()}
           >

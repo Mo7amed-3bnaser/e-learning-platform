@@ -17,21 +17,11 @@ const getAuthHeader = () => {
 };
 
 export const instructorApplicationApi = {
-    // Submit instructor application
+    // Submit instructor application (public - no auth required)
     submitApplication: async (formData: any) => {
         const response = await axios.post(
             `${API_URL}/instructor-applications`,
-            formData,
-            { headers: getAuthHeader() }
-        );
-        return response.data;
-    },
-
-    // Get my application status
-    getMyApplication: async () => {
-        const response = await axios.get(
-            `${API_URL}/instructor-applications/my-application`,
-            { headers: getAuthHeader() }
+            formData
         );
         return response.data;
     },

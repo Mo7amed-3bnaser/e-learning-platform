@@ -130,7 +130,7 @@ export default function Header() {
                         <FiUser className="w-4 h-4 text-slate-600" />
                         <span className="text-sm text-slate-700">الملف الشخصي</span>
                       </Link>
-                      
+
                       <Link
                         href="/dashboard"
                         onClick={() => setShowUserMenu(false)}
@@ -139,21 +139,6 @@ export default function Header() {
                         <FiGrid className="w-4 h-4 text-slate-600" />
                         <span className="text-sm text-slate-700">لوحة التحكم</span>
                       </Link>
-
-                      {/* Instructor Application Link - Students Only */}
-                      {user?.role === 'student' && (
-                        <Link
-                          href="/instructor-application"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-accent/5 transition-colors border-t border-slate-100"
-                        >
-                          <FiUserCheck className="w-4 h-4 text-accent" />
-                          <div className="flex flex-col">
-                            <span className="text-sm text-accent font-medium">انضم كمدرب</span>
-                            <span className="text-xs text-slate-500">قدم طلبك الآن</span>
-                          </div>
-                        </Link>
-                      )}
 
                       {/* Instructor Dashboard Link - Instructors Only */}
                       {user?.role === 'instructor' && (

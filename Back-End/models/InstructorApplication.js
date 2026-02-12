@@ -1,12 +1,8 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const instructorApplicationSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
     firstName: {
       type: String,
       required: [true, 'الاسم الأول مطلوب'],
@@ -21,11 +17,18 @@ const instructorApplicationSchema = new mongoose.Schema(
       type: String,
       required: [true, 'البريد الإلكتروني مطلوب'],
       trim: true,
+      lowercase: true,
     },
     phone: {
       type: String,
       required: [true, 'رقم الهاتف مطلوب'],
       trim: true,
+    },
+    password: {
+      type: String,
+      required: [true, 'كلمة المرور مطلوبة'],
+      minlength: [6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'],
+      select: false, // Don't return password by default
     },
     specialization: {
       type: String,
@@ -82,8 +85,19 @@ const instructorApplicationSchema = new mongoose.Schema(
   }
 );
 
+// Hash password before saving
+instructorApplicationSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+    return;
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
 // Index for faster queries
-instructorApplicationSchema.index({ userId: 1, status: 1 });
+instructorApplicationSchema.index({ email: 1, status: 1 });
 
 const InstructorApplication = mongoose.model(
   'InstructorApplication',
