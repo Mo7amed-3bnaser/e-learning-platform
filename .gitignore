@@ -13,4 +13,5 @@ dev.log
 # Markdown documentation files
 *.md
 !README.md
+!COMPLETION_PLAN.md
 .vscode/mcp.json
