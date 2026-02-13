@@ -1,7 +1,9 @@
 import asyncHandler from 'express-async-handler';
+import crypto from 'crypto';
 import User from '../models/User.js';
 import { generateToken, formatUserResponse } from '../utils/authHelpers.js';
 import { deleteImage } from '../config/cloudinary.js';
+import sendEmail, { getResetPasswordTemplate } from '../utils/sendEmail.js';
 
 /**
  * @desc    تسجيل مستخدم جديد
@@ -212,5 +214,111 @@ export const updateAvatar = asyncHandler(async (req, res) => {
       avatar: updatedUser.avatar,
       role: updatedUser.role
     }
+  });
+});
+
+/**
+ * @desc    نسيت كلمة المرور - إرسال رابط إعادة التعيين
+ * @route   POST /api/auth/forgot-password
+ * @access  Public
+ */
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400);
+    throw new Error('برجاء إدخال البريد الإلكتروني');
+  }
+
+  // البحث عن المستخدم
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('لا يوجد حساب مرتبط بهذا البريد الإلكتروني');
+  }
+
+  // التحقق من حالة الحظر
+  if (user.isBlocked) {
+    res.status(403);
+    throw new Error('تم حظر حسابك. تواصل مع الدعم الفني');
+  }
+
+  // إنشاء رمز إعادة التعيين
+  const resetToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  // إنشاء رابط إعادة التعيين
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
+
+  try {
+    // إرسال البريد الإلكتروني
+    await sendEmail({
+      to: user.email,
+      subject: '🔐 إعادة تعيين كلمة المرور - E-Learning Platform',
+      html: getResetPasswordTemplate(user.name, resetUrl),
+    });
+
+    res.json({
+      success: true,
+      message: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني 📧',
+    });
+  } catch (error) {
+    // في حالة فشل إرسال الإيميل، نحذف التوكن من الداتابيز
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    console.error('Email send error:', error);
+    res.status(500);
+    throw new Error('فشل إرسال البريد الإلكتروني. حاول مرة أخرى لاحقاً');
+  }
+});
+
+/**
+ * @desc    إعادة تعيين كلمة المرور باستخدام التوكن
+ * @route   POST /api/auth/reset-password
+ * @access  Public
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    res.status(400);
+    throw new Error('برجاء إدخال جميع البيانات المطلوبة');
+  }
+
+  if (password.length < 6) {
+    res.status(400);
+    throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+  }
+
+  // تشفير التوكن المرسل ومقارنته بالمحفوظ في الداتابيز
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  // البحث عن المستخدم بالتوكن المشفر والتأكد من أن التوكن لم ينتهي
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error('رابط إعادة التعيين غير صالح أو منتهي الصلاحية. اطلب رابط جديد');
+  }
+
+  // تعيين كلمة المرور الجديدة
+  user.password = password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'تم تعيين كلمة المرور الجديدة بنجاح! يمكنك تسجيل الدخول الآن 🎉',
   });
 });

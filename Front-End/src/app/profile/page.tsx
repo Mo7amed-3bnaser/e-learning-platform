@@ -66,7 +66,7 @@ function ProfileContent() {
       }
 
       showSuccess('تم تحديث البيانات بنجاح! ✨');
-      
+
       // مسح حقول كلمة المرور
       setFormData(prev => ({
         ...prev,
@@ -90,7 +90,7 @@ function ProfileContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Header />
-      
+
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
@@ -100,7 +100,7 @@ function ProfileContent() {
           <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
           <span className="text-sm font-medium">العودة للرئيسية</span>
         </Link>
-        
+
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">الملف الشخصي</h1>
@@ -249,7 +249,16 @@ function ProfileContent() {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Forgot Password Link */}
+            <div className="flex justify-start">
+              <Link
+                href="/forgot-password"
+                className="text-sm font-medium text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1.5 group"
+              >
+                <FiLock className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                نسيت كلمة المرور؟
+              </Link>
+            </div>
             <div className="flex justify-end pt-4">
               <button
                 type="submit"

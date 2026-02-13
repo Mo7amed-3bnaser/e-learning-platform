@@ -3,9 +3,6 @@
 tmpclaude-*
 nul
 
-# Scripts folder
-Back-End/scripts/
-
 # Log files
 *.log
 dev.log
