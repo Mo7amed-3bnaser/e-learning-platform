@@ -62,23 +62,20 @@ export default function CoursesPage() {
     try {
       const response = await ordersAPI.getMyOrders();
       const orders = response.data.data || [];
-      console.log('📦 Orders from API:', orders); // للتأكد من البيانات
       // استخراج IDs الكورسات المشتراة والمقبولة فقط
       const purchasedIds = orders
         .filter((order: any) => order.status === 'approved')
         .map((order: any) => {
           // courseId قد يكون string أو object بعد populate
-          const id = typeof order.courseId === 'string' 
-            ? order.courseId 
+          const id = typeof order.courseId === 'string'
+            ? order.courseId
             : order.courseId?._id;
           return id;
         })
         .filter(Boolean);
-      console.log('✅ Purchased Course IDs:', purchasedIds); // للتأكد من الـ IDs
       setPurchasedCourseIds(purchasedIds);
     } catch (error) {
       // في حالة عدم وجود مستخدم مسجل دخول، نتجاهل الخطأ
-      console.log('No user logged in or error fetching purchased courses');
     }
   };
 
@@ -110,7 +107,7 @@ export default function CoursesPage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
       <Header />
-      
+
       {/* Page Header */}
       <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
         <div className="max-w-7xl mx-auto px-4 py-16">
@@ -161,21 +158,19 @@ export default function CoursesPage() {
               <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded transition-colors ${
-                    viewMode === 'grid'
+                  className={`p-2 rounded transition-colors ${viewMode === 'grid'
                       ? 'bg-white text-primary shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
-                  }`}
+                    }`}
                 >
                   <FiGrid className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded transition-colors ${
-                    viewMode === 'list'
+                  className={`p-2 rounded transition-colors ${viewMode === 'list'
                       ? 'bg-white text-primary shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
-                  }`}
+                    }`}
                 >
                   <FiList className="w-5 h-5" />
                 </button>
@@ -201,11 +196,10 @@ export default function CoursesPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {isLoading ? (
           <div
-            className={`grid gap-6 ${
-              viewMode === 'grid'
+            className={`grid gap-6 ${viewMode === 'grid'
                 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
                 : 'grid-cols-1'
-            }`}
+              }`}
           >
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <CourseSkeleton key={i} />
@@ -238,15 +232,14 @@ export default function CoursesPage() {
           </div>
         ) : (
           <div
-            className={`grid gap-6 ${
-              viewMode === 'grid'
+            className={`grid gap-6 ${viewMode === 'grid'
                 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
                 : 'grid-cols-1'
-            }`}
+              }`}
           >
             {filteredCourses.map((course) => (
-              <CourseCard 
-                key={course._id} 
+              <CourseCard
+                key={course._id}
                 course={course}
                 isPurchased={purchasedCourseIds.includes(course._id)}
               />

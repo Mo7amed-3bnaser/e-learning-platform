@@ -120,7 +120,6 @@ export const markVideoComplete = async (req, res) => {
           userId,
           courseId,
         );
-        console.log("Certificate generated:", certificateData.certificateId);
 
         // Refresh enrollment data from DB (it was updated in generateCertificateForStudent)
         const updatedUser = await User.findById(userId);
