@@ -18,6 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "منصة مسار التعليمية",
   description: "منصة تعليمية متطورة لتقديم أفضل تجربة تعليمية",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

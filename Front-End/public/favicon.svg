@@ -1,0 +1,16 @@
+<svg width="130" height="100" viewBox="0 0 130 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Letter M - Left vertical bar -->
+  <path d="M12 20V85" stroke="#1e3a5f" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Letter M - Diagonal up -->
+  <path d="M12 20L45 60" stroke="#1e3a5f" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Letter M - Peak going up to arrow -->
+  <path d="M45 60L75 15" stroke="#1e3a5f" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Letter M - Right side going down -->
+  <path d="M75 15L75 50" stroke="#1e3a5f" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Arrow horizontal line -->
+  <path d="M75 15L105 15" stroke="#1e3a5f" stroke-width="12" stroke-linecap="round"/>
+  <!-- Arrow head -->
+  <path d="M95 5L108 15L95 25" stroke="#1e3a5f" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Road/Path - Orange dashed -->
+  <path d="M14 80V22L46 56L78 16H104" stroke="#f97316" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12 10" fill="none"/>
+</svg>
