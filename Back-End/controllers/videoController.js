@@ -3,9 +3,9 @@ import Video from "../models/Video.js";
 import Course from "../models/Course.js";
 
 /**
- * @desc    إضافة فيديو لكورس (Admin فقط)
+ * @desc    إضافة فيديو لكورس (Admin أو المدرب صاحب الكورس)
  * @route   POST /api/videos
- * @access  Private/Admin
+ * @access  Private/Admin/Instructor(Owner)
  */
 export const addVideo = asyncHandler(async (req, res) => {
   const {
@@ -26,6 +26,15 @@ export const addVideo = asyncHandler(async (req, res) => {
   if (!course) {
     res.status(404);
     throw new Error("الكورس غير موجود");
+  }
+
+  // التحقق من الصلاحية: أدمن أو صاحب الكورس
+  if (
+    req.user.role !== 'admin' &&
+    course.instructor.toString() !== req.user.id.toString()
+  ) {
+    res.status(403);
+    throw new Error('غير مصرح لك - لا تملك صلاحية إضافة فيديو لهذا الكورس');
   }
 
   // التحقق من وجود Video ID حسب النوع
@@ -180,9 +189,9 @@ export const getVideoById = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    تحديث فيديو (Admin فقط)
+ * @desc    تحديث فيديو (Admin أو المدرب صاحب الكورس)
  * @route   PUT /api/videos/:id
- * @access  Private/Admin
+ * @access  Private/Admin/Instructor(Owner)
  */
 export const updateVideo = asyncHandler(async (req, res) => {
   const video = await Video.findById(req.params.id);
@@ -190,6 +199,15 @@ export const updateVideo = asyncHandler(async (req, res) => {
   if (!video) {
     res.status(404);
     throw new Error("الفيديو غير موجود");
+  }
+
+  // التحقق من الصلاحية: أدمن أو صاحب الكورس
+  if (req.user.role !== 'admin') {
+    const course = await Course.findById(video.courseId);
+    if (!course || course.instructor.toString() !== req.user.id.toString()) {
+      res.status(403);
+      throw new Error('غير مصرح لك - لا تملك صلاحية تعديل هذا الفيديو');
+    }
   }
 
   const updatedVideo = await Video.findByIdAndUpdate(req.params.id, req.body, {
@@ -205,9 +223,9 @@ export const updateVideo = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    حذف فيديو (Admin فقط)
+ * @desc    حذف فيديو (Admin أو المدرب صاحب الكورس)
  * @route   DELETE /api/videos/:id
- * @access  Private/Admin
+ * @access  Private/Admin/Instructor(Owner)
  */
 export const deleteVideo = asyncHandler(async (req, res) => {
   const video = await Video.findById(req.params.id);
@@ -217,10 +235,37 @@ export const deleteVideo = asyncHandler(async (req, res) => {
     throw new Error("الفيديو غير موجود");
   }
 
+  // التحقق من الصلاحية: أدمن أو صاحب الكورس
+  if (req.user.role !== 'admin') {
+    const course = await Course.findById(video.courseId);
+    if (!course || course.instructor.toString() !== req.user.id.toString()) {
+      res.status(403);
+      throw new Error('غير مصرح لك - لا تملك صلاحية حذف هذا الفيديو');
+    }
+  }
+
   await video.deleteOne();
 
   res.json({
     success: true,
     message: "تم حذف الفيديو بنجاح",
+  });
+});
+
+/**
+ * @desc    الحصول على فيديوهات كورس للإدارة (المدرب صاحب الكورس أو Admin)
+ * @route   GET /api/videos/manage/:courseId
+ * @access  Private/Instructor(Owner)/Admin
+ */
+export const getInstructorCourseVideos = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+
+  // isInstructorOfCourse middleware already verified ownership
+  const videos = await Video.find({ courseId }).sort('order');
+
+  res.json({
+    success: true,
+    message: 'تم جلب فيديوهات الكورس بنجاح',
+    data: videos,
   });
 });

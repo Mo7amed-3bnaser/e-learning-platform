@@ -33,8 +33,10 @@ router.post('/', protect, instructorOrAdmin, createCourseValidation, validate, c
 router.put('/:id', protect, isInstructorOfCourse, updateCourse);
 router.delete('/:id', protect, isInstructorOfCourse, deleteCourse);
 
+// Instructor (owner) / Admin routes
+router.patch('/:id/publish', protect, isInstructorOfCourse, togglePublishCourse);
+
 // Admin only routes
-router.patch('/:id/publish', protect, admin, togglePublishCourse);
 router.get('/admin/all', protect, admin, getAllCoursesAdmin);
 
 export default router;

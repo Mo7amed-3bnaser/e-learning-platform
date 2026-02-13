@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
-import { FiPlus, FiEdit, FiTrash2, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiPlus, FiEdit, FiTrash2, FiEye, FiEyeOff, FiPlay } from "react-icons/fi";
 import { useAuthStore } from "@/store/authStore";
 import { instructorApi } from "@/lib/instructorApi";
 import toast from "react-hot-toast";
@@ -114,8 +114,8 @@ export default function InstructorCoursesPage() {
                                     <div className="flex items-center justify-between mb-2">
                                         <span
                                             className={`text-xs px-3 py-1 rounded-full font-medium ${course.isPublished
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-orange-100 text-orange-700"
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-orange-100 text-orange-700"
                                                 }`}
                                         >
                                             {course.isPublished ? "منشور" : "مسودة"}
@@ -143,6 +143,13 @@ export default function InstructorCoursesPage() {
                                         >
                                             <FiEdit className="w-4 h-4" />
                                             تعديل
+                                        </Link>
+                                        <Link
+                                            href={`/dashboard/instructor/courses/${course._id}/videos`}
+                                            className="flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-100 transition-colors"
+                                            title="إدارة الفيديوهات"
+                                        >
+                                            <FiPlay className="w-4 h-4" />
                                         </Link>
                                         <button
                                             onClick={() => handleDelete(course._id, course.title)}

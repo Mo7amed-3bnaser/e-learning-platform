@@ -95,10 +95,60 @@ export const instructorApi = {
         return response.data;
     },
 
+    // Toggle publish course
+    togglePublish: async (id: string) => {
+        const response = await axios.patch(
+            `${API_URL}/courses/${id}/publish`,
+            {},
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
     // Get course stats
     getCourseStats: async (id: string) => {
         const response = await axios.get(
             `${API_URL}/courses/instructor/${id}/stats`,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
+    // ======== Video Management ========
+
+    // Get course videos for management
+    getCourseVideos: async (courseId: string) => {
+        const response = await axios.get(
+            `${API_URL}/videos/manage/${courseId}`,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
+    // Add video to course
+    addVideo: async (videoData: any) => {
+        const response = await axios.post(
+            `${API_URL}/videos`,
+            videoData,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
+    // Update video
+    updateVideo: async (id: string, videoData: any) => {
+        const response = await axios.put(
+            `${API_URL}/videos/${id}`,
+            videoData,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
+    // Delete video
+    deleteVideo: async (id: string) => {
+        const response = await axios.delete(
+            `${API_URL}/videos/${id}`,
             { headers: getAuthHeader() }
         );
         return response.data;
