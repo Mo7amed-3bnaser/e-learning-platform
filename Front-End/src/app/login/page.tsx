@@ -38,9 +38,9 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setIsLoading(true);
-    
+
     try {
       const response = await authAPI.login({
         email: formData.email,
@@ -48,7 +48,7 @@ export default function LoginPage() {
       });
 
       const { data } = response.data;
-      
+
       // حفظ البيانات للمرة القادمة إذا كان "تذكرني" مفعل
       if (formData.rememberMe) {
         localStorage.setItem('remembered-login', JSON.stringify({
@@ -58,7 +58,7 @@ export default function LoginPage() {
       } else {
         localStorage.removeItem('remembered-login');
       }
-      
+
       // حفظ بيانات المستخدم في Store
       const userData = {
         id: data.id,
@@ -68,16 +68,16 @@ export default function LoginPage() {
         role: data.role,
         avatar: data.avatar || null,
       };
-      
+
       // حفظ البيانات في Store
       login(data.token, userData);
-      
+
       // عرض رسالة نجاح
       showSuccess(response.data.message || 'تم تسجيل الدخول بنجاح!');
-      
+
       // انتظار قليل لضمان حفظ البيانات في localStorage
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // التوجيه حسب نوع المستخدم
       if (data.role === 'admin') {
         window.location.href = '/admin';
@@ -85,6 +85,13 @@ export default function LoginPage() {
         window.location.href = '/';
       }
     } catch (error: unknown) {
+      // التحقق من أن الإيميل غير مؤكد
+      const axiosError = error as any;
+      if (axiosError?.response?.data?.message === 'EMAIL_NOT_VERIFIED') {
+        showError('يجب تأكيد البريد الإلكتروني أولاً');
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+        return;
+      }
       handleApiError(error);
       // في حالة الخطأ، نحتفظ بالبيانات في النموذج
       // لا نعمل reset للـ form
@@ -105,7 +112,7 @@ export default function LoginPage() {
           <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
           <span className="text-sm font-medium">العودة للرئيسية</span>
         </Link>
-        
+
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
           <div className="text-center">

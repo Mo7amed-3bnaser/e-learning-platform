@@ -3,10 +3,10 @@ import crypto from 'crypto';
 import User from '../models/User.js';
 import { generateToken, formatUserResponse } from '../utils/authHelpers.js';
 import { deleteImage } from '../config/cloudinary.js';
-import sendEmail, { getResetPasswordTemplate } from '../utils/sendEmail.js';
+import sendEmail, { getResetPasswordTemplate, getEmailVerificationTemplate } from '../utils/sendEmail.js';
 
 /**
- * @desc    تسجيل مستخدم جديد
+ * @desc    تسجيل مستخدم جديد (مع إرسال إيميل تأكيد)
  * @route   POST /api/auth/register
  * @access  Public
  */
@@ -36,16 +36,147 @@ export const register = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    const token = generateToken(user);
+    // إنشاء توكن التأكيد
+    const verificationToken = user.getEmailVerificationToken();
+    await user.save({ validateBeforeSave: false });
 
-    res.status(201).json({
-      success: true,
-      message: 'تم التسجيل بنجاح! مرحباً بك 🎉',
-      data: formatUserResponse(user, token)
-    });
+    // إنشاء رابط التأكيد
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+    const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
+
+    try {
+      // إرسال إيميل التأكيد
+      await sendEmail({
+        to: user.email,
+        subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+        html: getEmailVerificationTemplate(user.name, verificationUrl),
+      });
+
+      res.status(201).json({
+        success: true,
+        message: 'تم إنشاء الحساب بنجاح! تم إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
+        requiresVerification: true,
+      });
+    } catch (error) {
+      // في حالة فشل إرسال الإيميل، نحذف التوكن لكن لا نحذف اليوزر
+      user.emailVerificationToken = undefined;
+      user.emailVerificationExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      console.error('Email send error:', error);
+      res.status(500);
+      throw new Error('تم إنشاء الحساب لكن فشل إرسال البريد الإلكتروني. حاول إعادة إرسال رابط التأكيد');
+    }
   } else {
     res.status(400);
     throw new Error('فشل إنشاء الحساب. حاول مرة أخرى');
+  }
+});
+
+/**
+ * @desc    تأكيد البريد الإلكتروني
+ * @route   POST /api/auth/verify-email
+ * @access  Public
+ */
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    res.status(400);
+    throw new Error('رابط التأكيد غير صالح');
+  }
+
+  // تشفير التوكن المرسل ومقارنته بالمحفوظ في الداتابيز
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  // البحث عن المستخدم بالتوكن المشفر والتأكد من أن التوكن لم ينتهي
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error('رابط التأكيد غير صالح أو منتهي الصلاحية. اطلب رابط جديد');
+  }
+
+  // تأكيد البريد الإلكتروني
+  user.isEmailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpire = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  res.json({
+    success: true,
+    message: 'تم تأكيد البريد الإلكتروني بنجاح! يمكنك تسجيل الدخول الآن 🎉',
+  });
+});
+
+/**
+ * @desc    إعادة إرسال رابط تأكيد البريد الإلكتروني
+ * @route   POST /api/auth/resend-verification
+ * @access  Public
+ */
+export const resendVerification = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400);
+    throw new Error('برجاء إدخال البريد الإلكتروني');
+  }
+
+  // البحث عن المستخدم
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('لا يوجد حساب مرتبط بهذا البريد الإلكتروني');
+  }
+
+  // التحقق إذا كان البريد مؤكد بالفعل
+  if (user.isEmailVerified) {
+    res.status(400);
+    throw new Error('البريد الإلكتروني مؤكد بالفعل. يمكنك تسجيل الدخول');
+  }
+
+  // التحقق من حالة الحظر
+  if (user.isBlocked) {
+    res.status(403);
+    throw new Error('تم حظر حسابك. تواصل مع الدعم الفني');
+  }
+
+  // إنشاء توكن تأكيد جديد
+  const verificationToken = user.getEmailVerificationToken();
+  await user.save({ validateBeforeSave: false });
+
+  // إنشاء رابط التأكيد
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
+
+  try {
+    // إرسال إيميل التأكيد
+    await sendEmail({
+      to: user.email,
+      subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+      html: getEmailVerificationTemplate(user.name, verificationUrl),
+    });
+
+    res.json({
+      success: true,
+      message: 'تم إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
+    });
+  } catch (error) {
+    // في حالة فشل إرسال الإيميل، نحذف التوكن
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    console.error('Email send error:', error);
+    res.status(500);
+    throw new Error('فشل إرسال البريد الإلكتروني. حاول مرة أخرى لاحقاً');
   }
 });
 
@@ -83,6 +214,12 @@ export const login = asyncHandler(async (req, res) => {
   if (!isPasswordMatch) {
     res.status(401);
     throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+  }
+
+  // التحقق من تأكيد البريد الإلكتروني (الأدمن معفي)
+  if (!user.isEmailVerified && user.role !== 'admin') {
+    res.status(403);
+    throw new Error('EMAIL_NOT_VERIFIED');
   }
 
   // إنشاء التوكن

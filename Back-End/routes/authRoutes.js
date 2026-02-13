@@ -6,7 +6,9 @@ import {
   updateProfile,
   updateAvatar,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifyEmail,
+  resendVerification
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { registerValidation, loginValidation, validate } from '../middleware/validation.js';
@@ -19,6 +21,8 @@ router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+router.post('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerification);
 
 // Protected routes
 router.get('/me', protect, getMe);

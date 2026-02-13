@@ -73,6 +73,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationToken: {
+      type: String,
+      default: undefined,
+    },
+    emailVerificationExpire: {
+      type: Date,
+      default: undefined,
+    },
     resetPasswordToken: {
       type: String,
       default: undefined,
@@ -101,6 +113,23 @@ userSchema.pre("save", async function (next) {
 // Compare password method
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Generate and hash email verification token
+userSchema.methods.getEmailVerificationToken = function () {
+  // Generate random token
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
+  // Hash the token and save to DB
+  this.emailVerificationToken = crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
+  // Set expiry to 24 hours
+  this.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000;
+
+  return verificationToken;
 };
 
 // Generate and hash password reset token

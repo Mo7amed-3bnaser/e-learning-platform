@@ -14,13 +14,11 @@ import {
   FiHome,
 } from "react-icons/fi";
 import Logo from "@/components/Logo";
-import { useAuthStore } from "@/store/authStore";
 import { authAPI } from "@/lib/api";
 import { showSuccess, showError, handleApiError } from "@/lib/toast";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,13 +39,13 @@ export default function RegisterPage() {
       showError('برجاء إدخال الاسم الأول');
       return false;
     }
-    
+
     // التحقق من الاسم الأخير
     if (!formData.lastName.trim()) {
       showError('برجاء إدخال الاسم الأخير');
       return false;
     }
-    
+
     // التحقق من البريد الإلكتروني
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
@@ -58,13 +56,13 @@ export default function RegisterPage() {
       showError('البريد الإلكتروني غير صحيح');
       return false;
     }
-    
+
     // التحقق من رقم الموبايل
     if (!formData.phone.trim()) {
       showError('برجاء إدخال رقم الموبايل');
       return false;
     }
-    
+
     // التأكد من أن الرقم يحتوي على 11 رقم فقط
     const phoneRegex = /^01[0-2,5]{1}[0-9]{8}$/;
     if (formData.phone.length !== 11) {
@@ -75,13 +73,13 @@ export default function RegisterPage() {
       showError('رقم الموبايل غير صحيح (يجب أن يبدأ بـ 010, 011, 012, أو 015)');
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (currentStep === 1) {
       // التحقق من البيانات قبل الانتقال للخطوة الثانية
       if (!validateStep1()) {
@@ -90,32 +88,32 @@ export default function RegisterPage() {
       setCurrentStep(2);
       return;
     }
-    
+
     // التحقق من كلمة المرور
     if (!formData.password) {
       showError('برجاء إدخال كلمة المرور');
       return;
     }
-    
+
     if (formData.password.length < 6) {
       showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
       return;
     }
-    
+
     // التحقق من تطابق كلمة المرور
     if (formData.password !== formData.confirmPassword) {
       showError('كلمة المرور غير متطابقة');
       return;
     }
-    
+
     // التحقق من الموافقة على الشروط
     if (!formData.agreeTerms) {
       showError('برجاء الموافقة على الشروط والأحكام');
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       const response = await authAPI.register({
         name: `${formData.firstName} ${formData.lastName}`,
@@ -124,28 +122,11 @@ export default function RegisterPage() {
         password: formData.password,
       });
 
-      const { data } = response.data;
-      
-      // حفظ البيانات في Store
-      const userData = {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        role: data.role,
-        avatar: data.avatar || null,
-      };
-      
-      login(data.token, userData);
-      
       // عرض رسالة نجاح
-      showSuccess(response.data.message || 'تم إنشاء الحساب بنجاح!');
-      
-      // انتظار قليل لضمان حفظ البيانات في localStorage
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // التوجيه للصفحة الرئيسية
-      window.location.href = '/';
+      showSuccess(response.data.message || 'تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني');
+
+      // التوجيه لصفحة انتظار التأكيد
+      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
     } catch (error: any) {
       handleApiError(error);
     } finally {
@@ -191,7 +172,7 @@ export default function RegisterPage() {
           <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
           <span className="text-sm font-medium">العودة للرئيسية</span>
         </Link>
-        
+
         <div className="w-full max-w-md space-y-6">
           {/* Logo */}
           <div className="text-center">
@@ -199,7 +180,7 @@ export default function RegisterPage() {
               <Logo size="lg" />
             </Link>
             <h1 className="mt-6 text-3xl font-bold text-slate-800">
-              إنشاء حساب جديد 
+              إنشاء حساب جديد
             </h1>
             <p className="mt-2 text-slate-500">
               {currentStep === 1
@@ -212,43 +193,38 @@ export default function RegisterPage() {
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                  currentStep >= 1
-                    ? "bg-primary text-white"
-                    : "bg-slate-200 text-slate-500"
-                }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${currentStep >= 1
+                  ? "bg-primary text-white"
+                  : "bg-slate-200 text-slate-500"
+                  }`}
               >
                 {currentStep > 1 ? <FiCheck /> : "1"}
               </div>
               <span
-                className={`text-sm ${
-                  currentStep >= 1 ? "text-primary" : "text-slate-400"
-                }`}
+                className={`text-sm ${currentStep >= 1 ? "text-primary" : "text-slate-400"
+                  }`}
               >
                 المعلومات الشخصية
               </span>
             </div>
             <div className="w-12 h-0.5 bg-slate-200">
               <div
-                className={`h-full bg-primary transition-all duration-300 ${
-                  currentStep >= 2 ? "w-full" : "w-0"
-                }`}
+                className={`h-full bg-primary transition-all duration-300 ${currentStep >= 2 ? "w-full" : "w-0"
+                  }`}
               ></div>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                  currentStep >= 2
-                    ? "bg-primary text-white"
-                    : "bg-slate-200 text-slate-500"
-                }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${currentStep >= 2
+                  ? "bg-primary text-white"
+                  : "bg-slate-200 text-slate-500"
+                  }`}
               >
                 2
               </div>
               <span
-                className={`text-sm ${
-                  currentStep >= 2 ? "text-primary" : "text-slate-400"
-                }`}
+                className={`text-sm ${currentStep >= 2 ? "text-primary" : "text-slate-400"
+                  }`}
               >
                 بيانات الحساب
               </span>
@@ -345,13 +321,12 @@ export default function RegisterPage() {
                           setFormData({ ...formData, phone: value });
                         }
                       }}
-                      className={`block w-full pr-10 pl-4 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 bg-slate-50 hover:bg-white ${
-                        formData.phone && formData.phone.length === 11
-                          ? 'border-green-500 focus:ring-green-500 focus:border-transparent'
-                          : formData.phone && formData.phone.length > 0
+                      className={`block w-full pr-10 pl-4 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 bg-slate-50 hover:bg-white ${formData.phone && formData.phone.length === 11
+                        ? 'border-green-500 focus:ring-green-500 focus:border-transparent'
+                        : formData.phone && formData.phone.length > 0
                           ? 'border-orange-500 focus:ring-orange-500 focus:border-transparent'
                           : 'border-slate-200 focus:ring-primary focus:border-transparent'
-                      }`}
+                        }`}
                       placeholder="01xxxxxxxxx"
                       dir="ltr"
                       maxLength={11}
@@ -411,26 +386,24 @@ export default function RegisterPage() {
                         {[1, 2, 3, 4, 5].map((i) => (
                           <div
                             key={i}
-                            className={`h-1.5 flex-1 rounded-full transition-colors ${
-                              i <= passwordStrength(formData.password)
-                                ? getStrengthColor(
-                                    passwordStrength(formData.password)
-                                  )
-                                : "bg-slate-200"
-                            }`}
+                            className={`h-1.5 flex-1 rounded-full transition-colors ${i <= passwordStrength(formData.password)
+                              ? getStrengthColor(
+                                passwordStrength(formData.password)
+                              )
+                              : "bg-slate-200"
+                              }`}
                           ></div>
                         ))}
                       </div>
                       <p className="text-xs text-slate-500">
                         قوة كلمة المرور:{" "}
                         <span
-                          className={`font-medium ${
-                            passwordStrength(formData.password) >= 4
-                              ? "text-green-600"
-                              : passwordStrength(formData.password) >= 3
+                          className={`font-medium ${passwordStrength(formData.password) >= 4
+                            ? "text-green-600"
+                            : passwordStrength(formData.password) >= 3
                               ? "text-yellow-600"
                               : "text-red-600"
-                          }`}
+                            }`}
                         >
                           {getStrengthText(passwordStrength(formData.password))}
                         </span>
@@ -458,12 +431,11 @@ export default function RegisterPage() {
                           confirmPassword: e.target.value,
                         })
                       }
-                      className={`block w-full pr-10 pl-12 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white ${
-                        formData.confirmPassword &&
+                      className={`block w-full pr-10 pl-12 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white ${formData.confirmPassword &&
                         formData.password !== formData.confirmPassword
-                          ? "border-red-300 focus:ring-red-500"
-                          : "border-slate-200 focus:ring-primary"
-                      }`}
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-slate-200 focus:ring-primary"
+                        }`}
                       placeholder="••••••••"
                       dir="ltr"
                     />
@@ -538,9 +510,8 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`${
-                  currentStep === 1 ? "w-full" : "flex-1"
-                } flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-l from-primary to-primary-dark hover:from-primary-dark hover:to-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed`}
+                className={`${currentStep === 1 ? "w-full" : "flex-1"
+                  } flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-l from-primary to-primary-dark hover:from-primary-dark hover:to-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed`}
               >
                 {isLoading ? (
                   <svg
