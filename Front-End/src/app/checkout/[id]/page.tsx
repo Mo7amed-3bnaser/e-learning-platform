@@ -139,11 +139,11 @@ export default function CheckoutPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-slate-600">الاسم:</span>
-                    <span className="font-medium text-slate-800">{user?.name}</span>
+                    <span className="font-medium text-slate-800">{user?.name || 'غير متوفر'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">البريد الإلكتروني:</span>
-                    <span className="font-medium text-slate-800">{user?.email}</span>
+                    <span className="font-medium text-slate-800">{user?.email || 'غير متوفر'}</span>
                   </div>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
                       <h3 className="font-medium text-slate-800 text-sm line-clamp-2 mb-1">
                         {course.title}
                       </h3>
-                      <p className="text-xs text-slate-500">{course.instructor.name}</p>
+                      <p className="text-xs text-slate-500">{course.instructor?.name || 'المدرب'}</p>
                     </div>
                   </div>
                 </div>

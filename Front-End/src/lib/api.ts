@@ -166,9 +166,8 @@ export const videosAPI = {
 // ============================================
 export const ordersAPI = {
   // Student - إنشاء طلب شراء جديد
-  createOrder: (data: FormData) => api.post('/orders', data, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
+  createOrder: (data: { courseId: string; paymentMethod: string; screenshotUrl: string }) =>
+    api.post('/orders', data),
 
   // Student - جلب طلبات المستخدم
   getMyOrders: () => api.get('/orders/my-orders'),
