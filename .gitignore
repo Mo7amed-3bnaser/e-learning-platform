@@ -11,4 +11,5 @@ dev.log
 *.md
 !README.md
 !COMPLETION_PLAN.md
+!PROJECT_REVIEW.md
 .vscode/mcp.json
