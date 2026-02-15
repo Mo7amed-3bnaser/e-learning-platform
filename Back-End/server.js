@@ -6,6 +6,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 import connectDB from "./config/database.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
@@ -42,6 +43,9 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Data sanitization against NoSQL injection
+app.use(mongoSanitize());
 
 // Serve uploaded files
 app.use("/uploads", express.static("uploads"));

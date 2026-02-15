@@ -208,10 +208,18 @@ export const login = asyncHandler(async (req, res) => {
     throw new Error('تم حظر حسابك. تواصل مع الدعم الفني');
   }
 
+  // التحقق من Account Lockout
+  if (user.isLocked) {
+    res.status(403);
+    throw new Error('تم قفل حسابك مؤقتاً بسبب محاولات تسجيل دخول فاشلة متعددة. حاول مرة أخرى بعد 30 دقيقة');
+  }
+
   // التحقق من كلمة المرور
   const isPasswordMatch = await user.matchPassword(password);
 
   if (!isPasswordMatch) {
+    // زيادة عدد المحاولات الفاشلة
+    await user.incLoginAttempts();
     res.status(401);
     throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
   }
@@ -220,6 +228,11 @@ export const login = asyncHandler(async (req, res) => {
   if (!user.isEmailVerified && user.role !== 'admin') {
     res.status(403);
     throw new Error('EMAIL_NOT_VERIFIED');
+  }
+
+  // إعادة تعيين محاولات تسجيل الدخول عند النجاح
+  if (user.loginAttempts > 0) {
+    await user.resetLoginAttempts();
   }
 
   // إنشاء التوكن
@@ -262,7 +275,7 @@ export const getMe = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const updateProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).select('+password');
 
   if (user) {
     user.name = req.body.name || user.name;
@@ -287,9 +300,23 @@ export const updateProfile = asyncHandler(async (req, res) => {
       user.phone = req.body.phone;
     }
 
-    // تغيير كلمة المرور (إذا أراد)
-    if (req.body.password) {
-      user.password = req.body.password;
+    // تغيير كلمة المرور (إذا أراد) - مع التحقق من كلمة المرور الحالية
+    if (req.body.newPassword) {
+      // التحقق من وجود كلمة المرور الحالية
+      if (!req.body.currentPassword) {
+        res.status(400);
+        throw new Error('برجاء إدخال كلمة المرور الحالية لتغيير كلمة المرور');
+      }
+
+      // التحقق من صحة كلمة المرور الحالية
+      const isPasswordMatch = await user.matchPassword(req.body.currentPassword);
+      if (!isPasswordMatch) {
+        res.status(401);
+        throw new Error('كلمة المرور الحالية غير صحيحة');
+      }
+
+      // تعيين كلمة المرور الجديدة
+      user.password = req.body.newPassword;
     }
 
     const updatedUser = await user.save();
@@ -370,15 +397,23 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   // البحث عن المستخدم
   const user = await User.findOne({ email });
 
+  // إصلاح User Enumeration - رسالة عامة دائماً
+  // حتى لو المستخدم غير موجود، نرسل رسالة نجاح
   if (!user) {
-    res.status(404);
-    throw new Error('لا يوجد حساب مرتبط بهذا البريد الإلكتروني');
+    res.json({
+      success: true,
+      message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
+    });
+    return;
   }
 
-  // التحقق من حالة الحظر
+  // التحقق من حالة الحظر (بدون كشف وجود الحساب)
   if (user.isBlocked) {
-    res.status(403);
-    throw new Error('تم حظر حسابك. تواصل مع الدعم الفني');
+    res.json({
+      success: true,
+      message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
+    });
+    return;
   }
 
   // إنشاء رمز إعادة التعيين
@@ -399,7 +434,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
     res.json({
       success: true,
-      message: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني 📧',
+      message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
     });
   } catch (error) {
     // في حالة فشل إرسال الإيميل، نحذف التوكن من الداتابيز
@@ -408,8 +443,11 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     console.error('Email send error:', error);
-    res.status(500);
-    throw new Error('فشل إرسال البريد الإلكتروني. حاول مرة أخرى لاحقاً');
+    // رسالة عامة حتى في حالة الخطأ
+    res.json({
+      success: true,
+      message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
+    });
   }
 });
 

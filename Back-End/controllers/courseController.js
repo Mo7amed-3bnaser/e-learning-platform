@@ -133,10 +133,39 @@ export const updateCourse = asyncHandler(async (req, res) => {
     throw new Error('الكورس غير موجود');
   }
 
-  const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
+  // Whitelist - الحقول المسموح تعديلها فقط (منع Mass Assignment)
+  const allowedFields = [
+    'title',
+    'description',
+    'price',
+    'thumbnail',
+    'category',
+    'level',
+    'whatYouWillLearn',
+    'requirements'
+  ];
+
+  // تصفية البيانات المرسلة
+  const updates = {};
+  allowedFields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
   });
+
+  // Admin يمكنه تعديل instructor
+  if (req.user.role === 'admin' && req.body.instructor) {
+    updates.instructor = req.body.instructor;
+  }
+
+  const updatedCourse = await Course.findByIdAndUpdate(
+    req.params.id,
+    updates,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
   res.json({
     success: true,

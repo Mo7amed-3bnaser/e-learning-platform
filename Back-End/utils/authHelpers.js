@@ -3,6 +3,11 @@ import jwt from 'jsonwebtoken';
 /**
  * Generate JWT Token
  * التوكن هيحتوي على (ID, Name, Phone, Role) عشان الفرونت يستخدمهم في العلامة المائية
+ * 
+ * ملاحظة أمنية: تم تقليل مدة الـ Token من 30 يوم إلى 1 ساعة
+ * في المستقبل، يُنصح بتنفيذ نظام Refresh Token:
+ * - Access Token: 1 ساعة (للطلبات العادية)
+ * - Refresh Token: 7 أيام (لتجديد الـ Access Token)
  */
 export const generateToken = (user) => {
   return jwt.sign(
@@ -14,7 +19,7 @@ export const generateToken = (user) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: process.env.JWT_EXPIRE || '30d'
+      expiresIn: '1h' // تم التقليل من 30d إلى 1h للأمان
     }
   );
 };

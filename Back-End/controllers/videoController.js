@@ -210,10 +210,41 @@ export const updateVideo = asyncHandler(async (req, res) => {
     }
   }
 
-  const updatedVideo = await Video.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
+  // Whitelist - الحقول المسموح تعديلها فقط (منع Mass Assignment)
+  const allowedFields = [
+    'title',
+    'description',
+    'videoProvider',
+    'youtubeVideoId',
+    'bunnyVideoId',
+    'duration',
+    'order',
+    'isFreePreview',
+    'thumbnail'
+  ];
+
+  // تصفية البيانات المرسلة
+  const updates = {};
+  allowedFields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
   });
+
+  // منع تعديل courseId (حماية من نقل الفيديو لكورس آخر)
+  if (req.body.courseId) {
+    res.status(400);
+    throw new Error('لا يمكن تغيير الكورس المرتبط بالفيديو');
+  }
+
+  const updatedVideo = await Video.findByIdAndUpdate(
+    req.params.id,
+    updates,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   res.json({
     success: true,

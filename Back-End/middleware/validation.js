@@ -51,8 +51,10 @@ export const registerValidation = [
     .trim()
     .notEmpty()
     .withMessage("كلمة المرور مطلوبة")
-    .isLength({ min: 6 })
-    .withMessage("كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+    .isLength({ min: 10 })
+    .withMessage("كلمة المرور يجب أن تكون 10 أحرف على الأقل")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage("كلمة المرور يجب أن تحتوي على حرف كبير وحرف صغير ورقم ورمز خاص (@$!%*?&)"),
 ];
 
 /**

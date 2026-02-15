@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
+const FALLBACK_READY_MS = 2500;
+
 export default function AuthInitializer({
   children,
 }: {
@@ -12,13 +14,17 @@ export default function AuthInitializer({
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
   useEffect(() => {
-    // انتظر حتى يتم تحميل البيانات من localStorage
     if (hasHydrated) {
       setIsReady(true);
     }
   }, [hasHydrated]);
 
-  // عرض شاشة تحميل بسيطة أثناء انتظار hydration
+  // Safety: if hydration never fires (e.g. SSR/localStorage edge case), show content after delay
+  useEffect(() => {
+    const t = setTimeout(() => setIsReady(true), FALLBACK_READY_MS);
+    return () => clearTimeout(t);
+  }, []);
+
   if (!isReady) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">

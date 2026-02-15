@@ -93,6 +93,15 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: undefined,
     },
+    // Account Lockout fields
+    loginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockUntil: {
+      type: Date,
+      default: undefined,
+    },
   },
   {
     timestamps: true, // createdAt & updatedAt
@@ -147,6 +156,44 @@ userSchema.methods.getResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
   return resetToken;
+};
+
+// Virtual property to check if account is locked
+userSchema.virtual("isLocked").get(function () {
+  // Check if lockUntil exists and is in the future
+  return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+// Increment login attempts and lock account if needed
+userSchema.methods.incLoginAttempts = async function () {
+  // If lock has expired, reset attempts
+  if (this.lockUntil && this.lockUntil < Date.now()) {
+    return await this.updateOne({
+      $set: { loginAttempts: 1 },
+      $unset: { lockUntil: 1 },
+    });
+  }
+
+  // Otherwise increment attempts
+  const updates = { $inc: { loginAttempts: 1 } };
+
+  // Lock account after 5 failed attempts for 30 minutes
+  const maxAttempts = 5;
+  const lockTime = 30 * 60 * 1000; // 30 minutes
+
+  if (this.loginAttempts + 1 >= maxAttempts && !this.isLocked) {
+    updates.$set = { lockUntil: Date.now() + lockTime };
+  }
+
+  return await this.updateOne(updates);
+};
+
+// Reset login attempts
+userSchema.methods.resetLoginAttempts = async function () {
+  return await this.updateOne({
+    $set: { loginAttempts: 0 },
+    $unset: { lockUntil: 1 },
+  });
 };
 
 const User = mongoose.model("User", userSchema);
