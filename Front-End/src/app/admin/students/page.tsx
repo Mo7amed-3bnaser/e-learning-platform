@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { FiSearch, FiShield, FiShieldOff, FiTrash2, FiUsers } from 'react-icons/fi';
 import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { TableRowSkeleton, NoStudentsFound } from '@/components/ui';
 
 interface Student {
     _id: string;
@@ -109,15 +110,23 @@ export default function AdminStudentsPage() {
                     <p>عرض وإدارة حسابات الطلاب</p>
                 </div>
                 <div className="admin-table-container">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} style={{ padding: '0.75rem 1rem', display: 'flex', gap: '1rem' }}>
-                            <div className="admin-skeleton" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-                            <div style={{ flex: 1 }}>
-                                <div className="admin-skeleton" style={{ width: '40%', height: '16px', marginBottom: '0.25rem' }} />
-                                <div className="admin-skeleton" style={{ width: '60%', height: '14px' }} />
-                            </div>
-                        </div>
-                    ))}
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>الطالب</th>
+                                <th>الهاتف</th>
+                                <th>الكورسات</th>
+                                <th>الحالة</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <TableRowSkeleton key={i} columns={6} />
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         );
@@ -146,11 +155,7 @@ export default function AdminStudentsPage() {
 
                 <div className="admin-table-wrapper">
                     {students.length === 0 ? (
-                        <div className="admin-empty">
-                            <FiUsers />
-                            <h3>لا توجد نتائج</h3>
-                            <p>{searchQuery ? 'جرب كلمة بحث مختلفة' : 'لم يسجل أي طالب بعد'}</p>
-                        </div>
+                        <NoStudentsFound />
                     ) : (
                         <table className="admin-table">
                             <thead>

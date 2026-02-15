@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/Order.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
+import { paginateQuery } from '../utils/pagination.js';
 
 /**
  * @desc    إنشاء طلب شراء جديد
@@ -69,16 +70,19 @@ export const createOrder = asyncHandler(async (req, res) => {
  * @desc    الحصول على طلبات المستخدم
  * @route   GET /api/orders/my-orders
  * @access  Private
+ * @query   page, limit
  */
 export const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ userId: req.user._id })
-    .populate("courseId", "title thumbnail price")
-    .sort("-createdAt");
+  const result = await paginateQuery(Order, { userId: req.user._id }, req, {
+    populate: { path: 'courseId', select: 'title thumbnail price' },
+    sort: '-createdAt',
+    defaultLimit: 10
+  });
 
   res.json({
     success: true,
-    message: "تم جلب طلباتك بنجاح",
-    data: orders,
+    message: 'تم جلب طلباتك بنجاح',
+    ...result
   });
 });
 
@@ -86,20 +90,22 @@ export const getMyOrders = asyncHandler(async (req, res) => {
  * @desc    الحصول على كل الطلبات المعلقة (Admin)
  * @route   GET /api/orders/pending
  * @access  Private/Admin
+ * @query   page, limit
  */
 export const getPendingOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ status: "pending" })
-    .populate("userId", "name email phone")
-    .populate("courseId", "title thumbnail price")
-    .sort("-createdAt");
+  const result = await paginateQuery(Order, { status: "pending" }, req, {
+    populate: [
+      { path: 'userId', select: 'name email phone' },
+      { path: 'courseId', select: 'title thumbnail price' }
+    ],
+    sort: '-createdAt',
+    defaultLimit: 20
+  });
 
   res.json({
     success: true,
-    message: "تم جلب الطلبات المعلقة",
-    data: orders,
-    pagination: {
-      total: orders.length,
-    },
+    message: 'تم جلب الطلبات المعلقة',
+    ...result
   });
 });
 
@@ -107,25 +113,27 @@ export const getPendingOrders = asyncHandler(async (req, res) => {
  * @desc    الحصول على كل الطلبات (Admin)
  * @route   GET /api/orders
  * @access  Private/Admin
+ * @query   status, page, limit
  */
 export const getAllOrders = asyncHandler(async (req, res) => {
   const { status } = req.query;
 
   const filter = status ? { status } : {};
 
-  const orders = await Order.find(filter)
-    .populate("userId", "name email phone")
-    .populate("courseId", "title thumbnail price")
-    .populate("approvedBy", "name")
-    .sort("-createdAt");
+  const result = await paginateQuery(Order, filter, req, {
+    populate: [
+      { path: 'userId', select: 'name email phone' },
+      { path: 'courseId', select: 'title thumbnail price' },
+      { path: 'approvedBy', select: 'name' }
+    ],
+    sort: '-createdAt',
+    defaultLimit: 20
+  });
 
   res.json({
     success: true,
-    message: "تم جلب جميع الطلبات",
-    data: orders,
-    pagination: {
-      total: orders.length,
-    },
+    message: 'تم جلب جميع الطلبات',
+    ...result
   });
 });
 

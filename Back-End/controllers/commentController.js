@@ -1,6 +1,8 @@
 import Comment from '../models/Comment.js';
 import Video from '../models/Video.js';
 import User from '../models/User.js';
+import { paginateQuery } from '../utils/pagination.js';
+import logger from '../config/logger.js';
 
 /**
  * @desc    إضافة تعليق جديد على فيديو
@@ -45,7 +47,7 @@ export const addComment = async (req, res) => {
       data: comment
     });
   } catch (error) {
-    console.error('خطأ في إضافة التعليق:', error);
+    logger.error('خطأ في إضافة التعليق:', error);
     res.status(500).json({
       success: false,
       message: 'حدث خطأ أثناء إضافة التعليق',
@@ -58,6 +60,7 @@ export const addComment = async (req, res) => {
  * @desc    الحصول على تعليقات فيديو معين
  * @route   GET /api/comments/:videoId
  * @access  Public (يمكن لأي شخص رؤية التعليقات)
+ * @query   page, limit
  */
 export const getVideoComments = async (req, res) => {
   try {
@@ -72,17 +75,19 @@ export const getVideoComments = async (req, res) => {
       });
     }
 
-    // الحصول على التعليقات مرتبة من الأحدث للأقدم
-    const comments = await Comment.find({ videoId })
-      .sort({ createdAt: -1 })
-      .populate('userId', 'name avatar');
+    // استخدام pagination helper
+    const result = await paginateQuery(Comment, { videoId }, req, {
+      populate: { path: 'userId', select: 'name avatar' },
+      sort: '-createdAt',
+      defaultLimit: 20
+    });
 
     res.status(200).json({
       success: true,
-      data: comments
+      ...result
     });
   } catch (error) {
-    console.error('خطأ في جلب التعليقات:', error);
+    logger.error('خطأ في جلب التعليقات:', error);
     res.status(500).json({
       success: false,
       message: 'حدث خطأ أثناء جلب التعليقات',
@@ -124,7 +129,7 @@ export const deleteComment = async (req, res) => {
       message: 'تم حذف التعليق بنجاح'
     });
   } catch (error) {
-    console.error('خطأ في حذف التعليق:', error);
+    logger.error('خطأ في حذف التعليق:', error);
     res.status(500).json({
       success: false,
       message: 'حدث خطأ أثناء حذف التعليق',
@@ -169,7 +174,7 @@ export const updateComment = async (req, res) => {
       data: comment
     });
   } catch (error) {
-    console.error('خطأ في تحديث التعليق:', error);
+    logger.error('خطأ في تحديث التعليق:', error);
     res.status(500).json({
       success: false,
       message: 'حدث خطأ أثناء تحديث التعليق',

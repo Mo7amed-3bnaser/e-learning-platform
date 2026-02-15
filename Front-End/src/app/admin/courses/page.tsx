@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FiPlus, FiEdit2, FiTrash2, FiVideo, FiEye } from 'react-icons/fi';
 import { coursesAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { TableRowSkeleton, NoCoursesFound } from '@/components/ui';
 
 interface Course {
     _id: string;
@@ -91,15 +92,25 @@ export default function AdminCoursesPage() {
                     </div>
                 </div>
                 <div className="admin-table-container">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-                            <div className="admin-skeleton" style={{ width: '60px', height: '40px' }} />
-                            <div style={{ flex: 1 }}>
-                                <div className="admin-skeleton" style={{ width: '60%', height: '16px', marginBottom: '0.5rem' }} />
-                                <div className="admin-skeleton" style={{ width: '30%', height: '14px' }} />
-                            </div>
-                        </div>
-                    ))}
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>الكورس</th>
+                                <th>التصنيف</th>
+                                <th>المستوى</th>
+                                <th>السعر</th>
+                                <th>الطلاب</th>
+                                <th>التقييم</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4].map((i) => (
+                                <TableRowSkeleton key={i} columns={8} />
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         );
@@ -123,11 +134,7 @@ export default function AdminCoursesPage() {
             <div className="admin-table-container">
                 <div className="admin-table-wrapper">
                     {courses.length === 0 ? (
-                        <div className="admin-empty">
-                            <FiEye />
-                            <h3>لا توجد كورسات بعد</h3>
-                            <p>أضف كورسك الأول من الزر أعلاه</p>
-                        </div>
+                        <NoCoursesFound />
                     ) : (
                         <table className="admin-table">
                             <thead>

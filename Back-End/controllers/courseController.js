@@ -1,24 +1,48 @@
 import asyncHandler from 'express-async-handler';
 import Course from '../models/Course.js';
 import Video from '../models/Video.js';
+import { paginateQuery } from '../utils/pagination.js';
 
 /**
  * @desc    الحصول على كل الكورسات المنشورة (للطلاب)
  * @route   GET /api/courses
  * @access  Public
+ * @query   page, limit, search, category
  */
 export const getCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find({ isPublished: true })
-    .populate('instructor', 'name email avatar instructorProfile')
-    .select('title description price thumbnail category level rating enrolledStudents instructor');
+  // بناء الـ filter
+  const filter = { isPublished: true };
+  
+  // البحث بالعنوان أو الوصف
+  if (req.query.search) {
+    filter.$or = [
+      { title: { $regex: req.query.search, $options: 'i' } },
+      { description: { $regex: req.query.search, $options: 'i' } }
+    ];
+  }
+  
+  // الفلترة بالفئة
+  if (req.query.category) {
+    filter.category = req.query.category;
+  }
+  
+  // الفلترة بالمستوى
+  if (req.query.level) {
+    filter.level = req.query.level;
+  }
+  
+  // استخدام pagination helper
+  const result = await paginateQuery(Course, filter, req, {
+    populate: { path: 'instructor', select: 'name email avatar instructorProfile' },
+    select: 'title description price thumbnail category level rating enrolledStudents instructor',
+    sort: req.query.sort || '-createdAt',
+    defaultLimit: 12
+  });
 
   res.json({
     success: true,
     message: 'تم جلب الكورسات بنجاح',
-    data: courses,
-    pagination: {
-      total: courses.length
-    }
+    ...result
   });
 });
 
@@ -225,15 +249,31 @@ export const togglePublishCourse = asyncHandler(async (req, res) => {
  * @desc    الحصول على كل الكورسات (Admin - بما فيها غير المنشورة)
  * @route   GET /api/courses/admin/all
  * @access  Private/Admin
+ * @query   page, limit, search
  */
 export const getAllCoursesAdmin = asyncHandler(async (req, res) => {
-  const courses = await Course.find({})
-    .populate('instructor', 'name email avatar instructorProfile');
+  // بناء الـ filter
+  const filter = {};
+  
+  // البحث
+  if (req.query.search) {
+    filter.$or = [
+      { title: { $regex: req.query.search, $options: 'i' } },
+      { description: { $regex: req.query.search, $options: 'i' } }
+    ];
+  }
+  
+  // استخدام pagination helper
+  const result = await paginateQuery(Course, filter, req, {
+    populate: { path: 'instructor', select: 'name email avatar instructorProfile' },
+    sort: req.query.sort || '-createdAt',
+    defaultLimit: 20
+  });
 
   res.json({
     success: true,
     message: 'تم جلب جميع الكورسات',
-    data: courses
+    ...result
   });
 });
 

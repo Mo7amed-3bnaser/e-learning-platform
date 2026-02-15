@@ -9,6 +9,8 @@ import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import connectDB from "./config/database.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
+import logger from "./config/logger.js";
+import httpLogger from "./middleware/httpLogger.js";
 
 // Import Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -43,6 +45,9 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// HTTP Request Logging
+app.use(httpLogger);
 
 // Data sanitization against NoSQL injection
 app.use(mongoSanitize());
@@ -93,7 +98,5 @@ app.use(errorHandler);
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(
-    `✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`,
-  );
+  logger.info(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });

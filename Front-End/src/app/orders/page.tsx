@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { OrderCardSkeleton, NoOrdersFound } from '@/components/ui';
 import Link from 'next/link';
 import { FiShoppingBag, FiArrowRight, FiFilter, FiClock, FiCheckCircle, FiXCircle, FiPackage } from 'react-icons/fi';
 
@@ -152,8 +153,8 @@ export default function OrdersPage() {
                                 key={tab.key}
                                 onClick={() => setFilter(tab.key)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${filter === tab.key
-                                        ? 'bg-primary text-white shadow-md shadow-primary/25'
-                                        : 'bg-white text-slate-600 border border-slate-200 hover:border-primary/30 hover:text-primary'
+                                    ? 'bg-primary text-white shadow-md shadow-primary/25'
+                                    : 'bg-white text-slate-600 border border-slate-200 hover:border-primary/30 hover:text-primary'
                                     }`}
                             >
                                 {tab.icon}
@@ -166,38 +167,11 @@ export default function OrdersPage() {
                     {isLoading ? (
                         <div className="space-y-4">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 animate-pulse">
-                                    <div className="flex gap-4">
-                                        <div className="w-20 h-20 bg-slate-200 rounded-xl"></div>
-                                        <div className="flex-1 space-y-3">
-                                            <div className="h-5 bg-slate-200 rounded w-3/4"></div>
-                                            <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-                                            <div className="h-4 bg-slate-200 rounded w-1/4"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <OrderCardSkeleton key={i} />
                             ))}
                         </div>
                     ) : filteredOrders.length === 0 ? (
-                        <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100 text-center">
-                            <FiShoppingBag className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                                {filter === 'all' ? 'لا توجد طلبات بعد' : 'لا توجد طلبات في هذا التصنيف'}
-                            </h3>
-                            <p className="text-slate-600 mb-6">
-                                {filter === 'all'
-                                    ? 'عند شراء أي كورس ستظهر طلباتك هنا'
-                                    : 'جرب اختيار تصنيف آخر لعرض الطلبات'}
-                            </p>
-                            {filter === 'all' && (
-                                <Link
-                                    href="/courses"
-                                    className="inline-block px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors font-medium"
-                                >
-                                    تصفح الكورسات
-                                </Link>
-                            )}
-                        </div>
+                        <NoOrdersFound />
                     ) : (
                         <div className="space-y-4">
                             {filteredOrders.map((order) => (

@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import Course from '../models/Course.js';
 import Order from '../models/Order.js';
 import InstructorApplication from '../models/InstructorApplication.js';
+import { paginateQuery } from '../utils/pagination.js';
 
 /**
  * @desc    الحصول على إحصائيات الداشبورد
@@ -49,16 +50,32 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
  * @desc    الحصول على كل الطلاب
  * @route   GET /api/admin/students
  * @access  Private/Admin
+ * @query   page, limit, search
  */
 export const getAllStudents = asyncHandler(async (req, res) => {
-  const students = await User.find({ role: 'student' })
-    .populate('enrolledCourses', 'title thumbnail')
-    .sort('-createdAt');
+  // بناء الـ filter
+  const filter = { role: 'student' };
+  
+  // البحث
+  if (req.query.search) {
+    filter.$or = [
+      { name: { $regex: req.query.search, $options: 'i' } },
+      { email: { $regex: req.query.search, $options: 'i' } },
+      { phone: { $regex: req.query.search, $options: 'i' } }
+    ];
+  }
+  
+  // استخدام pagination helper
+  const result = await paginateQuery(User, filter, req, {
+    populate: { path: 'enrolledCourses', select: 'title thumbnail' },
+    sort: '-createdAt',
+    defaultLimit: 20
+  });
 
   res.json({
     success: true,
     message: 'تم جلب الطلاب بنجاح',
-    data: students
+    ...result
   });
 });
 
@@ -127,6 +144,7 @@ export const deleteStudent = asyncHandler(async (req, res) => {
  * @desc    البحث عن طالب
  * @route   GET /api/admin/students/search?q=
  * @access  Private/Admin
+ * @query   q, page, limit
  */
 export const searchStudents = asyncHandler(async (req, res) => {
   const { q } = req.query;
@@ -136,19 +154,26 @@ export const searchStudents = asyncHandler(async (req, res) => {
     throw new Error('برجاء إدخال كلمة البحث');
   }
 
-  const students = await User.find({
+  const filter = {
     role: 'student',
     $or: [
       { name: { $regex: q, $options: 'i' } },
       { email: { $regex: q, $options: 'i' } },
       { phone: { $regex: q, $options: 'i' } }
     ]
-  }).populate('enrolledCourses', 'title');
+  };
+  
+  // استخدام pagination helper
+  const result = await paginateQuery(User, filter, req, {
+    populate: { path: 'enrolledCourses', select: 'title' },
+    sort: '-createdAt',
+    defaultLimit: 20
+  });
 
   res.json({
     success: true,
     message: 'نتائج البحث',
-    data: students
+    ...result
   });
 });
 

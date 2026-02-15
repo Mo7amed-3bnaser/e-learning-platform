@@ -5,7 +5,7 @@ import { FiSearch, FiFilter, FiGrid, FiList } from 'react-icons/fi';
 import { coursesAPI, ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import CourseCard from '@/components/CourseCard';
-import CourseSkeleton from '@/components/CourseSkeleton';
+import { CourseCardSkeleton, NoCoursesFound } from '@/components/ui';
 import Header from '@/components/Header';
 import Link from 'next/link';
 
@@ -132,7 +132,7 @@ export default function CoursesPage() {
                 placeholder="ابحث عن كورس..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-slate-900 placeholder:text-slate-400"
               />
             </div>
 
@@ -143,7 +143,7 @@ export default function CoursesPage() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full md:w-48 pr-10 pl-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-white cursor-pointer"
+                  className="w-full md:w-48 pr-10 pl-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-white cursor-pointer text-slate-900"
                 >
                   <option value="all">جميع الفئات</option>
                   {categories.slice(1).map((category) => (
@@ -159,8 +159,8 @@ export default function CoursesPage() {
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                      ? 'bg-white text-primary shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                     }`}
                 >
                   <FiGrid className="w-5 h-5" />
@@ -168,8 +168,8 @@ export default function CoursesPage() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded transition-colors ${viewMode === 'list'
-                      ? 'bg-white text-primary shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                     }`}
                 >
                   <FiList className="w-5 h-5" />
@@ -197,44 +197,23 @@ export default function CoursesPage() {
         {isLoading ? (
           <div
             className={`grid gap-6 ${viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-1'
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
               }`}
           >
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <CourseSkeleton key={i} />
+              <CourseCardSkeleton key={i} />
             ))}
           </div>
         ) : filteredCourses.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-100 rounded-full mb-4">
-              <FiSearch className="w-10 h-10 text-slate-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">
-              لا توجد كورسات
-            </h3>
-            <p className="text-slate-600 mb-6">
-              {searchQuery || selectedCategory !== 'all'
-                ? 'جرب تغيير معايير البحث أو الفلترة'
-                : 'لم يتم إضافة أي كورسات بعد'}
-            </p>
-            {(searchQuery || selectedCategory !== 'all') && (
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategory('all');
-                }}
-                className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors"
-              >
-                إعادة تعيين الفلاتر
-              </button>
-            )}
-          </div>
+          <NoCoursesFound
+            searchTerm={searchQuery || (selectedCategory !== 'all' ? selectedCategory : '')}
+          />
         ) : (
           <div
             className={`grid gap-6 ${viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-1'
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
               }`}
           >
             {filteredCourses.map((course) => (

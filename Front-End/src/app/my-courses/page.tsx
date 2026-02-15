@@ -7,6 +7,7 @@ import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import Header from '@/components/Header';
 import { useAuthStore } from '@/store/authStore';
+import { CourseCardSkeleton, NoEnrolledCourses, FullPageLoading } from '@/components/ui';
 
 interface Course {
   _id: string;
@@ -72,11 +73,7 @@ export default function MyCoursesPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <FullPageLoading message="جاري تحميل كورساتك..." />;
   }
 
   return (
@@ -115,22 +112,20 @@ export default function MyCoursesPage() {
           <div className="flex items-center gap-2 bg-white rounded-xl p-1 shadow-sm border border-slate-100">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${
-                viewMode === 'grid'
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid'
                   ? 'bg-primary text-white'
                   : 'text-slate-400 hover:text-slate-600'
-              }`}
+                }`}
               title="عرض شبكي"
             >
               <FiGrid className="w-5 h-5" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-all ${
-                viewMode === 'list'
+              className={`p-2 rounded-lg transition-all ${viewMode === 'list'
                   ? 'bg-primary text-white'
                   : 'text-slate-400 hover:text-slate-600'
-              }`}
+                }`}
               title="عرض قائمة"
             >
               <FiList className="w-5 h-5" />
@@ -138,60 +133,27 @@ export default function MyCoursesPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
-                <div className="h-48 bg-slate-200"></div>
-                <div className="p-5 space-y-3">
-                  <div className="h-6 bg-slate-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-                  <div className="h-12 bg-slate-200 rounded"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : orders.length === 0 ? (
-          /* Empty State */
-          <div className="text-center py-16">
-            <div className="w-32 h-32 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FiBook className="w-16 h-16 text-slate-300" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-2">
-              لا توجد كورسات حتى الآن
-            </h2>
-            <p className="text-slate-500 mb-6">
-              لم تشترك في أي كورس بعد. تصفح الكورسات المتاحة وابدأ رحلة التعلم!
-            </p>
-            <button
-              onClick={() => router.push('/courses')}
-              className="bg-gradient-to-l from-primary to-primary-dark text-white px-8 py-3 rounded-xl font-medium hover:shadow-lg transition-all"
-            >
-              تصفح الكورسات
-            </button>
-          </div>
+        {/* Courses Grid/List */}
+        {orders.length === 0 ? (
+          <NoEnrolledCourses />
         ) : (
           /* Courses Grid/List */
           <div
-            className={`grid gap-6 ${
-              viewMode === 'grid'
+            className={`grid gap-6 ${viewMode === 'grid'
                 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
                 : 'grid-cols-1'
-            }`}
+              }`}
           >
             {orders.map((order) => (
               <div
                 key={order._id}
-                className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-green-200 ${
-                  viewMode === 'list' ? 'flex' : ''
-                }`}
+                className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-green-200 ${viewMode === 'list' ? 'flex' : ''
+                  }`}
               >
                 {/* صورة الكورس */}
                 <div
-                  className={`relative overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 ${
-                    viewMode === 'list' ? 'w-64 flex-shrink-0' : 'h-48'
-                  }`}
+                  className={`relative overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 ${viewMode === 'list' ? 'w-64 flex-shrink-0' : 'h-48'
+                    }`}
                 >
                   {order.courseId?.thumbnail ? (
                     <img

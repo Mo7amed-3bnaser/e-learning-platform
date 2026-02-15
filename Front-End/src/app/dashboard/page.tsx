@@ -8,6 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
 import { FiBook, FiClock, FiAward, FiShoppingBag, FiLogOut } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import { CourseCardSkeleton, NoEnrolledCourses } from '@/components/ui';
 
 interface EnrolledCourse {
   _id: string;
@@ -52,12 +53,12 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
-      
+
       // جلب الطلبات
       const ordersResponse = await ordersAPI.getMyOrders();
       const orders = ordersResponse.data.data || [];
       setRecentOrders(orders.slice(0, 5)); // آخر 5 طلبات
-      
+
       // جلب الكورسات المشترك فيها من الطلبات المقبولة
       const approvedOrders = orders.filter((order: Order) => order.status === 'approved');
       const enrolledCoursesData = approvedOrders.map((order: Order) => ({
@@ -76,14 +77,14 @@ export default function DashboardPage() {
       );
 
       setEnrolledCourses(uniqueCourses);
-      
+
       // حساب الإحصائيات
       setStats({
         totalCourses: uniqueCourses.length,
         completedCourses: 0,
         inProgressCourses: uniqueCourses.length,
       });
-      
+
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -143,7 +144,7 @@ export default function DashboardPage() {
                 <span>تسجيل الخروج</span>
               </button>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl font-bold">
                 {user?.name?.charAt(0) || 'U'}
@@ -220,34 +221,11 @@ export default function DashboardPage() {
                 {isLoading ? (
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="flex gap-4">
-                          <div className="w-24 h-24 bg-slate-200 rounded-lg"></div>
-                          <div className="flex-1 space-y-2">
-                            <div className="h-5 bg-slate-200 rounded w-3/4"></div>
-                            <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-                            <div className="h-8 bg-slate-200 rounded w-1/3"></div>
-                          </div>
-                        </div>
-                      </div>
+                      <CourseCardSkeleton key={i} />
                     ))}
                   </div>
                 ) : enrolledCourses.length === 0 ? (
-                  <div className="text-center py-12">
-                    <FiBook className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                      لم تشترك في أي كورس بعد
-                    </h3>
-                    <p className="text-slate-600 mb-6">
-                      ابدأ رحلة التعلم الآن واشترك في كورسك الأول!
-                    </p>
-                    <Link
-                      href="/courses"
-                      className="inline-block px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors"
-                    >
-                      تصفح الكورسات
-                    </Link>
-                  </div>
+                  <NoEnrolledCourses />
                 ) : (
                   <div className="space-y-4">
                     {enrolledCourses.map((course) => (

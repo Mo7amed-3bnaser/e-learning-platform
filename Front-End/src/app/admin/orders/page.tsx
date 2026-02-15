@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { FiSearch, FiEye, FiCheck, FiX, FiTrash2, FiImage } from 'react-icons/fi';
 import { ordersAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { TableRowSkeleton, NoOrdersFound } from '@/components/ui';
 
 interface Order {
     _id: string;
@@ -132,11 +133,25 @@ export default function AdminOrdersPage() {
                     <p>مراجعة وإدارة طلبات الشراء</p>
                 </div>
                 <div className="admin-table-container">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} style={{ padding: '0.75rem 1rem', display: 'flex', gap: '1rem' }}>
-                            <div className="admin-skeleton" style={{ width: '100%', height: '20px' }} />
-                        </div>
-                    ))}
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>الطالب</th>
+                                <th>الكورس</th>
+                                <th>السعر</th>
+                                <th>طريقة الدفع</th>
+                                <th>الإثبات</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <TableRowSkeleton key={i} columns={8} />
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         );
@@ -170,11 +185,7 @@ export default function AdminOrdersPage() {
             <div className="admin-table-container">
                 <div className="admin-table-wrapper">
                     {filteredOrders.length === 0 ? (
-                        <div className="admin-empty">
-                            <FiSearch />
-                            <h3>لا توجد طلبات</h3>
-                            <p>{filter === 'all' ? 'لم يتم إنشاء أي طلبات بعد' : 'لا توجد طلبات في هذا التصنيف'}</p>
-                        </div>
+                        <NoOrdersFound />
                     ) : (
                         <table className="admin-table">
                             <thead>
