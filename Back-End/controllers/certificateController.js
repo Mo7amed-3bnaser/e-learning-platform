@@ -6,6 +6,8 @@ import {
   generateCertificatePDF,
   uploadCertificateToCloudinary,
 } from "../utils/certificateGenerator.js";
+import { createNotification } from './notificationController.js';
+import sendEmail, { getCertificateIssuedTemplate } from '../utils/sendEmail.js';
 
 /**
  * @desc    Download certificate (if student has one)
@@ -138,6 +140,30 @@ export const generateCertificateForStudent = async (userId, courseId) => {
 
       user.markModified("enrolledCourses");
       await user.save();
+    }
+
+    // إنشاء إشعار للطالب
+    await createNotification({
+      user: userId,
+      type: 'certificate_issued',
+      title: 'مبروك! تم إصدار شهادتك 🎓',
+      message: `أحسنت! لقد أتممت كورس "${course.title}" بنجاح وتم إصدار شهادتك`,
+      link: `/certificates/${courseId}`,
+      metadata: {
+        courseId,
+        certificateId,
+      },
+    });
+
+    // إرسال إيميل للطالب
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: '🎓 مبروك! تم إصدار شهادتك - مسار',
+        html: getCertificateIssuedTemplate(user.name, course.title, certificateUrl),
+      });
+    } catch (emailError) {
+      console.error('خطأ في إرسال الإيميل:', emailError);
     }
 
     return {

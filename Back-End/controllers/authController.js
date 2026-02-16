@@ -497,3 +497,31 @@ export const resetPassword = asyncHandler(async (req, res) => {
     message: 'تم تعيين كلمة المرور الجديدة بنجاح! يمكنك تسجيل الدخول الآن 🎉',
   });
 });
+
+/**
+ * @desc    الحصول على معلومات مستخدم (عامة - للبروفايل العام)
+ * @route   GET /api/users/:id
+ * @access  Public
+ */
+export const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select('name email avatar bio role createdAt');
+
+  if (!user) {
+    res.status(404);
+    throw new Error('المستخدم غير موجود');
+  }
+
+  res.json({
+    success: true,
+    data: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      bio: user.bio,
+      role: user.role,
+      createdAt: user.createdAt,
+    },
+  });
+});
+

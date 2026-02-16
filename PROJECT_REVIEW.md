@@ -373,18 +373,20 @@
 - [x] Error Boundaries في React ✅
 - [x] حالات فارغة وتحميل مناسبة لكل الصفحات ✅
 
-### المرحلة 3 — الاختبارات
-- [ ] تثبيت Jest + Supertest
-- [ ] كتابة Unit tests للـ Controllers
-- [ ] كتابة Integration tests للـ API
-- [ ] اختبارات Frontend أساسية
 
-### المرحلة 4 — تحسين تجربة المستخدم
+### المرحلة 3 — تحسين تجربة المستخدم
 - [ ] نظام إشعارات (داخلي + إيميل)
 - [ ] تحسين الـ Responsive للجداول
 - [ ] إضافة Accessibility attributes
 - [ ] فرز وفلترة متقدمة للكورسات
 - [ ] صفحة المدرب العامة
+
+### المرحلة 4 — الاختبارات
+- [ ] تثبيت Jest + Supertest
+- [ ] كتابة Unit tests للـ Controllers
+- [ ] كتابة Integration tests للـ API
+- [ ] اختبارات Frontend أساسية
+
 
 ### المرحلة 5 — DevOps
 - [ ] Docker setup (Dockerfile + docker-compose)

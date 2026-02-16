@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck } from 'react-icons/fi';
 import Logo from './Logo';
+import NotificationBell from './NotificationBell';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
@@ -38,13 +39,16 @@ export default function Header() {
   };
 
   return (
-    <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+    <header
+      className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50"
+      role="banner"
+    >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/">
+        <Link href="/" aria-label="الصفحة الرئيسية - مسار">
           <Logo size="md" />
         </Link>
 
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-4" role="navigation" aria-label="التنقل الرئيسي">
           <Link
             href="/courses"
             className="px-4 py-2 text-slate-700 hover:text-primary font-medium transition-colors"
@@ -68,11 +72,17 @@ export default function Header() {
                 لوحتي
               </Link>
 
+              {/* Notification Bell */}
+              <NotificationBell />
+
               {/* User Menu */}
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                  aria-label="قائمة المستخدم"
+                  aria-expanded={showUserMenu}
+                  aria-haspopup="true"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-bold uppercase overflow-hidden">
                     {user?.avatar ? (
@@ -82,7 +92,7 @@ export default function Header() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                      <span aria-hidden="true">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
                     )}
                   </div>
                   <span className="text-sm font-medium text-slate-700">
@@ -92,7 +102,11 @@ export default function Header() {
 
                 {/* Dropdown Menu */}
                 {showUserMenu && (
-                  <div className="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-slate-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div
+                    className="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-slate-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                    role="menu"
+                    aria-label="خيارات المستخدم"
+                  >
                     <div className="px-4 py-3 border-b border-slate-100">
                       <p className="font-bold text-slate-900 text-lg mb-2">{user?.name || 'مستخدم'}</p>
                       <div className="space-y-1">

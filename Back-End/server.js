@@ -24,6 +24,8 @@ import progressRoutes from "./routes/progressRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import instructorApplicationRoutes from "./routes/instructorApplicationRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // Connect to MongoDB
 connectDB();
@@ -73,6 +75,8 @@ app.get("/", (req, res) => {
         certificates: "/api/certificates",
         reviews: "/api/reviews",
         instructorApplications: "/api/instructor-applications",
+        notifications: "/api/notifications",
+        users: "/api/users",
       },
     },
   });
@@ -90,6 +94,8 @@ app.use("/api/progress", progressRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/instructor-applications", instructorApplicationRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/users", userRoutes);
 
 // Error Handling
 app.use(notFound);

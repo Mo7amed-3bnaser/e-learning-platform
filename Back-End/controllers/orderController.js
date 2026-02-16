@@ -3,6 +3,8 @@ import Order from "../models/Order.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
 import { paginateQuery } from '../utils/pagination.js';
+import { createNotification } from './notificationController.js';
+import sendEmail, { getOrderApprovedTemplate, getOrderRejectedTemplate } from '../utils/sendEmail.js';
 
 /**
  * @desc    إنشاء طلب شراء جديد
@@ -183,6 +185,32 @@ export const approveOrder = asyncHandler(async (req, res) => {
   course.enrolledStudents += 1;
   await course.save();
 
+  // إنشاء إشعار للطالب
+  await createNotification({
+    user: order.userId._id,
+    type: 'order_approved',
+    title: 'تمت الموافقة على طلبك! 🎉',
+    message: `تم قبول طلب شراء كورس "${order.courseId.title}" ويمكنك الآن البدء في التعلم`,
+    link: `/courses/${order.courseId._id}`,
+    metadata: {
+      orderId: order._id,
+      courseId: order.courseId._id,
+    },
+  });
+
+  // إرسال إيميل للطالب
+  try {
+    const courseUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/courses/${order.courseId._id}`;
+    await sendEmail({
+      to: order.userId.email,
+      subject: '🎉 تمت الموافقة على طلبك - مسار',
+      html: getOrderApprovedTemplate(order.userId.name, order.courseId.title, courseUrl),
+    });
+  } catch (emailError) {
+    console.error('خطأ في إرسال الإيميل:', emailError);
+    // لا نرمي خطأ لأن العملية الأساسية نجحت
+  }
+
   res.json({
     success: true,
     message: "تم الموافقة على الطلب وإضافة الكورس للطالب بنجاح ✅",
@@ -214,6 +242,34 @@ export const rejectOrder = asyncHandler(async (req, res) => {
   order.rejectionReason = rejectionReason || "لم يتم تحديد سبب";
   order.approvedBy = req.user._id;
   await order.save();
+
+  // إنشاء إشعار للطالب
+  await createNotification({
+    user: order.userId,
+    type: 'order_rejected',
+    title: 'تم رفض طلبك',
+    message: `تم رفض طلب شراء الكورس. السبب: ${order.rejectionReason}`,
+    link: '/orders',
+    metadata: {
+      orderId: order._id,
+    },
+  });
+
+  // إرسال إيميل للطالب
+  try {
+    const user = await User.findById(order.userId);
+    const course = await Course.findById(order.courseId);
+    
+    if (user && course) {
+      await sendEmail({
+        to: user.email,
+        subject: 'تحديث بشأن طلبك - مسار',
+        html: getOrderRejectedTemplate(user.name, course.title, order.rejectionReason),
+      });
+    }
+  } catch (emailError) {
+    console.error('خطأ في إرسال الإيميل:', emailError);
+  }
 
   res.json({
     success: true,
