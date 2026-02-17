@@ -101,8 +101,13 @@ app.use("/api/users", userRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  logger.info(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-});
+// Start Server (only if not in test mode)
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    logger.info(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+  });
+}
+
+// Export app for testing
+export default app;

@@ -81,10 +81,10 @@
   - صفحة الطلبات (أدمن + طالب)
   - التعليقات على الفيديو
 
-### 5. اختبارات (Testing)
-- **لا يوجد أي اختبار** — لا Unit Tests ولا Integration Tests.
-- لا يوجد إطار عمل اختبارات مثبت (Jest, Mocha، إلخ).
-- `package.json` يحتوي على: `"test": "echo \"Error: no test specified\" && exit 1"`
+### 5. اختبارات (Testing) ✅ **مكتملة**
+- ✅ تم تثبيت Jest + Supertest (Backend) و Jest + React Testing Library (Frontend).
+- ✅ 105 اختبار وحدة و تكامل في Backend — 44 اختبار في Frontend.
+- ✅ `package.json` يحتوي على أوامر: `test`, `test:unit`, `test:integration`, `test:coverage`.
 
 ### 6. نظام تسجيل الأحداث (Logging)
 - لا يوجد نظام Logging احترافي.
@@ -304,12 +304,13 @@
 ## 🛠 جودة الكود والـ DevOps
 
 ### الاختبارات (Testing)
-- **الحالة:** لا يوجد أي اختبارات — 0%.
-- **المطلوب:**
-  - تثبيت Jest و Supertest.
-  - Unit tests لكل Controller.
-  - Integration tests للـ API Endpoints.
-  - اختبارات Frontend بـ React Testing Library.
+- **الحالة:** ✅ مكتملة — 149 اختبار (105 Backend + 44 Frontend).
+- **ما تم:**
+  - Jest + Supertest مثبت في Backend.
+  - Jest + React Testing Library مثبت في Frontend.
+  - Unit tests لكل Controller رئيسي + Middleware + Utils.
+  - Integration tests لـ API Endpoints (Auth, Courses, Orders, Admin).
+  - اختبارات Frontend لمكونات رئيسية + Auth Store.
 
 ### TypeScript
 - **الحالة:** Frontend يستخدم TypeScript لكن Backend بـ JavaScript عادي.
@@ -374,18 +375,28 @@
 - [x] حالات فارغة وتحميل مناسبة لكل الصفحات ✅
 
 
-### المرحلة 3 — تحسين تجربة المستخدم
-- [ ] نظام إشعارات (داخلي + إيميل)
-- [ ] تحسين الـ Responsive للجداول
-- [ ] إضافة Accessibility attributes
-- [ ] فرز وفلترة متقدمة للكورسات
-- [ ] صفحة المدرب العامة
+### المرحلة 3 — تحسين تجربة المستخدم ✅ **مكتملة - 2026-02-17**
+- [x] نظام إشعارات (داخلي + إيميل) ✅
+  - نظام إشعارات داخلي مكتمل (API + NotificationBell في الـ Header)
+  - إيميلات الطلبات والشهادات مكتملة
+  - ملاحظة: ناقص إيميلات المدربين (approved/rejected) وإيميل التسجيل في كورس
+- [x] تحسين الـ Responsive للجداول ✅
+  - ResponsiveTable component يدعم العرض على كل الشاشات
+- [x] إضافة Accessibility attributes ✅
+  - aria-labels موجودة في المكونات الرئيسية (Header, NotificationBell, CourseFilters)
+- [x] فرز وفلترة متقدمة للكورسات ✅
+  - CourseFilters component يدعم الفرز والفلترة حسب التصنيف والمستوى والسعر والتقييم
+- [x] صفحة المدرب العامة ✅
+  - صفحة `/instructors/[id]` مكتملة بالكامل مع إحصائيات الكورسات
 
-### المرحلة 4 — الاختبارات
-- [ ] تثبيت Jest + Supertest
-- [ ] كتابة Unit tests للـ Controllers
-- [ ] كتابة Integration tests للـ API
-- [ ] اختبارات Frontend أساسية
+### المرحلة 4 — الاختبارات ✅ **مكتملة - 2026-07-17**
+- [x] تثبيت Jest + Supertest ✅
+- [x] كتابة Unit tests للـ Controllers ✅
+  - 105 اختبار وحدة (9 test suites): authController, courseController, videoController, orderController, adminController, authMiddleware, validation, authHelpers, pagination
+- [x] كتابة Integration tests للـ API ✅
+  - اختبارات تكامل لـ: Auth API, Courses API, Orders API, Admin API
+- [x] اختبارات Frontend أساسية ✅
+  - 44 اختبار (6 test suites): StarRating, EmptyState, Loading, LoadingButton, CourseProgressBar, Auth Store (Zustand)
 
 
 ### المرحلة 5 — DevOps
