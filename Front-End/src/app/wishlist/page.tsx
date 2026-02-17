@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useAuthStore } from '@/store/authStore';
 import CourseCard from '@/components/CourseCard';
 import PageLoader from '@/components/PageLoader';
 import EmptyState from '@/components/EmptyState';
-import { FiHeart } from 'react-icons/fi';
+import { FiHeart, FiArrowRight } from 'react-icons/fi';
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -43,19 +44,30 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-12">
       <div className="container mx-auto px-4">
+        {/* Back button */}
+        <div className="mb-6">
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light font-medium transition-colors"
+          >
+            <FiArrowRight className="w-5 h-5" />
+            رجوع
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
               <FiHeart className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-800">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">
               قائمة الرغبات
             </h1>
           </div>
-          <p className="text-slate-600 mr-16">
+          <p className="text-slate-600 dark:text-slate-400 mr-16">
             الكورسات المفضلة التي تريد الالتحاق بها لاحقاً
           </p>
         </div>
@@ -66,14 +78,13 @@ export default function WishlistPage() {
             icon={FiHeart}
             title="قائمة الرغبات فارغة"
             description="لم تقم بإضافة أي كورسات لقائمة الرغبات بعد"
-            actionLabel="تصفح الكورسات"
-            actionLink="/courses"
+            action={{ label: 'تصفح الكورسات', href: '/courses' }}
           />
         ) : (
           <>
             {/* Count */}
             <div className="mb-6">
-              <p className="text-slate-600">
+              <p className="text-slate-600 dark:text-slate-400">
                 <span className="font-bold text-primary">{wishlist.length}</span>{' '}
                 {wishlist.length === 1 ? 'كورس' : 'كورس'}
               </p>

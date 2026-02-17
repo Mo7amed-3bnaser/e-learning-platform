@@ -106,16 +106,16 @@ function ResetPasswordContent() {
     // No token state
     if (!token) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white p-8">
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900 p-8">
                 <div className="w-full max-w-md text-center space-y-6">
-                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto">
-                        <FiAlertTriangle className="w-12 h-12 text-red-600" />
+                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/40 dark:to-red-800/40 rounded-full flex items-center justify-center mx-auto">
+                        <FiAlertTriangle className="w-12 h-12 text-red-600 dark:text-red-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-3">
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">
                             رابط غير صالح ⚠️
                         </h2>
-                        <p className="text-slate-500 leading-relaxed">
+                        <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
                             الرابط الذي تستخدمه غير صالح أو تالف. اطلب رابط جديد لإعادة
                             تعيين كلمة المرور.
                         </p>
@@ -129,7 +129,7 @@ function ResetPasswordContent() {
                         </Link>
                         <Link
                             href="/login"
-                            className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 transition-all duration-300 text-center"
+                            className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300 text-center"
                         >
                             العودة لتسجيل الدخول
                         </Link>
@@ -142,11 +142,11 @@ function ResetPasswordContent() {
     return (
         <div className="min-h-screen flex">
             {/* Left Side - Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-white relative">
+            <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-900 relative">
                 {/* Back Button - Top Right */}
                 <Link
                     href="/"
-                    className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors group"
+                    className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors group"
                 >
                     <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     <span className="text-sm font-medium">العودة للرئيسية</span>
@@ -164,13 +164,13 @@ function ResetPasswordContent() {
                         <>
                             {/* Header */}
                             <div className="text-center">
-                                <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/20 dark:from-primary/20 dark:to-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                                     <FiLock className="w-10 h-10 text-primary" />
                                 </div>
-                                <h1 className="text-3xl font-bold text-slate-800">
+                                <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">
                                     تعيين كلمة مرور جديدة 🔑
                                 </h1>
-                                <p className="mt-3 text-slate-500 leading-relaxed">
+                                <p className="mt-3 text-slate-500 dark:text-slate-400 leading-relaxed">
                                     أدخل كلمة المرور الجديدة. تأكد أنها قوية وسهلة التذكر
                                 </p>
                             </div>
@@ -181,13 +181,13 @@ function ResetPasswordContent() {
                                 <div className="space-y-2">
                                     <label
                                         htmlFor="password"
-                                        className="block text-sm font-medium text-slate-700"
+                                        className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                                     >
                                         كلمة المرور الجديدة
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <FiLock className="h-5 w-5 text-slate-400" />
+                                            <FiLock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                                         </div>
                                         <input
                                             id="password"
@@ -197,7 +197,7 @@ function ResetPasswordContent() {
                                             minLength={6}
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            className="block w-full pr-10 pl-12 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
+                                            className="block w-full pr-10 pl-12 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700"
                                             placeholder="••••••••"
                                             dir="ltr"
                                         />
@@ -207,9 +207,9 @@ function ResetPasswordContent() {
                                             className="absolute inset-y-0 left-0 pl-3 flex items-center"
                                         >
                                             {showPassword ? (
-                                                <FiEyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                                                <FiEyeOff className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400" />
                                             ) : (
-                                                <FiEye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                                                <FiEye className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400" />
                                             )}
                                         </button>
                                     </div>
@@ -223,7 +223,7 @@ function ResetPasswordContent() {
                                                         key={i}
                                                         className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i < strengthLevel
                                                                 ? strengthColors[strengthLevel - 1]
-                                                                : "bg-slate-200"
+                                                                : "bg-slate-200 dark:bg-slate-600"
                                                             }`}
                                                     />
                                                 ))}
@@ -251,13 +251,13 @@ function ResetPasswordContent() {
                                 <div className="space-y-2">
                                     <label
                                         htmlFor="confirmPassword"
-                                        className="block text-sm font-medium text-slate-700"
+                                        className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                                     >
                                         تأكيد كلمة المرور
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <FiLock className="h-5 w-5 text-slate-400" />
+                                            <FiLock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                                         </div>
                                         <input
                                             id="confirmPassword"
@@ -267,11 +267,11 @@ function ResetPasswordContent() {
                                             minLength={6}
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className={`block w-full pr-10 pl-12 py-3 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white ${confirmPassword && password !== confirmPassword
-                                                    ? "border-red-300 bg-red-50"
+                                            className={`block w-full pr-10 pl-12 py-3 border rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 ${confirmPassword && password !== confirmPassword
+                                                    ? "border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20"
                                                     : confirmPassword && password === confirmPassword
-                                                        ? "border-green-300 bg-green-50"
-                                                        : "border-slate-200"
+                                                        ? "border-green-300 dark:border-green-500 bg-green-50 dark:bg-green-900/20"
+                                                        : "border-slate-200 dark:border-slate-600"
                                                 }`}
                                             placeholder="••••••••"
                                             dir="ltr"
@@ -284,9 +284,9 @@ function ResetPasswordContent() {
                                             className="absolute inset-y-0 left-0 pl-3 flex items-center"
                                         >
                                             {showConfirmPassword ? (
-                                                <FiEyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                                                <FiEyeOff className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400" />
                                             ) : (
-                                                <FiEye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                                                <FiEye className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400" />
                                             )}
                                         </button>
                                     </div>
@@ -322,21 +322,21 @@ function ResetPasswordContent() {
                     ) : (
                         /* Success State */
                         <div className="text-center space-y-6">
-                            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto">
-                                <FiCheckCircle className="w-12 h-12 text-green-600" />
+                            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/40 dark:to-green-800/40 rounded-full flex items-center justify-center mx-auto">
+                                <FiCheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-slate-800 mb-3">
+                                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">
                                     تم بنجاح! 🎉
                                 </h2>
-                                <p className="text-slate-500 leading-relaxed">
+                                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
                                     تم تعيين كلمة المرور الجديدة بنجاح. يمكنك الآن تسجيل الدخول
                                     بكلمة المرور الجديدة.
                                 </p>
                             </div>
 
                             {/* Countdown */}
-                            <div className="bg-primary/5 rounded-xl p-4">
+                            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4">
                                 <p className="text-primary text-sm">
                                     سيتم توجيهك إلى صفحة تسجيل الدخول خلال{" "}
                                     <span className="font-bold text-lg">{countdown}</span> ثوانٍ

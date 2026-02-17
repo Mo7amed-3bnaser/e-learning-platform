@@ -146,7 +146,7 @@ export default function CoursesPage() {
   }, [courses, searchQuery, filters]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
       {/* Header */}
       <Header />
 
@@ -163,29 +163,29 @@ export default function CoursesPage() {
       </div>
 
       {/* Search Bar */}
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
+      <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Input */}
             <div className="relative flex-1 w-full md:max-w-md">
-              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="ابحث عن كورس..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-slate-900 placeholder:text-slate-400"
+                className="w-full pr-10 pl-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-800"
                 aria-label="البحث عن كورس"
               />
             </div>
 
             {/* View Mode Toggle */}
-            <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+            <div className="hidden md:flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                    ? 'bg-white text-primary shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                   }`}
                 aria-label="عرض شبكي"
                 aria-pressed={viewMode === 'grid'}
@@ -195,8 +195,8 @@ export default function CoursesPage() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded transition-colors ${viewMode === 'list'
-                    ? 'bg-white text-primary shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                   }`}
                 aria-label="عرض قائمة"
                 aria-pressed={viewMode === 'list'}
@@ -207,7 +207,7 @@ export default function CoursesPage() {
           </div>
 
           {/* Results Count */}
-          <div className="mt-4 text-sm text-slate-600" role="status" aria-live="polite">
+          <div className="mt-4 text-sm text-slate-600 dark:text-slate-400" role="status" aria-live="polite">
             {isLoading ? (
               'جاري التحميل...'
             ) : (

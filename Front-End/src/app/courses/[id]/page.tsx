@@ -128,7 +128,7 @@ export default function CourseDetailsPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-20">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
           <div className="container mx-auto px-4 py-8">
             <div className="animate-pulse space-y-6">
               <div className="h-64 bg-slate-200 rounded-2xl"></div>
@@ -148,12 +148,12 @@ export default function CourseDetailsPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* زر الرجوع */}
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-600 hover:text-primary mb-6 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light mb-6 transition-colors"
           >
             <FiArrowRight className="w-5 h-5" />
             <span>رجوع</span>
@@ -178,13 +178,13 @@ export default function CourseDetailsPage() {
 
               {/* ما ستتعلمه */}
               {course.whatYouWillLearn && course.whatYouWillLearn.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <h2 className="text-2xl font-bold text-slate-800 mb-4">ما ستتعلمه</h2>
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">ما ستتعلمه</h2>
                   <div className="grid md:grid-cols-2 gap-3">
                     {course.whatYouWillLearn.map((item, index) => (
                       <div key={index} className="flex items-start gap-3">
-                        <FiCheck className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-slate-700">{item}</span>
+                        <FiCheck className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-700 dark:text-slate-300">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -192,8 +192,8 @@ export default function CourseDetailsPage() {
               )}
 
               {/* محتوى الكورس (أسماء الدروس فقط) */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h2 className="text-2xl font-bold text-slate-800 mb-4">محتوى الكورس</h2>
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">محتوى الكورس</h2>
 
                 {course.videos && course.videos.length > 0 ? (
                   <div className="space-y-2">
@@ -206,9 +206,9 @@ export default function CourseDetailsPage() {
                           <div
                             key={video._id}
                             onClick={() => canWatch && video.isFreePreview && !isEnrolled ? setPreviewVideo(video) : null}
-                            className={`flex items-center justify-between p-4 rounded-xl border border-slate-100 transition-all ${canWatch && video.isFreePreview && !isEnrolled
-                                ? 'hover:bg-green-50 hover:border-green-200 cursor-pointer group'
-                                : 'hover:bg-slate-50'
+                            className={`flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-700 transition-all ${canWatch && video.isFreePreview && !isEnrolled
+                                ? 'hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-200 dark:hover:border-green-800 cursor-pointer group'
+                                : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
                               }`}
                           >
                             <div className="flex items-center gap-3">
@@ -221,15 +221,15 @@ export default function CourseDetailsPage() {
                                 ) : isEnrolled ? (
                                   <FiPlay className="w-5 h-5 text-primary" />
                                 ) : (
-                                  <FiLock className="w-4 h-4 text-slate-400" />
+                                  <FiLock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                                 )}
                               </div>
                               <div>
-                                <p className={`font-medium ${video.isFreePreview ? 'text-slate-800 group-hover:text-green-700' : 'text-slate-800'}`}>
+                                <p className={`font-medium ${video.isFreePreview ? 'text-slate-800 dark:text-slate-100 group-hover:text-green-700 dark:group-hover:text-green-400' : 'text-slate-800 dark:text-slate-100'}`}>
                                   {video.title}
                                 </p>
                                 {video.isFreePreview && (
-                                  <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+                                  <span className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
                                     <FiPlay className="w-3 h-3" />
                                     معاينة مجانية - اضغط للمشاهدة
                                   </span>
@@ -237,12 +237,12 @@ export default function CourseDetailsPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-2 text-slate-500 text-sm">
+                              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                                 <FiClock className="w-4 h-4" />
                                 <span>{formatDuration(video.duration)}</span>
                               </div>
                               {video.isFreePreview && !isEnrolled && (
-                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                                <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-bold rounded-full">
                                   مجاني
                                 </span>
                               )}
@@ -252,17 +252,17 @@ export default function CourseDetailsPage() {
                       })}
                   </div>
                 ) : (
-                  <p className="text-slate-500 text-center py-8">لا توجد دروس متاحة حالياً</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-center py-8">لا توجد دروس متاحة حالياً</p>
                 )}
               </div>
 
               {/* المتطلبات */}
               {course.requirements && course.requirements.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <h2 className="text-2xl font-bold text-slate-800 mb-4">المتطلبات</h2>
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">المتطلبات</h2>
                   <ul className="space-y-2">
                     {course.requirements.map((req, index) => (
-                      <li key={index} className="flex items-start gap-2 text-slate-700">
+                      <li key={index} className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
                         <span className="text-primary mt-1">•</span>
                         <span>{req}</span>
                       </li>
@@ -287,16 +287,16 @@ export default function CourseDetailsPage() {
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-4">
                 {/* بطاقة الشراء */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-100 dark:border-slate-700">
                   {isEnrolled ? (
                     // لو الطالب مسجل في الكورس
                     <>
                       <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <FiCheck className="w-8 h-8 text-green-600" />
+                        <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <FiCheck className="w-8 h-8 text-green-600 dark:text-green-400" />
                         </div>
-                        <p className="text-green-600 font-bold text-lg">أنت مسجل في هذا الكورس</p>
-                        <p className="text-slate-500 text-sm mt-1">يمكنك البدء في المشاهدة الآن</p>
+                        <p className="text-green-600 dark:text-green-400 font-bold text-lg">أنت مسجل في هذا الكورس</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">يمكنك البدء في المشاهدة الآن</p>
                       </div>
 
                       <div className="flex gap-3">
@@ -310,7 +310,7 @@ export default function CourseDetailsPage() {
 
                         <button
                           onClick={scrollToDetails}
-                          className="flex-1 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 py-4 rounded-xl font-semibold hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2"
+                          className="flex-1 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-600 py-4 rounded-xl font-semibold hover:border-primary hover:text-primary dark:hover:border-primary-light dark:hover:text-primary-light transition-all flex items-center justify-center gap-2"
                         >
                           <FiInfo className="w-5 h-5" />
                           <span>تفاصيل الكورس</span>
@@ -324,7 +324,7 @@ export default function CourseDetailsPage() {
                         <div className="text-4xl font-bold text-primary mb-2">
                           ${course.price}
                         </div>
-                        <p className="text-slate-500 text-sm">دفعة واحدة فقط</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">دفعة واحدة فقط</p>
                       </div>
 
                       <button
@@ -338,38 +338,38 @@ export default function CourseDetailsPage() {
                   )}
 
                   {/* معلومات الكورس */}
-                  <div className="mt-6 pt-6 border-t border-slate-100 space-y-4">
+                  <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700 space-y-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600 flex items-center gap-2">
+                      <span className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
                         <FiUsers className="w-4 h-4" />
                         الطلاب
                       </span>
-                      <span className="font-medium text-slate-800">{course.enrolledStudents} طالب</span>
+                      <span className="font-medium text-slate-800 dark:text-slate-100">{course.enrolledStudents} طالب</span>
                     </div>
 
                     {course.videos && (
                       <>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-600 flex items-center gap-2">
+                          <span className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
                             <FiBookOpen className="w-4 h-4" />
                             الدروس
                           </span>
-                          <span className="font-medium text-slate-800">{course.videos.length} درس</span>
+                          <span className="font-medium text-slate-800 dark:text-slate-100">{course.videos.length} درس</span>
                         </div>
 
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-600 flex items-center gap-2">
+                          <span className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
                             <FiClock className="w-4 h-4" />
                             المدة
                           </span>
-                          <span className="font-medium text-slate-800">{getTotalDuration()}</span>
+                          <span className="font-medium text-slate-800 dark:text-slate-100">{getTotalDuration()}</span>
                         </div>
                       </>
                     )}
 
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">المستوى</span>
-                      <span className="font-medium text-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400">المستوى</span>
+                      <span className="font-medium text-slate-800 dark:text-slate-100">
                         {course.level === 'beginner' ? 'مبتدئ' : course.level === 'intermediate' ? 'متوسط' : 'متقدم'}
                       </span>
                     </div>
@@ -378,8 +378,8 @@ export default function CourseDetailsPage() {
 
                 {/* معلومات المدرس */}
                 {course.instructor && (
-                  <div className="bg-white rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-bold text-slate-800 mb-4">المدرب</h3>
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-4">المدرب</h3>
                     <div className="flex items-center gap-3">
                       {course.instructor.channelLogo ? (
                         <img
@@ -399,9 +399,9 @@ export default function CourseDetailsPage() {
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-slate-800">{course.instructor.name}</p>
+                        <p className="font-medium text-slate-800 dark:text-slate-100">{course.instructor.name}</p>
                         {course.instructor.bio && (
-                          <p className="text-sm text-slate-500">{course.instructor.bio}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">{course.instructor.bio}</p>
                         )}
                       </div>
                     </div>
@@ -420,7 +420,7 @@ export default function CourseDetailsPage() {
           onClick={() => setPreviewVideo(null)}
         >
           <div
-            className="bg-white rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl animate-in fade-in zoom-in duration-300"
+            className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl animate-in fade-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -454,8 +454,8 @@ export default function CourseDetailsPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-slate-50 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-slate-600">
+            <div className="p-4 bg-slate-50 dark:bg-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                 <FiClock className="w-4 h-4" />
                 <span className="text-sm">{formatDuration(previewVideo.duration)}</span>
               </div>

@@ -33,11 +33,11 @@ export default function ForgotPasswordPage() {
     return (
         <div className="min-h-screen flex">
             {/* Left Side - Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-white relative">
+            <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-900 relative">
                 {/* Back Button - Top Right */}
                 <Link
                     href="/"
-                    className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors group"
+                    className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors group"
                 >
                     <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     <span className="text-sm font-medium">العودة للرئيسية</span>
@@ -55,13 +55,13 @@ export default function ForgotPasswordPage() {
                         <>
                             {/* Header */}
                             <div className="text-center">
-                                <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/20 dark:from-primary/20 dark:to-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                                     <FiMail className="w-10 h-10 text-primary" />
                                 </div>
-                                <h1 className="text-3xl font-bold text-slate-800">
+                                <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">
                                     نسيت كلمة المرور؟ 🔐
                                 </h1>
-                                <p className="mt-3 text-slate-500 leading-relaxed">
+                                <p className="mt-3 text-slate-500 dark:text-slate-400 leading-relaxed">
                                     لا تقلق! أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين
                                     كلمة المرور
                                 </p>
@@ -73,13 +73,13 @@ export default function ForgotPasswordPage() {
                                 <div className="space-y-2">
                                     <label
                                         htmlFor="email"
-                                        className="block text-sm font-medium text-slate-700"
+                                        className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                                     >
                                         البريد الإلكتروني
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <FiMail className="h-5 w-5 text-slate-400" />
+                                            <FiMail className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                                         </div>
                                         <input
                                             id="email"
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
                                             required
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="block w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
+                                            className="block w-full pr-10 pl-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700"
                                             placeholder="example@email.com"
                                             dir="ltr"
                                         />
@@ -108,11 +108,11 @@ export default function ForgotPasswordPage() {
                                 </LoadingButton>
 
                                 {/* Back to Login */}
-                                <p className="text-center text-sm text-slate-600">
+                                <p className="text-center text-sm text-slate-600 dark:text-slate-400">
                                     تذكرت كلمة المرور؟{" "}
                                     <Link
                                         href="/login"
-                                        className="font-semibold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1"
+                                        className="font-semibold text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors inline-flex items-center gap-1"
                                     >
                                         <FiArrowRight className="w-4 h-4" />
                                         العودة لتسجيل الدخول
@@ -123,14 +123,14 @@ export default function ForgotPasswordPage() {
                     ) : (
                         /* Success State */
                         <div className="text-center space-y-6">
-                            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto animate-bounce">
-                                <FiCheckCircle className="w-12 h-12 text-green-600" />
+                            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/40 dark:to-green-800/40 rounded-full flex items-center justify-center mx-auto animate-bounce">
+                                <FiCheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-slate-800 mb-3">
+                                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">
                                     تم الإرسال بنجاح! 📧
                                 </h2>
-                                <p className="text-slate-500 leading-relaxed">
+                                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
                                     تم إرسال رابط إعادة تعيين كلمة المرور إلى
                                 </p>
                                 <p
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
                                 >
                                     {email}
                                 </p>
-                                <p className="text-slate-400 text-sm mt-4">
+                                <p className="text-slate-400 dark:text-slate-500 text-sm mt-4">
                                     تحقق من بريدك الإلكتروني (وربما مجلد الرسائل غير المرغوب
                                     فيها). الرابط صالح لمدة 15 دقيقة.
                                 </p>
@@ -152,13 +152,13 @@ export default function ForgotPasswordPage() {
                                         setIsEmailSent(false);
                                         setEmail("");
                                     }}
-                                    className="w-full px-6 py-3 rounded-xl font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all duration-300"
+                                    className="w-full px-6 py-3 rounded-xl font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all duration-300"
                                 >
                                     إرسال رابط جديد
                                 </button>
                                 <Link
                                     href="/login"
-                                    className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 transition-all duration-300 text-center"
+                                    className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300 text-center"
                                 >
                                     العودة لتسجيل الدخول
                                 </Link>

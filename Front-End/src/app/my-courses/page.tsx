@@ -77,7 +77,7 @@ export default function MyCoursesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
       <Header />
 
       {/* Page Header */}
@@ -102,19 +102,19 @@ export default function MyCoursesPage() {
         {/* Stats & View Toggle */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="bg-white rounded-xl px-4 py-2 shadow-sm border border-slate-100">
-              <span className="text-slate-500">عدد الكورسات:</span>
+            <div className="bg-white dark:bg-slate-800 rounded-xl px-4 py-2 shadow-sm border border-slate-100 dark:border-slate-700">
+              <span className="text-slate-500 dark:text-slate-400">عدد الكورسات:</span>
               <span className="font-bold text-primary mr-2">{orders.length}</span>
             </div>
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2 bg-white rounded-xl p-1 shadow-sm border border-slate-100">
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-xl p-1 shadow-sm border border-slate-100 dark:border-slate-700">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'grid'
                   ? 'bg-primary text-white'
-                  : 'text-slate-400 hover:text-slate-600'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
                 }`}
               title="عرض شبكي"
             >
@@ -124,7 +124,7 @@ export default function MyCoursesPage() {
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'list'
                   ? 'bg-primary text-white'
-                  : 'text-slate-400 hover:text-slate-600'
+                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
                 }`}
               title="عرض قائمة"
             >
@@ -147,7 +147,7 @@ export default function MyCoursesPage() {
             {orders.map((order) => (
               <div
                 key={order._id}
-                className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-green-200 ${viewMode === 'list' ? 'flex' : ''
+                className={`group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:border-green-200 dark:hover:border-green-800/50 ${viewMode === 'list' ? 'flex' : ''
                   }`}
               >
                 {/* صورة الكورس */}
@@ -177,7 +177,7 @@ export default function MyCoursesPage() {
 
                   {/* Play Overlay */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl">
+                    <div className="w-16 h-16 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center shadow-xl">
                       <FiPlay className="w-8 h-8 text-primary mr-[-2px]" />
                     </div>
                   </div>
@@ -193,7 +193,7 @@ export default function MyCoursesPage() {
                   )}
 
                   {/* عنوان الكورس */}
-                  <h3 className="text-xl font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 line-clamp-2 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
                     {order.courseId?.title || 'كورس غير متاح'}
                   </h3>
 
@@ -211,7 +211,7 @@ export default function MyCoursesPage() {
                           {order.courseId.instructor.name.charAt(0)}
                         </div>
                       )}
-                      <span className="text-sm text-slate-600">{order.courseId.instructor.name}</span>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">{order.courseId.instructor.name}</span>
                     </div>
                   )}
 
@@ -230,7 +230,7 @@ export default function MyCoursesPage() {
 
                     <button
                       onClick={() => handleViewDetails(order.courseId?._id)}
-                      className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 py-2.5 rounded-xl font-medium hover:border-primary hover:text-primary transition-all"
+                      className="w-full flex items-center justify-center gap-2 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-600 py-2.5 rounded-xl font-medium hover:border-primary hover:text-primary dark:hover:border-primary-light dark:hover:text-primary-light transition-all"
                     >
                       <FiInfo className="w-4 h-4" />
                       <span className="text-sm">تفاصيل الكورس</span>

@@ -88,14 +88,14 @@ function ProfileContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors mb-4 group"
+          className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors mb-4 group"
         >
           <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
           <span className="text-sm font-medium">العودة للرئيسية</span>
@@ -103,11 +103,11 @@ function ProfileContent() {
 
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">الملف الشخصي</h1>
-          <p className="text-slate-600">إدارة بياناتك الشخصية وصورة البروفايل</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">الملف الشخصي</h1>
+          <p className="text-slate-600 dark:text-slate-400">إدارة بياناتك الشخصية وصورة البروفايل</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
           {/* Profile Header with Avatar */}
           <div className="bg-gradient-to-r from-primary to-primary-dark p-8 text-white relative">
             <div className="flex items-center gap-6">
@@ -134,12 +134,12 @@ function ProfileContent() {
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             {/* Name Field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 الاسم الكامل
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiUser className="h-5 w-5 text-slate-400" />
+                  <FiUser className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   type="text"
@@ -147,7 +147,7 @@ function ProfileContent() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="أحمد محمد"
                   required
                 />
@@ -156,12 +156,12 @@ function ProfileContent() {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 البريد الإلكتروني
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiMail className="h-5 w-5 text-slate-400" />
+                  <FiMail className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   type="email"
@@ -169,7 +169,7 @@ function ProfileContent() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="example@email.com"
                   dir="ltr"
                   required
@@ -179,12 +179,12 @@ function ProfileContent() {
 
             {/* Phone Field */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 رقم الهاتف
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiPhone className="h-5 w-5 text-slate-400" />
+                  <FiPhone className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   type="tel"
@@ -192,7 +192,7 @@ function ProfileContent() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="01012345678"
                   dir="ltr"
                   required
@@ -201,18 +201,18 @@ function ProfileContent() {
             </div>
 
             {/* Divider */}
-            <div className="border-t border-slate-200 pt-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">تغيير كلمة المرور (اختياري)</h3>
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">تغيير كلمة المرور (اختياري)</h3>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 كلمة المرور الجديدة
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-slate-400" />
+                  <FiLock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   type="password"
@@ -220,7 +220,7 @@ function ProfileContent() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="اتركه فارغاً إذا لم ترد التغيير"
                   minLength={6}
                 />
@@ -229,12 +229,12 @@ function ProfileContent() {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 تأكيد كلمة المرور
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-slate-400" />
+                  <FiLock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   type="password"
@@ -242,7 +242,7 @@ function ProfileContent() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="أعد كتابة كلمة المرور"
                   minLength={6}
                 />
@@ -253,7 +253,7 @@ function ProfileContent() {
             <div className="flex justify-start">
               <Link
                 href="/forgot-password"
-                className="text-sm font-medium text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1.5 group"
+                className="text-sm font-medium text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors inline-flex items-center gap-1.5 group"
               >
                 <FiLock className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 نسيت كلمة المرور؟

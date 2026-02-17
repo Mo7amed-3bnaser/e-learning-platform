@@ -107,10 +107,10 @@ function VerifyEmailContent() {
         return (
             <div className="min-h-screen flex">
                 {/* Left Side - Success Message */}
-                <div className="flex-1 flex items-center justify-center p-8 bg-white relative">
+                <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-900 relative">
                     <Link
                         href="/"
-                        className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors group"
+                        className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors group"
                     >
                         <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         <span className="text-sm font-medium">العودة للرئيسية</span>
@@ -126,20 +126,20 @@ function VerifyEmailContent() {
 
                         {/* Success State */}
                         <div className="text-center space-y-6">
-                            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto animate-bounce">
-                                <FiCheckCircle className="w-12 h-12 text-green-600" />
+                            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/40 dark:to-green-800/40 rounded-full flex items-center justify-center mx-auto animate-bounce">
+                                <FiCheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-slate-800 mb-3">
+                                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">
                                     تم التأكيد بنجاح! 🎉
                                 </h2>
-                                <p className="text-slate-500 leading-relaxed">
+                                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
                                     تم تأكيد بريدك الإلكتروني بنجاح. يمكنك الآن تسجيل الدخول والاستمتاع بجميع خدمات المنصة.
                                 </p>
                             </div>
 
                             {/* Countdown */}
-                            <div className="bg-primary/5 rounded-xl p-4">
+                            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4">
                                 <p className="text-primary text-sm">
                                     سيتم توجيهك إلى صفحة تسجيل الدخول خلال{" "}
                                     <span className="font-bold text-lg">{countdown}</span> ثوانٍ
@@ -186,16 +186,16 @@ function VerifyEmailContent() {
     // ===== State: Token error =====
     if (token && isError) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white p-8">
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900 p-8">
                 <div className="w-full max-w-md text-center space-y-6">
-                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto">
-                        <FiAlertTriangle className="w-12 h-12 text-red-600" />
+                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/40 dark:to-red-800/40 rounded-full flex items-center justify-center mx-auto">
+                        <FiAlertTriangle className="w-12 h-12 text-red-600 dark:text-red-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-3">
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">
                             رابط غير صالح ⚠️
                         </h2>
-                        <p className="text-slate-500 leading-relaxed">
+                        <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
                             {errorMessage || "الرابط الذي تستخدمه غير صالح أو منتهي الصلاحية. يمكنك طلب رابط تأكيد جديد."}
                         </p>
                     </div>
@@ -208,7 +208,7 @@ function VerifyEmailContent() {
                         </Link>
                         <Link
                             href="/register"
-                            className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 transition-all duration-300 text-center"
+                            className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300 text-center"
                         >
                             إنشاء حساب جديد
                         </Link>
@@ -222,11 +222,11 @@ function VerifyEmailContent() {
     return (
         <div className="min-h-screen flex">
             {/* Left Side - Verification Pending */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-white relative">
+            <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-900 relative">
                 {/* Back Button */}
                 <Link
                     href="/"
-                    className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors group"
+                    className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors group"
                 >
                     <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     <span className="text-sm font-medium">العودة للرئيسية</span>
@@ -242,56 +242,56 @@ function VerifyEmailContent() {
 
                     {/* Header */}
                     <div className="text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                            <FiMail className="w-10 h-10 text-blue-600" />
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/40 dark:to-blue-800/40 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <FiMail className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <h1 className="text-3xl font-bold text-slate-800">
+                        <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">
                             تأكيد البريد الإلكتروني 📧
                         </h1>
-                        <p className="mt-3 text-slate-500 leading-relaxed">
+                        <p className="mt-3 text-slate-500 dark:text-slate-400 leading-relaxed">
                             تم إرسال رابط تأكيد إلى بريدك الإلكتروني
                         </p>
                     </div>
 
                     {/* Email Display */}
                     {email && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                            <p className="text-sm text-blue-700 mb-1">تم الإرسال إلى:</p>
-                            <p className="font-semibold text-blue-900 text-lg" dir="ltr">{email}</p>
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-center">
+                            <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">تم الإرسال إلى:</p>
+                            <p className="font-semibold text-blue-900 dark:text-blue-100 text-lg" dir="ltr">{email}</p>
                         </div>
                     )}
 
                     {/* Instructions */}
                     <div className="space-y-4">
-                        <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                            <div className="w-8 h-8 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <span className="text-primary font-bold text-sm">1</span>
                             </div>
-                            <p className="text-slate-600 text-sm leading-relaxed">
-                                افتح بريدك الإلكتروني وابحث عن رسالة من <strong className="text-slate-800">مسار</strong>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                افتح بريدك الإلكتروني وابحث عن رسالة من <strong className="text-slate-800 dark:text-slate-200">مسار</strong>
                             </p>
                         </div>
-                        <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                            <div className="w-8 h-8 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <span className="text-primary font-bold text-sm">2</span>
                             </div>
-                            <p className="text-slate-600 text-sm leading-relaxed">
-                                اضغط على زر <strong className="text-slate-800">&quot;تأكيد البريد الإلكتروني&quot;</strong> في الرسالة
+                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                اضغط على زر <strong className="text-slate-800 dark:text-slate-200">&quot;تأكيد البريد الإلكتروني&quot;</strong> في الرسالة
                             </p>
                         </div>
-                        <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                            <div className="w-8 h-8 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <span className="text-primary font-bold text-sm">3</span>
                             </div>
-                            <p className="text-slate-600 text-sm leading-relaxed">
-                                بعد التأكيد يمكنك <strong className="text-slate-800">تسجيل الدخول</strong> واستخدام المنصة
+                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                بعد التأكيد يمكنك <strong className="text-slate-800 dark:text-slate-200">تسجيل الدخول</strong> واستخدام المنصة
                             </p>
                         </div>
                     </div>
 
                     {/* Warning */}
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                        <p className="text-amber-800 text-sm leading-relaxed">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+                        <p className="text-amber-800 dark:text-amber-200 text-sm leading-relaxed">
                             <strong>💡 نصيحة:</strong> إذا لم تجد الرسالة في البريد الوارد، تحقق من مجلد <strong>البريد المزعج (Spam)</strong>
                         </p>
                     </div>
@@ -315,7 +315,7 @@ function VerifyEmailContent() {
 
                         <Link
                             href="/login"
-                            className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 transition-all duration-300 text-center border border-primary/20"
+                            className="block w-full px-6 py-3 rounded-xl font-medium text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300 text-center border border-primary/20 dark:border-primary/30"
                         >
                             العودة لتسجيل الدخول
                         </Link>

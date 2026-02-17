@@ -100,13 +100,13 @@ export default function DashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
     }
   };
 
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
         {/* Header */}
         <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
           <div className="max-w-7xl mx-auto px-4 py-8">
@@ -164,38 +164,38 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm mb-1">إجمالي الكورسات</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">إجمالي الكورسات</p>
                   <p className="text-3xl font-bold text-primary">{stats.totalCourses}</p>
                 </div>
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center">
                   <FiBook className="w-6 h-6 text-primary" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm mb-1">قيد الدراسة</p>
-                  <p className="text-3xl font-bold text-orange-600">{stats.inProgressCourses}</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">قيد الدراسة</p>
+                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.inProgressCourses}</p>
                 </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <FiClock className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+                  <FiClock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm mb-1">مكتملة</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.completedCourses}</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">مكتملة</p>
+                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.completedCourses}</p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <FiAward className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                  <FiAward className="w-6 h-6 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </div>
@@ -205,14 +205,14 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* الكورسات المشترك فيها */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800">
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                     كورساتي
                   </h2>
                   <Link
                     href="/courses"
-                    className="text-primary hover:text-primary-dark text-sm font-medium"
+                    className="text-primary hover:text-primary-dark dark:hover:text-primary-light text-sm font-medium"
                   >
                     تصفح المزيد ←
                   </Link>
@@ -232,9 +232,9 @@ export default function DashboardPage() {
                       <Link
                         key={course._id}
                         href={`/courses/${course._id}/watch`}
-                        className="flex gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100"
+                        className="flex gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border border-slate-100 dark:border-slate-700"
                       >
-                        <div className="w-24 h-24 bg-slate-200 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-24 h-24 bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden flex-shrink-0">
                           {course.thumbnail ? (
                             <img
                               src={course.thumbnail}
@@ -243,15 +243,15 @@ export default function DashboardPage() {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <FiBook className="w-8 h-8 text-slate-400" />
+                              <FiBook className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                             </div>
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-slate-800 mb-1">
+                          <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">
                             {course.title}
                           </h3>
-                          <p className="text-sm text-slate-600 mb-2">
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
                             {course.instructor?.name || 'مدرس غير معروف'}
                           </p>
                           <div className="flex items-center gap-3">
@@ -269,10 +269,10 @@ export default function DashboardPage() {
 
             {/* Sidebar - الطلبات الأخيرة */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
                 <div className="flex items-center gap-2 mb-6">
                   <FiShoppingBag className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-bold text-slate-800">
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                     طلباتي الأخيرة
                   </h2>
                 </div>
@@ -281,13 +281,13 @@ export default function DashboardPage() {
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
                       <div key={i} className="animate-pulse">
-                        <div className="h-4 bg-slate-200 rounded mb-2"></div>
-                        <div className="h-3 bg-slate-200 rounded w-2/3"></div>
+                        <div className="h-4 bg-slate-200 dark:bg-slate-600 rounded mb-2"></div>
+                        <div className="h-3 bg-slate-200 dark:bg-slate-600 rounded w-2/3"></div>
                       </div>
                     ))}
                   </div>
                 ) : recentOrders.length === 0 ? (
-                  <p className="text-slate-600 text-sm text-center py-8">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm text-center py-8">
                     لا توجد طلبات بعد
                   </p>
                 ) : (
@@ -295,9 +295,9 @@ export default function DashboardPage() {
                     {recentOrders.map((order) => (
                       <div
                         key={order._id}
-                        className="p-3 rounded-lg border border-slate-100"
+                        className="p-3 rounded-lg border border-slate-100 dark:border-slate-700"
                       >
-                        <p className="font-medium text-slate-800 text-sm mb-1">
+                        <p className="font-medium text-slate-800 dark:text-slate-100 text-sm mb-1">
                           {order.courseId.title}
                         </p>
                         <div className="flex items-center justify-between">
@@ -308,12 +308,12 @@ export default function DashboardPage() {
                           >
                             {getStatusText(order.status)}
                           </span>
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
                             {new Date(order.createdAt).toLocaleDateString('ar-EG')}
                           </span>
                         </div>
                         {order.status === 'rejected' && order.rejectionReason && (
-                          <p className="text-xs text-red-600 mt-2">
+                          <p className="text-xs text-red-600 dark:text-red-400 mt-2">
                             السبب: {order.rejectionReason}
                           </p>
                         )}
@@ -324,7 +324,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/orders"
-                  className="block mt-4 text-center text-primary hover:text-primary-dark text-sm font-medium"
+                  className="block mt-4 text-center text-primary hover:text-primary-dark dark:hover:text-primary-light text-sm font-medium"
                 >
                   عرض جميع الطلبات ←
                 </Link>

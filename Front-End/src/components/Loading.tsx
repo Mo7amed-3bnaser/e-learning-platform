@@ -69,7 +69,7 @@ export const LoadingDots: React.FC<{ className?: string }> = ({ className = '' }
  */
 export const LoadingBar: React.FC<{ className?: string }> = ({ className = '' }) => {
     return (
-        <div className={`w-full h-1 bg-gray-200 rounded-full overflow-hidden ${className}`}>
+        <div className={`w-full h-1 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden ${className}`}>
             <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 animate-shimmer" />
         </div>
     );
@@ -91,7 +91,7 @@ export const InlineLoading: React.FC<{ message?: string }> = ({ message = 'جا�
     return (
         <div className="flex items-center justify-center gap-3 py-8">
             <LoadingSpinner size="sm" />
-            <span className="text-gray-600">{message}</span>
+            <span className="text-gray-600 dark:text-slate-400">{message}</span>
         </div>
     );
 };
@@ -115,10 +115,10 @@ export const ButtonLoading: React.FC = () => {
  */
 export const CardLoadingOverlay: React.FC<{ message?: string }> = ({ message }) => {
     return (
-        <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
+        <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
             <div className="text-center">
                 <LoadingSpinner size="lg" className="mx-auto mb-2" />
-                {message && <p className="text-sm text-gray-600">{message}</p>}
+                {message && <p className="text-sm text-gray-600 dark:text-slate-400">{message}</p>}
             </div>
         </div>
     );
@@ -149,10 +149,10 @@ export const ProgressBar: React.FC<{ progress: number; className?: string }> = (
     return (
         <div className={`w-full ${className}`}>
             <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">جاري التحميل</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">جاري التحميل</span>
                 <span className="text-sm font-medium text-blue-600">{Math.round(progress)}%</span>
             </div>
-            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
                 <div
                     className="h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-300 ease-out"
                     style={{ width: `${progress}%` }}
@@ -168,7 +168,7 @@ export const ProgressBar: React.FC<{ progress: number; className?: string }> = (
  */
 export const SkeletonPulse: React.FC<{ className?: string }> = ({ className = '' }) => {
     return (
-        <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
+        <div className={`animate-pulse bg-gray-200 dark:bg-slate-600 rounded ${className}`} />
     );
 };
 

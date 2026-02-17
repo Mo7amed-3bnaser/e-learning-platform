@@ -28,19 +28,19 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         <div className={`flex flex-col items-center justify-center py-16 px-4 ${className}`}>
             {/* Icon */}
             {icon && (
-                <div className="mb-6 text-gray-400">
+                <div className="mb-6 text-gray-400 dark:text-slate-500">
                     {icon}
                 </div>
             )}
 
             {/* Title */}
-            <h3 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2 text-center">
                 {title}
             </h3>
 
             {/* Description */}
             {description && (
-                <p className="text-gray-600 text-center max-w-md mb-8">
+                <p className="text-gray-600 dark:text-slate-400 text-center max-w-md mb-8">
                     {description}
                 </p>
             )}
@@ -51,14 +51,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
                     {action.href ? (
                         <Link
                             href={action.href}
-                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl"
+                            className="px-6 py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-lg hover:from-primary-dark hover:to-primary transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
                             {action.label}
                         </Link>
                     ) : (
                         <button
                             onClick={action.onClick}
-                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl"
+                            className="px-6 py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-lg hover:from-primary-dark hover:to-primary transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
                             {action.label}
                         </button>

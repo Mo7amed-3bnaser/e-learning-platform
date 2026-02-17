@@ -120,7 +120,7 @@ export default function OrdersPage() {
 
     return (
         <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
                 {/* Header */}
                 <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
                     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -154,7 +154,7 @@ export default function OrdersPage() {
                                 onClick={() => setFilter(tab.key)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${filter === tab.key
                                     ? 'bg-primary text-white shadow-md shadow-primary/25'
-                                    : 'bg-white text-slate-600 border border-slate-200 hover:border-primary/30 hover:text-primary'
+                                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-600 hover:border-primary/30 dark:hover:border-primary/50 hover:text-primary dark:hover:text-primary-light'
                                     }`}
                             >
                                 {tab.icon}
@@ -177,7 +177,7 @@ export default function OrdersPage() {
                             {filteredOrders.map((order) => (
                                 <div
                                     key={order._id}
-                                    className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-200"
+                                    className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow duration-200"
                                 >
                                     <div className="flex gap-4">
                                         {/* Course Thumbnail */}
@@ -198,7 +198,7 @@ export default function OrdersPage() {
                                         {/* Order Details */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-3 mb-2">
-                                                <h3 className="font-bold text-slate-800 truncate">
+                                                <h3 className="font-bold text-slate-800 dark:text-slate-100 truncate">
                                                     {order.courseId?.title || 'كورس محذوف'}
                                                 </h3>
                                                 <span
@@ -211,7 +211,7 @@ export default function OrdersPage() {
                                                 </span>
                                             </div>
 
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
                                                 <span>{formatDate(order.createdAt)}</span>
                                                 {order.paymentMethod && (
                                                     <>
@@ -222,7 +222,7 @@ export default function OrdersPage() {
                                                 {order.price != null && (
                                                     <>
                                                         <span className="text-slate-300">•</span>
-                                                        <span className="font-semibold text-slate-700">${order.price}</span>
+                                                        <span className="font-semibold text-slate-700 dark:text-slate-300">${order.price}</span>
                                                     </>
                                                 )}
                                             </div>

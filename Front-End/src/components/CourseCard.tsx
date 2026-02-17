@@ -80,9 +80,9 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
   };
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-primary/20 hover:-translate-y-1 hover-lift">
+    <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-primary/30 hover:-translate-y-1 hover-lift">
         {/* صورة الكورس */}
-        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 image-zoom-container">
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 dark:from-primary/20 dark:to-primary-dark/20 image-zoom-container">
           {course.thumbnail ? (
             <img
               src={course.thumbnail}
@@ -91,13 +91,13 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <FiBookOpen className="w-16 h-16 text-primary/30" />
+              <FiBookOpen className="w-16 h-16 text-primary/30 dark:text-primary/40" />
             </div>
           )}
           
           {/* Category Badge */}
           <div className="absolute top-3 right-3">
-            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary badge-pulse">
+            <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary badge-pulse">
               {course.category || 'عام'}
             </span>
           </div>
@@ -107,14 +107,14 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
             <button
               onClick={handleToggleWishlist}
               disabled={isTogglingWishlist}
-              className={`absolute top-3 left-3 p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-all ${
+              className={`absolute top-3 left-3 p-2.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-all ${
                 isTogglingWishlist ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               aria-label={inWishlist ? 'إزالة من قائمة الرغبات' : 'إضافة لقائمة الرغبات'}
             >
               <FiHeart 
                 className={`w-5 h-5 transition-all ${
-                  inWishlist ? 'fill-red-500 text-red-500' : 'text-slate-600'
+                  inWishlist ? 'fill-red-500 text-red-500' : 'text-slate-600 dark:text-slate-400'
                 }`}
               />
             </button>
@@ -134,14 +134,14 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
                 <span className="font-bold text-lg">🎁 مجاني</span>
               </div>
             ) : (
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/50 overflow-hidden">
+              <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-600/50 overflow-hidden">
                 <div className="px-4 py-2.5 flex items-baseline gap-1">
                   <span className="text-xs text-slate-400 font-medium self-start mt-1">$</span>
                   <span className="text-3xl font-black bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
                     {course.price}
                   </span>
                 </div>
-                <div className="bg-gradient-to-r from-primary/10 to-primary-dark/10 px-4 py-1 text-center">
+                <div className="bg-gradient-to-r from-primary/10 to-primary-dark/10 dark:from-primary/20 dark:to-primary-dark/20 px-4 py-1 text-center">
                   <span className="text-[10px] font-medium text-primary-dark">دفعة واحدة</span>
                 </div>
               </div>
@@ -152,18 +152,18 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
         {/* معلومات الكورس */}
         <div className="p-5">
           {/* عنوان الكورس */}
-          <h3 className="text-xl font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 line-clamp-2 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
             {course.title}
           </h3>
 
           {/* الوصف */}
-          <p className="text-slate-600 text-sm mb-4 line-clamp-2">
+          <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">
             {course.description}
           </p>
 
           {/* معلومات المدرس */}
           {course.instructor && (
-            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-700">
               {course.instructor.channelLogo ? (
                 <img
                   src={course.instructor.channelLogo}
@@ -182,8 +182,8 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
                 </div>
               )}
               <div>
-                <p className="text-xs text-slate-500">المدرس</p>
-                <p className="text-sm font-medium text-slate-700">
+                <p className="text-xs text-slate-500 dark:text-slate-400">المدرس</p>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   {course.instructor.name}
                 </p>
               </div>
@@ -191,7 +191,7 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
           )}
 
           {/* إحصائيات */}
-          <div className="flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
             {course.studentsCount !== undefined && (
               <div className="flex items-center gap-1">
                 <FiUsers className="w-4 h-4" />
@@ -231,7 +231,7 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
                 {/* زر تفاصيل الكورس */}
                 <button
                   onClick={handleViewDetails}
-                  className="flex-1 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-medium transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl font-medium transition-all"
                 >
                   <FiInfo className="w-4 h-4" />
                   <span>التفاصيل</span>

@@ -103,11 +103,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white relative">
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-900 relative">
         {/* Back Button - Top Right */}
         <Link
           href="/"
-          className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors group"
+          className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors group"
         >
           <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
           <span className="text-sm font-medium">العودة للرئيسية</span>
@@ -119,10 +119,10 @@ export default function LoginPage() {
             <Link href="/" className="inline-flex justify-center">
               <Logo size="lg" />
             </Link>
-            <h1 className="mt-6 text-3xl font-bold text-slate-800">
+            <h1 className="mt-6 text-3xl font-bold text-slate-800 dark:text-slate-100">
               مرحباً بعودتك! 👋
             </h1>
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-slate-500 dark:text-slate-400">
               سجل دخولك للمتابعة في رحلة التعلم
             </p>
           </div>
@@ -133,13 +133,13 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 البريد الإلكتروني
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiMail className="h-5 w-5 text-slate-400" />
+                  <FiMail className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   id="email"
@@ -151,7 +151,7 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="block w-full pr-10 pl-4 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700"
                   placeholder="example@email.com"
                   dir="ltr"
                 />
@@ -162,13 +162,13 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 كلمة المرور
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-slate-400" />
+                  <FiLock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                 </div>
                 <input
                   id="password"
@@ -180,7 +180,7 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="block w-full pr-10 pl-12 py-3 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 hover:bg-white"
+                  className="block w-full pr-10 pl-12 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700"
                   placeholder="••••••••"
                   dir="ltr"
                 />
@@ -190,9 +190,9 @@ export default function LoginPage() {
                   className="absolute inset-y-0 left-0 pl-3 flex items-center"
                 >
                   {showPassword ? (
-                    <FiEyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                    <FiEyeOff className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400" />
                   ) : (
-                    <FiEye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                    <FiEye className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400" />
                   )}
                 </button>
               </div>
@@ -209,18 +209,18 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, rememberMe: e.target.checked })
                   }
-                  className="h-4 w-4 text-primary focus:ring-primary border-slate-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-primary focus:ring-primary border-slate-300 dark:border-slate-600 rounded cursor-pointer"
                 />
                 <label
                   htmlFor="remember-me"
-                  className="mr-2 block text-sm text-slate-600 cursor-pointer"
+                  className="mr-2 block text-sm text-slate-600 dark:text-slate-400 cursor-pointer"
                 >
                   تذكرني
                 </label>
               </div>
               <Link
                 href="/forgot-password"
-                className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                className="text-sm font-medium text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors"
               >
                 نسيت كلمة المرور؟
               </Link>
@@ -238,11 +238,11 @@ export default function LoginPage() {
             </LoadingButton>
 
             {/* Sign Up Link */}
-            <p className="text-center text-sm text-slate-600">
+            <p className="text-center text-sm text-slate-600 dark:text-slate-400">
               ليس لديك حساب؟{" "}
               <Link
                 href="/register"
-                className="font-semibold text-primary hover:text-primary-dark transition-colors"
+                className="font-semibold text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors"
               >
                 إنشاء حساب جديد
               </Link>

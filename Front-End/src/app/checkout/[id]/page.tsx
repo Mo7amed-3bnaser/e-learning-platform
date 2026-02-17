@@ -91,7 +91,7 @@ export default function CheckoutPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-20">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
           <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="animate-pulse space-y-6">
               <div className="h-10 bg-slate-200 rounded w-1/4"></div>
@@ -110,7 +110,7 @@ export default function CheckoutPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* زر الرجوع */}
           <button
@@ -131,7 +131,7 @@ export default function CheckoutPage() {
             {/* معلومات الدفع */}
             <div className="lg:col-span-2 space-y-6">
               {/* معلومات المستخدم */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
                   <FiCheck className="w-5 h-5 text-green-500" />
                   معلومات الحساب
@@ -149,7 +149,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* طريقة الدفع (Sandbox) */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
                   <FiCreditCard className="w-5 h-5 text-primary" />
                   طريقة الدفع
@@ -180,7 +180,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* الشروط والأحكام */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -222,7 +222,7 @@ export default function CheckoutPage() {
 
             {/* ملخص الطلب */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-24">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg sticky top-24">
                 <h2 className="text-xl font-bold text-slate-800 mb-4">ملخص الطلب</h2>
                 
                 {/* الكورس */}

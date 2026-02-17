@@ -19,7 +19,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     height,
     animation = 'pulse',
 }) => {
-    const baseClasses = 'bg-gray-200';
+    const baseClasses = 'bg-gray-200 dark:bg-slate-600';
 
     const variantClasses = {
         text: 'h-4 rounded',
@@ -53,7 +53,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
  */
 export const CourseCardSkeleton: React.FC = () => {
     return (
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
             {/* Image Skeleton */}
             <Skeleton variant="rectangular" height={200} />
 

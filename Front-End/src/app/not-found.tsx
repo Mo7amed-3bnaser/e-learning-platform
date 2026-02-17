@@ -12,7 +12,7 @@ export default function NotFound() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 relative overflow-hidden flex items-center justify-center">
             {/* Background Decorative Elements */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-10 right-[10%] w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
@@ -80,13 +80,13 @@ export default function NotFound() {
                     className={`transition-all duration-1000 delay-300 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                         }`}
                 >
-                    <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">
                         الصفحة غير موجودة
                     </h2>
-                    <p className="text-lg text-slate-500 mb-2 max-w-md mx-auto leading-relaxed">
+                    <p className="text-lg text-slate-500 dark:text-slate-400 mb-2 max-w-md mx-auto leading-relaxed">
                         يبدو أنك ضللت الطريق! الصفحة اللي بتدور عليها مش موجودة أو تم نقلها.
                     </p>
-                    <p className="text-sm text-slate-400 mb-10">
+                    <p className="text-sm text-slate-400 dark:text-slate-500 mb-10">
                         لا تقلق، نقدر نرجعك للمسار الصحيح 🚀
                     </p>
                 </div>
@@ -107,7 +107,7 @@ export default function NotFound() {
 
                     <Link
                         href="/courses"
-                        className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-primary border-2 border-primary/20 rounded-2xl font-semibold text-lg hover:border-primary/40 hover:bg-primary/5 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md"
+                        className="group inline-flex items-center gap-3 px-8 py-4 bg-white dark:bg-slate-800 text-primary border-2 border-primary/20 dark:border-primary/30 rounded-2xl font-semibold text-lg hover:border-primary/40 dark:hover:border-primary/50 hover:bg-primary/5 dark:hover:bg-primary/10 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md"
                     >
                         <FiBookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         <span>تصفح الكورسات</span>
@@ -119,7 +119,7 @@ export default function NotFound() {
                     className={`mt-16 transition-all duration-1000 delay-700 ${mounted ? "opacity-100" : "opacity-0"
                         }`}
                 >
-                    <div className="inline-flex items-center gap-2 text-sm text-slate-400 bg-slate-100/80 px-5 py-2.5 rounded-full backdrop-blur-sm">
+                    <div className="inline-flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500 bg-slate-100/80 dark:bg-slate-800/80 px-5 py-2.5 rounded-full backdrop-blur-sm">
                         <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                         <span>
                             منصة <span className="font-semibold text-primary">مسار</span> التعليمية | كل المسارات تبدأ من هنا

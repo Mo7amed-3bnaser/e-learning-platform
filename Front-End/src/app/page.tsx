@@ -11,7 +11,7 @@ export default function Home() {
   const { isAuthenticated } = useAuthStore();
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Header */}
       <Header />
 
@@ -21,19 +21,19 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="space-y-6 text-right animate-fadeIn">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium badge-pulse">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 dark:bg-primary/20 rounded-full text-primary text-sm font-medium badge-pulse">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
                 منصة التعلم الإلكتروني الأولى
               </div>
               
-              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
+              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
                 ابدأ رحلتك نحو
                 <span className="text-primary block mt-2">
                   <TypingEffect text="النجاح والتميز" speed={150} className="inline-block" />
                 </span>
               </h1>
               
-              <p className="text-xl text-slate-600 leading-relaxed">
+              <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
                 انضم إلى آلاف المتعلمين واكتشف مسارك التعليمي المثالي مع أفضل الدورات والمدربين المحترفين
               </p>
 
@@ -48,7 +48,7 @@ export default function Home() {
                 {!isAuthenticated && (
                   <Link
                     href="/register"
-                    className="flex items-center gap-3 px-8 py-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-primary hover:text-primary transition-all font-semibold hover-scale"
+                    className="flex items-center gap-3 px-8 py-4 border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:border-primary hover:text-primary dark:hover:border-primary-light dark:hover:text-primary-light transition-all font-semibold hover-scale"
                   >
                     إنشاء حساب
                   </Link>
@@ -58,41 +58,41 @@ export default function Home() {
 
             {/* Image/Illustration */}
             <div className="relative animate-slideInUp">
-              <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 rounded-3xl p-8 backdrop-blur-sm border border-primary/20">
+              <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 dark:from-primary/20 dark:via-primary/10 dark:to-accent/20 rounded-3xl p-8 backdrop-blur-sm border border-primary/20 dark:border-primary/30">
                 {/* Stats Cards */}
                 <div className="space-y-4">
-                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover-lift animate-fadeIn">
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover-lift animate-fadeIn">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center hover-scale">
+                      <div className="w-14 h-14 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center hover-scale">
                         <FiBook className="w-7 h-7 text-primary" />
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-slate-900">+500</div>
-                        <div className="text-slate-600">دورة تعليمية</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">+500</div>
+                        <div className="text-slate-600 dark:text-slate-400">دورة تعليمية</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all mr-8 hover-lift animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all mr-8 hover-lift animate-fadeIn" style={{ animationDelay: '0.1s' }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center hover-scale">
+                      <div className="w-14 h-14 bg-accent/10 dark:bg-accent/20 rounded-xl flex items-center justify-center hover-scale">
                         <FiUsers className="w-7 h-7 text-accent" />
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-slate-900">+10K</div>
-                        <div className="text-slate-600">طالب نشط</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">+10K</div>
+                        <div className="text-slate-600 dark:text-slate-400">طالب نشط</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover-lift animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover-lift animate-fadeIn" style={{ animationDelay: '0.2s' }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center hover-scale">
+                      <div className="w-14 h-14 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center hover-scale">
                         <FiAward className="w-7 h-7 text-primary" />
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-slate-900">+50</div>
-                        <div className="text-slate-600">مدرب خبير</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">+50</div>
+                        <div className="text-slate-600 dark:text-slate-400">مدرب خبير</div>
                       </div>
                     </div>
                   </div>
@@ -108,12 +108,12 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-slate-900/50">
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-slate-900 mb-4">لماذا مسار؟</h2>
-              <p className="text-xl text-slate-600">المنصة الأكثر تطوراً للتعلم عبر الإنترنت</p>
+              <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">لماذا مسار؟</h2>
+              <p className="text-xl text-slate-600 dark:text-slate-400">المنصة الأكثر تطوراً للتعلم عبر الإنترنت</p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -141,14 +141,14 @@ export default function Home() {
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className="group p-6 rounded-2xl border-2 border-slate-100 hover:border-primary/50 hover:shadow-lg transition-all text-center hover-lift animate-fadeIn"
+                  className="group p-6 rounded-2xl border-2 border-slate-100 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg transition-all text-center hover-lift animate-fadeIn"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform hover-glow">
                     <feature.icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{feature.title}</h3>
-                  <p className="text-slate-600">{feature.desc}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{feature.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-400">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -175,7 +175,7 @@ export default function Home() {
                 </p>
                 <Link
                   href="/courses"
-                  className="inline-flex items-center gap-3 px-10 py-4 bg-white text-primary rounded-xl hover:bg-slate-50 transition-all shadow-xl hover:shadow-2xl font-bold text-lg hover-lift"
+                  className="inline-flex items-center gap-3 px-10 py-4 bg-white dark:bg-slate-100 text-primary rounded-xl hover:bg-slate-50 dark:hover:bg-slate-200 transition-all shadow-xl hover:shadow-2xl font-bold text-lg hover-lift"
                 >
                   استكشف الدورات
                   <FiArrowLeft />
@@ -191,7 +191,7 @@ export default function Home() {
                 </p>
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-3 px-10 py-4 bg-white text-primary rounded-xl hover:bg-slate-50 transition-all shadow-xl hover:shadow-2xl font-bold text-lg hover-lift animate-pulse-slow"
+                  className="inline-flex items-center gap-3 px-10 py-4 bg-white dark:bg-slate-100 text-primary rounded-xl hover:bg-slate-50 dark:hover:bg-slate-200 transition-all shadow-xl hover:shadow-2xl font-bold text-lg hover-lift animate-pulse-slow"
                 >
                   إنشاء حساب مجاني
                   <FiArrowLeft />
@@ -203,7 +203,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12">
+      <footer className="bg-slate-900 dark:bg-slate-950 text-white py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <Logo size="md" showText={true} className="text-white" />
