@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FiUsers, FiClock, FiBookOpen, FiShoppingCart, FiInfo, FiPlay } from 'react-icons/fi';
+import { FiUsers, FiClock, FiBookOpen, FiShoppingCart, FiInfo, FiPlay, FiHeart } from 'react-icons/fi';
+import { useWishlistStore } from '@/store/wishlistStore';
+import { useAuthStore } from '@/store/authStore';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface CourseCardProps {
   course: {
@@ -25,6 +29,11 @@ interface CourseCardProps {
 
 export default function CourseCard({ course, isPurchased = false }: CourseCardProps) {
   const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+  
+  const inWishlist = isInWishlist(course._id);
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,6 +51,32 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
     e.preventDefault();
     e.stopPropagation();
     router.push(`/watch/${course._id}`);
+  };
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      toast.error('يجب تسجيل الدخول أولاً');
+      router.push('/login');
+      return;
+    }
+
+    setIsTogglingWishlist(true);
+    try {
+      if (inWishlist) {
+        await removeFromWishlist(course._id);
+        toast.success('تمت إزالة الكورس من قائمة الرغبات');
+      } else {
+        await addToWishlist(course._id);
+        toast.success('تمت إضافة الكورس لقائمة الرغبات');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'حدث خطأ');
+    } finally {
+      setIsTogglingWishlist(false);
+    }
   };
 
   return (
@@ -66,6 +101,24 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
               {course.category || 'عام'}
             </span>
           </div>
+
+          {/* Wishlist Button */}
+          {!isPurchased && (
+            <button
+              onClick={handleToggleWishlist}
+              disabled={isTogglingWishlist}
+              className={`absolute top-3 left-3 p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-all ${
+                isTogglingWishlist ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              aria-label={inWishlist ? 'إزالة من قائمة الرغبات' : 'إضافة لقائمة الرغبات'}
+            >
+              <FiHeart 
+                className={`w-5 h-5 transition-all ${
+                  inWishlist ? 'fill-red-500 text-red-500' : 'text-slate-600'
+                }`}
+              />
+            </button>
+          )}
 
           {/* Price Badge */}
           <div className="absolute bottom-3 left-3">

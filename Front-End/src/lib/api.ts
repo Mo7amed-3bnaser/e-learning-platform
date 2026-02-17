@@ -310,4 +310,24 @@ export const reviewsAPI = {
     api.delete(`/reviews/${reviewId}`),
 };
 
+// ============================================
+// Wishlist APIs
+// ============================================
+export const wishlistAPI = {
+  // Get user wishlist
+  getWishlist: () => api.get('/wishlist'),
+
+  // Add course to wishlist
+  addToWishlist: (courseId: string) =>
+    api.post(`/wishlist/${courseId}`),
+
+  // Remove course from wishlist
+  removeFromWishlist: (courseId: string) =>
+    api.delete(`/wishlist/${courseId}`),
+
+  // Check if course is in wishlist
+  checkWishlist: (courseId: string) =>
+    api.get(`/wishlist/check/${courseId}`),
+};
+
 export default api;

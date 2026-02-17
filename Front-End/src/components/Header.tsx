@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
-import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck, FiHeart } from 'react-icons/fi';
 import Logo from './Logo';
 import NotificationBell from './NotificationBell';
 import { useRouter } from 'next/navigation';
@@ -134,6 +134,15 @@ export default function Header() {
                       >
                         <FiBook className="w-4 h-4 text-slate-600" />
                         <span className="text-sm text-slate-700">كورساتي</span>
+                      </Link>
+
+                      <Link
+                        href="/wishlist"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors"
+                      >
+                        <FiHeart className="w-4 h-4 text-slate-600" />
+                        <span className="text-sm text-slate-700">قائمة الرغبات</span>
                       </Link>
 
                       <Link

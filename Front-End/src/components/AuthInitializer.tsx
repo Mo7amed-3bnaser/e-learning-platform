@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { useWishlistStore } from '@/store/wishlistStore';
 
 const FALLBACK_READY_MS = 2500;
 
@@ -12,12 +13,21 @@ export default function AuthInitializer({
 }) {
   const [isReady, setIsReady] = useState(false);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const fetchWishlist = useWishlistStore((state) => state.fetchWishlist);
 
   useEffect(() => {
     if (hasHydrated) {
       setIsReady(true);
+      
+      // جلب قائمة الرغبات عند تسجيل الدخول
+      if (isAuthenticated) {
+        fetchWishlist().catch(() => {
+          // تجاهل الأخطاء - سيتم إعادة المحاولة عند زيارة صفحة wishlist
+        });
+      }
     }
-  }, [hasHydrated]);
+  }, [hasHydrated, isAuthenticated, fetchWishlist]);
 
   // Safety: if hydration never fires (e.g. SSR/localStorage edge case), show content after delay
   useEffect(() => {
