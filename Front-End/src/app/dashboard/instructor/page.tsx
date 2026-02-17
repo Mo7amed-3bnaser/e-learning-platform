@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
+import PageLoader from "@/components/PageLoader";
 import { FiBook, FiUsers, FiDollarSign, FiPlus, FiTrendingUp } from "react-icons/fi";
 import { useAuthStore } from "@/store/authStore";
 import { instructorApi } from "@/lib/instructorApi";
@@ -56,16 +57,7 @@ export default function InstructorDashboard() {
     };
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen bg-slate-50">
-                <Header />
-                <div className="container mx-auto px-6 py-20">
-                    <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <PageLoader message="جاري تحميل لوحة التحكم..." />;
     }
 
     return (

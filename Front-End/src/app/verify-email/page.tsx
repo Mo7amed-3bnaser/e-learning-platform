@@ -12,6 +12,7 @@ import {
 } from "react-icons/fi";
 import Logo from "@/components/Logo";
 import LoadingButton from "@/components/LoadingButton";
+import PageLoader from "@/components/PageLoader";
 import { authAPI } from "@/lib/api";
 import { showSuccess, showError, handleApiError } from "@/lib/toast";
 
@@ -97,23 +98,8 @@ function VerifyEmailContent() {
 
     // ===== State: Verifying token (loading) =====
     if (token && isVerifying) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-white p-8">
-                <div className="w-full max-w-md text-center space-y-6">
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center mx-auto">
-                        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-3">
-                            جاري تأكيد البريد الإلكتروني...
-                        </h2>
-                        <p className="text-slate-500 leading-relaxed">
-                            يتم التحقق من رابط التأكيد، يرجى الانتظار
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
+        return <PageLoader message="جاري تأكيد البريد الإلكتروني..." />;
+    }
     }
 
     // ===== State: Token verified successfully =====
@@ -407,11 +393,7 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
     return (
         <Suspense
-            fallback={
-                <div className="min-h-screen flex items-center justify-center bg-white">
-                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            }
+            fallback={<PageLoader message="جاري التحميل..." />}
         >
             <VerifyEmailContent />
         </Suspense>

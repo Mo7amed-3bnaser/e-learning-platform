@@ -1,4 +1,5 @@
 import React from 'react';
+import PageLoader from './PageLoader';
 
 interface LoadingSpinnerProps {
     size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -76,17 +77,10 @@ export const LoadingBar: React.FC<{ className?: string }> = ({ className = '' })
 
 /**
  * Full Page Loading
- * شاشة تحميل كاملة
+ * شاشة تحميل كاملة - بتصميم مسار (نفس BrandLoader)
  */
 export const FullPageLoading: React.FC<{ message?: string }> = ({ message = 'جاري التحميل...' }) => {
-    return (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="text-center">
-                <LoadingSpinner size="xl" className="mx-auto mb-4" />
-                <p className="text-gray-600 font-medium">{message}</p>
-            </div>
-        </div>
-    );
+    return <PageLoader message={message} />;
 };
 
 /**

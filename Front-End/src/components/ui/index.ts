@@ -20,6 +20,10 @@ export {
     SkeletonPulse,
 } from '../Loading';
 
+// Brand Loading Components
+export { default as BrandLoader } from '../BrandLoader';
+export { default as PageLoader } from '../PageLoader';
+
 // Skeleton Components
 export {
     default as Skeleton,

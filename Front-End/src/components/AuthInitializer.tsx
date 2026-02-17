@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { useWishlistStore } from '@/store/wishlistStore';
+import BrandLoader from './BrandLoader';
 
-const FALLBACK_READY_MS = 2500;
+const FALLBACK_READY_MS = 4000;
 
 export default function AuthInitializer({
   children,
@@ -12,6 +13,7 @@ export default function AuthInitializer({
   children: React.ReactNode;
 }) {
   const [isReady, setIsReady] = useState(false);
+  const [loaderDone, setLoaderDone] = useState(false);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const fetchWishlist = useWishlistStore((state) => state.fetchWishlist);
@@ -35,11 +37,22 @@ export default function AuthInitializer({
     return () => clearTimeout(t);
   }, []);
 
-  if (!isReady) {
+  const handleLoaderFinish = useCallback(() => {
+    setLoaderDone(true);
+  }, []);
+
+  // Show the branded loader until both data is ready AND loader animation is done
+  if (!isReady || !loaderDone) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <>
+        <BrandLoader onFinish={handleLoaderFinish} minimumDuration={2800} />
+        {/* Pre-render children hidden so they're ready when loader finishes */}
+        {isReady && (
+          <div style={{ visibility: 'hidden', position: 'absolute', top: 0, left: 0, width: 0, height: 0, overflow: 'hidden' }}>
+            {children}
+          </div>
+        )}
+      </>
     );
   }
 

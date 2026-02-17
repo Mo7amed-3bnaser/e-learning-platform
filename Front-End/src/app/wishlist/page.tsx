@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useAuthStore } from '@/store/authStore';
 import CourseCard from '@/components/CourseCard';
-import Loading from '@/components/Loading';
+import PageLoader from '@/components/PageLoader';
 import EmptyState from '@/components/EmptyState';
 import { FiHeart } from 'react-icons/fi';
 
@@ -29,7 +29,7 @@ export default function WishlistPage() {
 
   // عرض شاشة تحميل أثناء التحقق من حالة المصادقة
   if (!_hasHydrated) {
-    return <Loading />;
+    return <PageLoader message="جاري التحميل..." />;
   }
 
   // إذا لم يكن مسجل دخول
@@ -39,13 +39,7 @@ export default function WishlistPage() {
 
   // شاشة التحميل
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
-        <div className="container mx-auto px-4">
-          <Loading />
-        </div>
-      </div>
-    );
+    return <PageLoader message="جاري تحميل قائمة الرغبات..." />;
   }
 
   return (
