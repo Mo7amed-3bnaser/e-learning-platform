@@ -716,7 +716,7 @@ export default function Home() {
           <ScrollReveal preset="fadeUp" delay={0.3}>
             <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-sm">
               <p>© 2026 مسار — جميع الحقوق محفوظة</p>
-              <p>صُنع بـ ❤️ للمتعلمين العرب</p>
+              <p>تم تطوير هذه المنصه بواسطة يسي ومحمد</p>
             </div>
           </ScrollReveal>
         </div>
