@@ -264,17 +264,6 @@ export default function MasarRoadHero() {
         </motion.div>
       </motion.div>
 
-      {/* ── Subtle "M" watermark behind everything ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, delay: 2.5 }}
-        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
-      >
-        <span className="text-[160px] font-black leading-none text-primary/[0.03] dark:text-white/[0.03]">
-          M
-        </span>
-      </motion.div>
     </div>
   );
 }
