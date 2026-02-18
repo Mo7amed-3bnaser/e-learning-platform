@@ -322,7 +322,7 @@ export default function CourseDetailsPage() {
                     // لو الطالب مش مسجل
                     <>
                       <div className="text-center mb-6">
-                        <div className="text-4xl font-bold text-primary mb-2">
+                        <div className="text-4xl font-bold text-primary dark:text-accent mb-2">
                           ${course.price}
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">دفعة واحدة فقط</p>
@@ -330,7 +330,7 @@ export default function CourseDetailsPage() {
 
                       <button
                         onClick={handleBuyNow}
-                        className="w-full bg-gradient-to-l from-primary to-primary-dark text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-l from-primary to-primary-dark dark:from-accent dark:to-accent-dark text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                       >
                         <FiShoppingCart className="w-5 h-5" />
                         <span>اشتر الآن</span>
@@ -465,7 +465,7 @@ export default function CourseDetailsPage() {
                   setPreviewVideo(null);
                   handleBuyNow();
                 }}
-                className="flex items-center gap-2 bg-gradient-to-l from-primary to-primary-dark text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transition-all"
+                className="flex items-center gap-2 bg-gradient-to-l from-primary to-primary-dark dark:from-accent dark:to-accent-dark text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transition-all"
               >
                 <FiShoppingCart className="w-4 h-4" />
                 <span>اشتر الكورس كاملاً</span>

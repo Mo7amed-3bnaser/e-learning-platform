@@ -134,15 +134,15 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
                 <span className="font-bold text-lg">🎁 مجاني</span>
               </div>
             ) : (
-              <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-600/50 overflow-hidden">
+              <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-500/50 overflow-hidden">
                 <div className="px-4 py-2.5 flex items-baseline gap-1">
-                  <span className="text-xs text-slate-400 font-medium self-start mt-1">$</span>
-                  <span className="text-3xl font-black bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                  <span className="text-xs text-slate-400 dark:text-accent font-medium self-start mt-1">$</span>
+                  <span className="text-3xl font-black text-primary dark:text-accent">
                     {course.price}
                   </span>
                 </div>
-                <div className="bg-gradient-to-r from-primary/10 to-primary-dark/10 dark:from-primary/20 dark:to-primary-dark/20 px-4 py-1 text-center">
-                  <span className="text-[10px] font-medium text-primary-dark">دفعة واحدة</span>
+                <div className="bg-gradient-to-r from-primary/10 to-primary-dark/10 dark:from-primary/30 dark:to-primary-dark/30 px-4 py-1 text-center">
+                  <span className="text-[10px] font-medium text-primary-dark dark:text-primary-light">دفعة واحدة</span>
                 </div>
               </div>
             )}
@@ -240,7 +240,7 @@ export default function CourseCard({ course, isPurchased = false }: CourseCardPr
                 {/* زر اشتر الآن */}
                 <button
                   onClick={handleBuyNow}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-l from-primary to-primary-dark text-white py-2.5 rounded-xl font-medium hover:shadow-lg transition-all animate-pulse-slow hover:scale-105"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-l from-primary to-primary-dark dark:from-accent dark:to-accent-dark text-white py-2.5 rounded-xl font-medium hover:shadow-lg transition-all animate-pulse-slow hover:scale-105"
                 >
                   <FiShoppingCart className="w-4 h-4" />
                   <span>اشتر الآن</span>
