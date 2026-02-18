@@ -197,77 +197,75 @@ export default function CertificateCard({ courseId, courseName, courseProgress }
           }}
         >
           {/* Decorative corner borders */}
-          <div style={{ position:'absolute', top:18, left:18, width:60, height:60, borderTop:'4px solid #1e3a5f', borderLeft:'4px solid #f97316', borderRadius:'4px 0 0 0' }} />
-          <div style={{ position:'absolute', top:18, right:18, width:60, height:60, borderTop:'4px solid #1e3a5f', borderRight:'4px solid #f97316', borderRadius:'0 4px 0 0' }} />
-          <div style={{ position:'absolute', bottom:18, left:18, width:60, height:60, borderBottom:'4px solid #1e3a5f', borderLeft:'4px solid #f97316', borderRadius:'0 0 0 4px' }} />
-          <div style={{ position:'absolute', bottom:18, right:18, width:60, height:60, borderBottom:'4px solid #1e3a5f', borderRight:'4px solid #f97316', borderRadius:'0 0 4px 0' }} />
+          <div style={{ position: 'absolute', top: 18, left: 18, width: 60, height: 60, borderTop: '4px solid #1e3a5f', borderLeft: '4px solid #f97316', borderRadius: '4px 0 0 0' }} />
+          <div style={{ position: 'absolute', top: 18, right: 18, width: 60, height: 60, borderTop: '4px solid #1e3a5f', borderRight: '4px solid #f97316', borderRadius: '0 4px 0 0' }} />
+          <div style={{ position: 'absolute', bottom: 18, left: 18, width: 60, height: 60, borderBottom: '4px solid #1e3a5f', borderLeft: '4px solid #f97316', borderRadius: '0 0 0 4px' }} />
+          <div style={{ position: 'absolute', bottom: 18, right: 18, width: 60, height: 60, borderBottom: '4px solid #1e3a5f', borderRight: '4px solid #f97316', borderRadius: '0 0 4px 0' }} />
 
           {/* Outer frame */}
-          <div style={{ position:'absolute', inset:12, border:'2px solid #1e3a5f', borderRadius:8, opacity:0.15 }} />
+          <div style={{ position: 'absolute', inset: 12, border: '2px solid #1e3a5f', borderRadius: 8, opacity: 0.15 }} />
 
           {/* Watermark text */}
-          <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', opacity:0.04, fontSize:120, fontWeight:900, color:'#1e3a5f', userSelect:'none', pointerEvents:'none' }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.04, fontSize: 120, fontWeight: 900, color: '#1e3a5f', userSelect: 'none', pointerEvents: 'none' }}>
             مسار
           </div>
 
           {/* Top ribbon */}
-          <div style={{ position:'absolute', top:0, left:0, right:0, height:6, background:'linear-gradient(90deg, #1e3a5f, #f97316, #1e3a5f)' }} />
-          <div style={{ position:'absolute', bottom:0, left:0, right:0, height:6, background:'linear-gradient(90deg, #1e3a5f, #f97316, #1e3a5f)' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #1e3a5f, #f97316, #1e3a5f)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #1e3a5f, #f97316, #1e3a5f)' }} />
 
           {/* Content */}
-          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:0, padding:'40px 80px', textAlign:'center' }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0, padding: '40px 80px', textAlign: 'center' }}>
 
             {/* Platform name */}
-            <p style={{ fontSize:13, letterSpacing:6, color:'#f97316', fontWeight:700, textTransform:'uppercase', marginBottom:6 }}>
+            <p style={{ fontSize: 13, letterSpacing: 6, color: '#f97316', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>
               منصة مسار التعليمية
             </p>
 
             {/* Main title */}
-            <h1 style={{ fontSize:38, fontWeight:900, color:'#1e3a5f', lineHeight:1.1, marginBottom:4 }}>
+            <h1 style={{ fontSize: 38, fontWeight: 900, color: '#1e3a5f', lineHeight: 1.1, marginBottom: 4 }}>
               شهادة إتمام
             </h1>
-            <p style={{ fontSize:13, color:'#64748b', letterSpacing:3, marginBottom:24 }}>
+            <p style={{ fontSize: 13, color: '#64748b', letterSpacing: 3, marginBottom: 24 }}>
               Certificate of Completion
             </p>
 
             {/* Divider */}
-            <div style={{ width:120, height:2, background:'linear-gradient(90deg, transparent, #f97316, transparent)', marginBottom:20 }} />
+            <div style={{ width: 120, height: 2, background: 'linear-gradient(90deg, transparent, #f97316, transparent)', marginBottom: 20 }} />
 
             {/* "This certifies that" */}
-            <p style={{ fontSize:14, color:'#475569', marginBottom:8 }}>
+            <p style={{ fontSize: 14, color: '#475569', marginBottom: 8 }}>
               يُشهد بأن الطالب / الطالبة
             </p>
 
             {/* Student name */}
-            <h2 style={{ fontSize:32, fontWeight:900, color:'#1e3a5f', marginBottom:16, borderBottom:'2px solid #f97316', paddingBottom:6, minWidth:200 }}>
+            <h2 style={{ fontSize: 32, fontWeight: 900, color: '#1e3a5f', marginBottom: 16, borderBottom: '2px solid #f97316', paddingBottom: 6, minWidth: 200 }}>
               {certificate.studentName}
             </h2>
 
             {/* Course completion */}
-            <p style={{ fontSize:14, color:'#475569', marginBottom:8 }}>
+            <p style={{ fontSize: 14, color: '#475569', marginBottom: 8 }}>
               قد أتم بنجاح كورس
             </p>
-            <h3 style={{ fontSize:20, fontWeight:700, color:'#0d2137', marginBottom:24, maxWidth:500 }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#0d2137', marginBottom: 24, maxWidth: 500 }}>
               {courseName}
             </h3>
 
             {/* Footer row */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', marginTop:4 }}>
-              <div style={{ textAlign:'center' }}>
-                <p style={{ fontSize:11, color:'#94a3b8', marginBottom:2 }}>تاريخ الإتمام</p>
-                <p style={{ fontSize:13, fontWeight:700, color:'#334155' }}>{completionDate}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: 4 }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>تاريخ الإتمام</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>{completionDate}</p>
               </div>
-              <div style={{ width:2, height:32, background:'#e2e8f0' }} />
-              <div style={{ textAlign:'center' }}>
-                <div style={{ width:48, height:48, borderRadius:'50%', border:'2px solid #1e3a5f', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 2px' }}>
-                  <span style={{ fontSize:20, fontWeight:900, color:'#1e3a5f' }}>م</span>
-                </div>
-                <p style={{ fontSize:10, color:'#94a3b8' }}>مسار</p>
+              <div style={{ width: 2, height: 32, background: '#e2e8f0' }} />
+              <div style={{ textAlign: 'center' }}>
+                <img src="/images/logo.png" alt="مسار" style={{ width: 56, height: 56, objectFit: 'contain', margin: '0 auto 2px' }} />
+                <p style={{ fontSize: 10, color: '#94a3b8' }}>مسار</p>
               </div>
-              <div style={{ width:2, height:32, background:'#e2e8f0' }} />
-              <div style={{ textAlign:'center' }}>
-                <p style={{ fontSize:11, color:'#94a3b8', marginBottom:2 }}>رقم الشهادة</p>
-                <p style={{ fontSize:11, fontWeight:700, color:'#334155', fontFamily:'monospace', letterSpacing:1 }}>{certificate.certificateId}</p>
+              <div style={{ width: 2, height: 32, background: '#e2e8f0' }} />
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>رقم الشهادة</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#334155', fontFamily: 'monospace', letterSpacing: 1 }}>{certificate.certificateId}</p>
               </div>
             </div>
           </div>
