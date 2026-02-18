@@ -8,6 +8,7 @@ import CourseCard from '@/components/CourseCard';
 import { CourseCardSkeleton, NoCoursesFound } from '@/components/ui';
 import CourseFiltersComponent, { CourseFilters } from '@/components/CourseFilters';
 import Header from '@/components/Header';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Course {
   _id: string;
@@ -151,8 +152,9 @@ export default function CoursesPage() {
       <Header />
 
       {/* Page Header */}
-      <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
-        <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="bg-linear-to-l from-primary to-primary-dark text-white">
+        <div className="max-w-7xl mx-auto px-4 pt-10 pb-14">
+          <Breadcrumb items={[{ label: 'الكورسات' }]} variant="dark" className="mb-5 opacity-80" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             تصفح الكورسات 📚
           </h1>

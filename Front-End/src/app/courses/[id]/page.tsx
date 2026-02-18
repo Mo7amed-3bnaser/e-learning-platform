@@ -11,6 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useProgressStore } from '@/store/progressStore';
 import ReviewForm from '@/components/ReviewForm';
 import ReviewsList from '@/components/ReviewsList';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Video {
   _id: string;
@@ -151,13 +152,13 @@ export default function CourseDetailsPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* زر الرجوع */}
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light mb-6 transition-colors"
-          >
-            <FiArrowRight className="w-5 h-5" />
-            <span>رجوع</span>
-          </button>
+          <Breadcrumb
+            items={[
+              { label: 'الكورسات', href: '/courses' },
+              { label: course.title },
+            ]}
+            className="mb-6"
+          />
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* المحتوى الرئيسي */}

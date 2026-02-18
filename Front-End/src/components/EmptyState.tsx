@@ -2,7 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 
 interface EmptyStateProps {
-    icon?: React.ReactNode;
+    // Accept either a rendered element OR a component class/function (e.g. FiHeart or <FiHeart />)
+    icon?: React.ReactNode | React.ComponentType<{ className?: string }>;
     title: string;
     description?: string;
     action?: {
@@ -24,12 +25,22 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     action,
     className = '',
 }) => {
+    // Support both JSX elements and component references (e.g. icon={FiHeart} or icon={<FiHeart />})
+    const renderIcon = () => {
+        if (!icon) return null;
+        if (typeof icon === 'function') {
+            const IconComponent = icon as React.ComponentType<{ className?: string }>;
+            return <IconComponent className="w-16 h-16" />;
+        }
+        return icon;
+    };
+
     return (
         <div className={`flex flex-col items-center justify-center py-16 px-4 ${className}`}>
             {/* Icon */}
             {icon && (
                 <div className="mb-6 text-gray-400 dark:text-slate-500">
-                    {icon}
+                    {renderIcon()}
                 </div>
             )}
 

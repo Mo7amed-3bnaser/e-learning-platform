@@ -10,7 +10,7 @@ import { createNotification } from './notificationController.js';
 import sendEmail, { getCertificateIssuedTemplate } from '../utils/sendEmail.js';
 
 /**
- * @desc    Download certificate (if student has one)
+ * @desc    Get certificate for a course (if student has completed it)
  * @route   GET /api/certificates/:courseId
  * @access  Private
  */
@@ -24,7 +24,6 @@ export const downloadCertificate = asyncHandler(async (req, res) => {
     throw new Error("المستخدم غير موجود");
   }
 
-  // Find enrollment
   const enrollment = user.enrolledCourses.find((e) => {
     if (e.course) return e.course.toString() === courseId;
     return e.toString() === courseId;
@@ -35,8 +34,8 @@ export const downloadCertificate = asyncHandler(async (req, res) => {
     throw new Error("يجب التسجيل في الكورس أولاً");
   }
 
-  // Check if certificate exists
-  if (!enrollment.certificateUrl || !enrollment.certificateId) {
+  // Must have at least a certificate ID (URL is optional — frontend renders the certificate)
+  if (!enrollment.certificateId) {
     res.status(404);
     throw new Error("لم يتم إنشاء الشهادة بعد. يجب إتمام الكورس بنسبة 100%");
   }
@@ -45,9 +44,92 @@ export const downloadCertificate = asyncHandler(async (req, res) => {
     success: true,
     message: "تم جلب الشهادة بنجاح",
     data: {
-      certificateUrl: enrollment.certificateUrl,
       certificateId: enrollment.certificateId,
+      certificateUrl: enrollment.certificateUrl || null,
       completedAt: enrollment.completedAt,
+      studentName: user.name,
+    },
+  });
+});
+
+/**
+ * @desc    Generate (or re-generate) certificate for a completed course
+ * @route   POST /api/certificates/generate/:courseId
+ * @access  Private
+ */
+export const generateCertificate = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+  const course = await Course.findById(courseId);
+
+  if (!user || !course) {
+    res.status(404);
+    throw new Error("المستخدم أو الكورس غير موجود");
+  }
+
+  const enrollmentIndex = user.enrolledCourses.findIndex((e) => {
+    if (e.course) return e.course.toString() === courseId;
+    return e.toString() === courseId;
+  });
+
+  if (enrollmentIndex === -1) {
+    res.status(403);
+    throw new Error("يجب التسجيل في الكورس أولاً");
+  }
+
+  const enrollment = user.enrolledCourses[enrollmentIndex];
+
+  // Return existing certificate if already generated
+  if (enrollment.certificateId) {
+    return res.json({
+      success: true,
+      message: "الشهادة موجودة بالفعل",
+      data: {
+        certificateId: enrollment.certificateId,
+        certificateUrl: enrollment.certificateUrl || null,
+        completedAt: enrollment.completedAt,
+        studentName: user.name,
+      },
+    });
+  }
+
+  // Generate new certificate
+  const certificateId = generateCertificateId();
+  const completedAt = new Date();
+
+  // Try PDF generation + Cloudinary upload (optional — don't fail if it doesn't work)
+  let certificateUrl = null;
+  try {
+    const pdfBuffer = await generateCertificatePDF({
+      studentName: user.name,
+      courseName: course.title,
+      completionDate: completedAt,
+      certificateId,
+    });
+    certificateUrl = await uploadCertificateToCloudinary(pdfBuffer, certificateId);
+  } catch (pdfError) {
+    console.error("PDF generation failed (non-fatal):", pdfError.message);
+  }
+
+  // Save certificate data regardless of PDF success
+  user.enrolledCourses[enrollmentIndex].certificateId = certificateId;
+  user.enrolledCourses[enrollmentIndex].completedAt = completedAt;
+  if (certificateUrl) {
+    user.enrolledCourses[enrollmentIndex].certificateUrl = certificateUrl;
+  }
+  user.markModified("enrolledCourses");
+  await user.save();
+
+  res.json({
+    success: true,
+    message: "تم إنشاء الشهادة بنجاح",
+    data: {
+      certificateId,
+      certificateUrl,
+      completedAt,
+      studentName: user.name,
     },
   });
 });
@@ -113,21 +195,23 @@ export const generateCertificateForStudent = async (userId, courseId) => {
     // Generate unique certificate ID
     const certificateId = generateCertificateId();
 
-    // Generate PDF
-    const pdfBuffer = await generateCertificatePDF({
-      studentName: user.name,
-      courseName: course.title,
-      completionDate: new Date(),
-      certificateId,
-    });
+    const completedAt = new Date();
 
-    // Upload to Cloudinary
-    const certificateUrl = await uploadCertificateToCloudinary(
-      pdfBuffer,
-      certificateId,
-    );
+    // Try PDF + Cloudinary (non-fatal if fails)
+    let certificateUrl = null;
+    try {
+      const pdfBuffer = await generateCertificatePDF({
+        studentName: user.name,
+        courseName: course.title,
+        completionDate: completedAt,
+        certificateId,
+      });
+      certificateUrl = await uploadCertificateToCloudinary(pdfBuffer, certificateId);
+    } catch (pdfError) {
+      console.error("PDF/Cloudinary failed (non-fatal):", pdfError.message);
+    }
 
-    // Update user enrollment with certificate data
+    // Save certificate data regardless of PDF success
     const enrollmentIndex = user.enrolledCourses.findIndex((e) => {
       if (e.course) return e.course.toString() === courseId;
       return e.toString() === courseId;
@@ -135,9 +219,10 @@ export const generateCertificateForStudent = async (userId, courseId) => {
 
     if (enrollmentIndex !== -1) {
       user.enrolledCourses[enrollmentIndex].certificateId = certificateId;
-      user.enrolledCourses[enrollmentIndex].certificateUrl = certificateUrl;
-      user.enrolledCourses[enrollmentIndex].completedAt = new Date();
-
+      user.enrolledCourses[enrollmentIndex].completedAt = completedAt;
+      if (certificateUrl) {
+        user.enrolledCourses[enrollmentIndex].certificateUrl = certificateUrl;
+      }
       user.markModified("enrolledCourses");
       await user.save();
     }
@@ -168,7 +253,8 @@ export const generateCertificateForStudent = async (userId, courseId) => {
 
     return {
       certificateId,
-      certificateUrl,
+      certificateUrl: certificateUrl || null,
+      completedAt,
     };
   } catch (error) {
     console.error("Error generating certificate:", error);

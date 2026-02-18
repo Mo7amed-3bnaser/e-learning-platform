@@ -6,6 +6,7 @@ import { FiPlay, FiClock, FiBookOpen, FiGrid, FiList, FiBook, FiInfo } from 'rea
 import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import Header from '@/components/Header';
+import Breadcrumb from '@/components/Breadcrumb';
 import { useAuthStore } from '@/store/authStore';
 import { CourseCardSkeleton, NoEnrolledCourses, FullPageLoading } from '@/components/ui';
 
@@ -81,8 +82,9 @@ export default function MyCoursesPage() {
       <Header />
 
       {/* Page Header */}
-      <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
-        <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="bg-linear-to-l from-primary to-primary-dark text-white">
+        <div className="max-w-7xl mx-auto px-4 pt-10 pb-14">
+          <Breadcrumb items={[{ label: 'كورساتي' }]} variant="dark" className="mb-5 opacity-80" />
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
               <FiBook className="w-8 h-8" />

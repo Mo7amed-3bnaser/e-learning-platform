@@ -1,7 +1,12 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 type Theme = 'light' | 'dark';
+
+// sessionStorage: theme resets to light on every new browser session
+const sessionStorageAdapter = createJSONStorage(() =>
+  typeof window !== 'undefined' ? sessionStorage : localStorage
+);
 
 interface ThemeState {
   theme: Theme;
@@ -28,6 +33,7 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: 'masar-theme',
+      storage: sessionStorageAdapter,
       partialize: (state) => ({ theme: state.theme }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

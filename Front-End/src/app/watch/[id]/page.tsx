@@ -10,6 +10,7 @@ import CourseProgressBar from '@/components/CourseProgressBar';
 import VideoCompletionButton from '@/components/VideoCompletionButton';
 import VideoProgressIndicator from '@/components/VideoProgressIndicator';
 import CertificateCard from '@/components/CertificateCard';
+import Breadcrumb from '@/components/Breadcrumb';
 import { coursesAPI, videosAPI, ordersAPI } from '@/lib/api';
 import { handleApiError, showToast } from '@/lib/toast';
 import { useAuthStore } from '@/store/authStore';
@@ -40,7 +41,7 @@ export default function WatchCoursePage() {
   const params = useParams();
   const router = useRouter();
   const courseId = params.id as string;
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const {
     fetchCourseProgress,
     markVideoComplete,
@@ -194,13 +195,14 @@ export default function WatchCoursePage() {
             {/* التنقل */}
             <div className="bg-slate-800 border-b border-slate-700 px-4 py-3">
               <div className="container mx-auto flex items-center justify-between max-w-6xl">
-                <button
-                  onClick={() => router.push(`/courses/${courseId}`)}
-                  className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
-                >
-                  <FiArrowRight className="w-5 h-5" />
-                  <span>رجوع للكورس</span>
-                </button>
+                <Breadcrumb
+                  variant="dark"
+                  items={[
+                    { label: 'الكورسات', href: '/courses' },
+                    { label: course.title, href: `/courses/${courseId}` },
+                    { label: 'المشاهدة' },
+                  ]}
+                />
 
                 <button
                   onClick={() => setShowPlaylist(!showPlaylist)}
@@ -233,6 +235,11 @@ export default function WatchCoursePage() {
                   title={currentVideo.title}
                   autoplay={true}
                   className="w-full"
+                  watermarkUser={
+                    user
+                      ? { name: user.name, email: user.email, id: user.id }
+                      : undefined
+                  }
                 />
               </div>
             </div>

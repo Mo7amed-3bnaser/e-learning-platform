@@ -1,19 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
+import VideoWatermark from './VideoWatermark';
+
+interface WatermarkUser {
+  name: string;
+  email: string;
+  id: string;
+}
 
 interface YouTubePlayerProps {
   videoId: string;
   title?: string;
   className?: string;
   autoplay?: boolean;
+  watermarkUser?: WatermarkUser;
 }
 
 export default function YouTubePlayer({
   videoId,
   title = 'Course Video',
   className = '',
-  autoplay = false
+  autoplay = false,
+  watermarkUser,
 }: YouTubePlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,6 +53,10 @@ export default function YouTubePlayer({
           onLoad={() => setIsLoading(false)}
           className="absolute top-0 left-0 w-full h-full"
         />
+        {/* User watermark overlay — shown only when user data is provided */}
+        {watermarkUser && !isLoading && (
+          <VideoWatermark user={watermarkUser} />
+        )}
       </div>
     </div>
   );

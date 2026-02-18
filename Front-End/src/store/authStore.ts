@@ -45,7 +45,6 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           isAuthenticated: false,
         });
-        // مسح localStorage
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth-storage');
           localStorage.removeItem('remembered-login');
@@ -63,7 +62,6 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
-      // حفظ البيانات المهمة فقط
       partialize: (state) => ({
         token: state.token,
         user: state.user,

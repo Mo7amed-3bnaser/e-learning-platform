@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { OrderCardSkeleton, NoOrdersFound } from '@/components/ui';
 import Link from 'next/link';
 import { FiShoppingBag, FiArrowRight, FiFilter, FiClock, FiCheckCircle, FiXCircle, FiPackage } from 'react-icons/fi';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Order {
     _id: string;
@@ -125,13 +126,11 @@ export default function OrdersPage() {
                 <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
                     <div className="max-w-5xl mx-auto px-4 py-8">
                         <div className="flex items-center justify-between mb-4">
-                            <Link
-                                href="/dashboard"
-                                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
-                            >
-                                <FiArrowRight className="w-4 h-4" />
-                                العودة للوحة التحكم
-                            </Link>
+                        <Breadcrumb
+                            items={[{ label: 'لوحتي', href: '/dashboard' }, { label: 'طلباتي' }]}
+                            variant="dark"
+                            className="opacity-80"
+                        />
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">

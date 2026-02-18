@@ -42,7 +42,7 @@ export default function Header() {
 
   return (
     <header
-      className="border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm sticky top-0 z-50"
+      className="border-b border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-50"
       role="banner"
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">

@@ -8,6 +8,7 @@ import { showSuccess, showError, handleApiError } from '@/lib/toast';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import AvatarUpload from '@/components/AvatarUpload';
+import Breadcrumb from '@/components/Breadcrumb';
 import { FiUser, FiMail, FiPhone, FiLock, FiSave, FiHome } from 'react-icons/fi';
 
 export default function ProfilePage() {
@@ -92,14 +93,7 @@ function ProfileContent() {
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors mb-4 group"
-        >
-          <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-medium">العودة للرئيسية</span>
-        </Link>
+        <Breadcrumb items={[{ label: 'الملف الشخصي' }]} className="mb-6" />
 
         {/* Page Header */}
         <div className="mb-8">

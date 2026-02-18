@@ -276,9 +276,13 @@ export const progressAPI = {
 // Certificates APIs
 // ============================================
 export const certificatesAPI = {
-  // Get certificate for a course
+  // Get certificate for a course (if already generated)
   getCertificate: (courseId: string) =>
     api.get(`/certificates/${courseId}`),
+
+  // Generate (or re-fetch) certificate for a completed course
+  generateCertificate: (courseId: string) =>
+    api.post(`/certificates/generate/${courseId}`),
 
   // Verify certificate by ID
   verifyCertificate: (certificateId: string) =>
