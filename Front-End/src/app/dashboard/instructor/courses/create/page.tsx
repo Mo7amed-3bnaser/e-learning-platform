@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { FiSave, FiArrowRight } from "react-icons/fi";
+import Breadcrumb from "@/components/Breadcrumb";
+import { FiSave } from "react-icons/fi";
 import { instructorApi } from "@/lib/instructorApi";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -103,13 +104,7 @@ export default function CreateCoursePage() {
                 <div className="max-w-3xl mx-auto">
                     {/* Header */}
                     <div className="mb-8">
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
-                        >
-                            <FiArrowRight />
-                            رجوع
-                        </button>
+                        <Breadcrumb items={[{ label: 'لوحة المدرب', href: '/dashboard/instructor' }, { label: 'كورساتي', href: '/dashboard/instructor/courses' }, { label: 'إنشاء كورس جديد' }]} className="mb-4" />
                         <h1 className="text-3xl font-bold text-slate-900">إنشاء كورس جديد</h1>
                         <p className="text-slate-600 mt-2">املأ البيانات التالية لإنشاء كورسك</p>
                     </div>

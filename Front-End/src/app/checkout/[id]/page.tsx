@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { FiArrowRight, FiShoppingCart, FiCheck, FiCreditCard, FiDollarSign } from 'react-icons/fi';
+import { FiShoppingCart, FiCheck, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import Header from '@/components/Header';
+import Breadcrumb from '@/components/Breadcrumb';
 import { coursesAPI, ordersAPI } from '@/lib/api';
 import { handleApiError, showToast } from '@/lib/toast';
 import { useAuthStore } from '@/store/authStore';
@@ -112,14 +113,15 @@ export default function CheckoutPage() {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          {/* زر الرجوع */}
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-600 hover:text-primary mb-6 transition-colors"
-          >
-            <FiArrowRight className="w-5 h-5" />
-            <span>رجوع</span>
-          </button>
+          {/* Breadcrumb */}
+          <Breadcrumb
+            items={[
+              { label: 'الكورسات', href: '/courses' },
+              { label: course?.title || '...' },
+              { label: 'إتمام الشراء' },
+            ]}
+            className="mb-6"
+          />
 
           {/* العنوان */}
           <div className="mb-8">

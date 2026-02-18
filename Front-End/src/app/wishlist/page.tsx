@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useAuthStore } from '@/store/authStore';
 import CourseCard from '@/components/CourseCard';
 import PageLoader from '@/components/PageLoader';
 import EmptyState from '@/components/EmptyState';
-import { FiHeart, FiArrowRight } from 'react-icons/fi';
+import Header from '@/components/Header';
+import Breadcrumb from '@/components/Breadcrumb';
+import { FiHeart } from 'react-icons/fi';
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -44,18 +45,11 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-12">
-      <div className="container mx-auto px-4">
-        {/* Back button */}
-        <div className="mb-6">
-          <Link
-            href="/courses"
-            className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light font-medium transition-colors"
-          >
-            <FiArrowRight className="w-5 h-5" />
-            رجوع
-          </Link>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <Header />
+      <div className="container mx-auto px-4 py-12">
+        {/* Breadcrumb */}
+        <Breadcrumb items={[{ label: 'قائمة الرغبات' }]} className="mb-6" />
 
         {/* Header */}
         <div className="mb-8">

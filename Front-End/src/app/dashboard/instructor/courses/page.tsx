@@ -6,6 +6,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import PageLoader from "@/components/PageLoader";
 import { FiPlus, FiEdit, FiTrash2, FiEye, FiEyeOff, FiPlay } from "react-icons/fi";
+import Breadcrumb from "@/components/Breadcrumb";
 import { useAuthStore } from "@/store/authStore";
 import { instructorApi } from "@/lib/instructorApi";
 import toast from "react-hot-toast";
@@ -57,6 +58,7 @@ export default function InstructorCoursesPage() {
             <Header />
 
             <div className="container mx-auto px-6 py-8">
+                <Breadcrumb items={[{ label: 'لوحة المدرب', href: '/dashboard/instructor' }, { label: 'كورساتي' }]} className="mb-6" />
                 {/* Page Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div>

@@ -6,9 +6,10 @@ import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
-import { FiBook, FiClock, FiAward, FiShoppingBag, FiLogOut } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
+import { FiBook, FiClock, FiAward, FiShoppingBag } from 'react-icons/fi';
 import { CourseCardSkeleton, NoEnrolledCourses } from '@/components/ui';
+import Header from '@/components/Header';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface EnrolledCourse {
   _id: string;
@@ -35,8 +36,7 @@ interface Order {
 }
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,11 +92,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
@@ -126,25 +121,10 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-        {/* Header */}
+        <Header />
+        {/* Welcome Banner */}
         <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
           <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex items-center justify-between mb-6">
-              <Link
-                href="/"
-                className="text-white/80 hover:text-white transition-colors text-sm"
-              >
-                ← العودة للرئيسية
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-              >
-                <FiLogOut className="w-4 h-4" />
-                <span>تسجيل الخروج</span>
-              </button>
-            </div>
-
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl font-bold">
                 {user?.name?.charAt(0) || 'U'}
@@ -162,6 +142,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8">
+          <Breadcrumb items={[{ label: 'لوحة التحكم' }]} className="mb-6" />
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">

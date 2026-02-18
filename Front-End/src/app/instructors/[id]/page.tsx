@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
+import Breadcrumb from '@/components/Breadcrumb';
 import CourseCard from '@/components/CourseCard';
 import { CourseCardSkeleton } from '@/components/ui';
 import { FiMail, FiBook, FiUsers, FiStar, FiAward } from 'react-icons/fi';
@@ -158,6 +159,7 @@ export default function InstructorProfilePage() {
             {/* Instructor Profile Header */}
             <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
                 <div className="max-w-7xl mx-auto px-4 py-16">
+                    <Breadcrumb items={[{ label: instructor.name }]} variant="dark" className="mb-8" />
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                         {/* Avatar */}
                         <div className="relative">

@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Link from 'next/link';
+import Breadcrumb from '@/components/Breadcrumb';
 import { FiBook, FiUsers, FiAward, FiTarget, FiMail, FiPhone } from 'react-icons/fi';
 
 export const metadata = {
@@ -43,6 +44,7 @@ export default function AboutPage() {
         <section className="relative overflow-hidden bg-primary text-white py-20 px-6">
           <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_20%_50%,#f97316_0%,transparent_50%),radial-gradient(circle_at_80%_20%,#2d5a8a_0%,transparent_50%)]" />
           <div className="relative container mx-auto max-w-4xl text-center">
+            <Breadcrumb items={[{ label: 'عن المنصة' }]} variant="dark" className="mb-5 justify-center" />
             <span className="inline-block bg-accent/20 text-accent border border-accent/30 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               عن المنصة
             </span>

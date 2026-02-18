@@ -707,7 +707,7 @@ export default function Home() {
                 <ul className="space-y-3 text-sm text-slate-400">
                   <li>support@masar.edu</li>
                   <li>+20 100 000 0000</li>
-                  <li>القاهرة، مصر</li>
+                  <li>سوهاج، مصر</li>
                 </ul>
               </div>
             </StaggerItem>

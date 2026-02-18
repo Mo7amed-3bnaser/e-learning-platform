@@ -4,12 +4,12 @@ import { useState, useEffect, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
+import Breadcrumb from "@/components/Breadcrumb";
 import PageLoader from "@/components/PageLoader";
 import {
     FiPlus,
     FiTrash2,
     FiEdit2,
-    FiArrowRight,
     FiMenu,
     FiSave,
     FiX,
@@ -247,17 +247,7 @@ export default function InstructorCourseVideosPage({
                 <div className="max-w-4xl mx-auto">
                     {/* Header */}
                     <div className="mb-8">
-                        <button
-                            onClick={() =>
-                                router.push(
-                                    `/dashboard/instructor/courses/${courseId}/edit`
-                                )
-                            }
-                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
-                        >
-                            <FiArrowRight />
-                            رجوع لتعديل الكورس
-                        </button>
+                        <Breadcrumb items={[{ label: 'لوحة المدرب', href: '/dashboard/instructor' }, { label: 'كورساتي', href: '/dashboard/instructor/courses' }, { label: 'إدارة الفيديوهات' }]} className="mb-4" />
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-3xl font-bold text-slate-900">

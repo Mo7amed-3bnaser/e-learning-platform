@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Link from 'next/link';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export const metadata = {
   title: 'الشروط والأحكام | مسار التعليمية',
@@ -116,6 +117,7 @@ export default function TermsPage() {
         {/* Hero */}
         <section className="bg-primary text-white py-16 px-6">
           <div className="container mx-auto max-w-4xl text-center">
+            <Breadcrumb items={[{ label: 'الشروط والأحكام' }]} variant="dark" className="mb-5 justify-center" />
             <span className="inline-block bg-white/10 border border-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-5">
               آخر تحديث: يناير ٢٠٢٦
             </span>
