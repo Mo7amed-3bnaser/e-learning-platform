@@ -10,9 +10,21 @@ const api = axios.create({
     },
 });
 
-// Add token to requests
+// Read token from Zustand persist storage (auth-storage key)
+const getAuthToken = (): string | null => {
+    try {
+        const raw = localStorage.getItem('auth-storage');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed?.state?.token ?? null;
+    } catch {
+        return null;
+    }
+};
+
+// Add token to requests - unified with the rest of the app
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = getAuthToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

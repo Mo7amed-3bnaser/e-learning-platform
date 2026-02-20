@@ -289,6 +289,8 @@ export const updateProfile = asyncHandler(async (req, res) => {
         throw new Error('البريد الإلكتروني مستخدم من قبل');
       }
       user.email = req.body.email;
+      // New email must be verified again
+      user.isEmailVerified = false;
     }
 
     if (req.body.phone && req.body.phone !== user.phone) {
@@ -504,7 +506,8 @@ export const resetPassword = asyncHandler(async (req, res) => {
  * @access  Public
  */
 export const getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('name email avatar bio role createdAt');
+  // Email is intentionally excluded to prevent information leakage
+  const user = await User.findById(req.params.id).select('name avatar bio role createdAt instructorProfile');
 
   if (!user) {
     res.status(404);
@@ -516,10 +519,10 @@ export const getUserById = asyncHandler(async (req, res) => {
     data: {
       _id: user._id,
       name: user.name,
-      email: user.email,
       avatar: user.avatar,
       bio: user.bio,
       role: user.role,
+      instructorProfile: user.instructorProfile,
       createdAt: user.createdAt,
     },
   });

@@ -17,8 +17,8 @@ export const protect = asyncHandler(async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get user from token (without password)
-      req.user = await User.findById(decoded.id).select('-password');
+      // Get user from token (select passwordChangedAt for token invalidation check)
+      req.user = await User.findById(decoded.id).select('-password +passwordChangedAt');
 
       if (!req.user) {
         res.status(401);
@@ -29,6 +29,15 @@ export const protect = asyncHandler(async (req, res, next) => {
       if (req.user.isBlocked) {
         res.status(403);
         throw new Error('تم حظر حسابك. تواصل مع الدعم الفني');
+      }
+
+      // Invalidate token if password was changed after it was issued
+      if (req.user.passwordChangedAt) {
+        const tokenIssuedAt = decoded.iat * 1000;
+        if (req.user.passwordChangedAt.getTime() > tokenIssuedAt) {
+          res.status(401);
+          throw new Error('تم تغيير كلمة المرور. برجاء تسجيل الدخول مرة أخرى');
+        }
       }
 
       next();

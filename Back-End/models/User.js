@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "كلمة المرور مطلوبة"],
-      minlength: [6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"],
+      minlength: [8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"],
       select: false, // Don't return password by default
     },
     role: {
@@ -108,21 +108,30 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: undefined,
     },
+    // Tracks when password was last changed — used to invalidate old tokens
+    passwordChangedAt: {
+      type: Date,
+      default: undefined,
+      select: false,
+    },
   },
   {
     timestamps: true, // createdAt & updatedAt
   },
 );
 
-// Hash password before saving
+// Hash password before saving and record change timestamp
 userSchema.pre("save", async function (next) {
-  // Only hash if password is modified
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+
+  // Record password change time so old tokens get rejected
+  this.passwordChangedAt = new Date(Date.now() - 1000); // 1s grace period
+  next();
 });
 
 // Compare password method

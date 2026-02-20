@@ -5,8 +5,13 @@ import rateLimit from 'express-rate-limit';
  * 5 محاولات كل 15 دقيقة
  */
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 دقيقة
-  max: 5, // 5 محاولات فقط
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  // Key by IP + email (email comes from body) to prevent VPN bypass
+  keyGenerator: (req) => {
+    const email = (req.body?.email || '').toLowerCase().trim();
+    return `${req.ip}_${email}`;
+  },
   message: {
     success: false,
     message: 'تم تجاوز الحد الأقصى لمحاولات تسجيل الدخول. حاول مرة أخرى بعد 15 دقيقة',
@@ -20,8 +25,12 @@ export const loginLimiter = rateLimit({
  * 3 محاولات كل ساعة
  */
 export const forgotPasswordLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // ساعة واحدة
-  max: 3, // 3 محاولات فقط
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  keyGenerator: (req) => {
+    const email = (req.body?.email || '').toLowerCase().trim();
+    return `${req.ip}_${email}`;
+  },
   message: {
     success: false,
     message: 'تم تجاوز الحد الأقصى لطلبات إعادة تعيين كلمة المرور. حاول مرة أخرى بعد ساعة',

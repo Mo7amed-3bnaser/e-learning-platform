@@ -172,13 +172,13 @@
 
 | # | المشكلة | الملف | التفاصيل |
 |---|---------|-------|----------|
-| 1 | **JWT يحتوي بيانات شخصية** | `Back-End/utils/authHelpers.js` | الـ token payload فيه `name` و `phone` — JWT بيتفك بـ base64 بسهولة. المفروض فيه `id` و `role` بس |
-| 2 | **كلمة المرور بتتخزن في localStorage كنص عادي** | `Front-End/src/app/login/page.tsx` | ميزة "تذكرني" بتحفظ الباسورد الفعلي في cleartext في localStorage — ده كارثة أمنية |
-| 3 | **Sandbox Payment بدون حماية بيئة** | `Back-End/controllers/sandboxController.js` | `POST /api/orders/sandbox/pay` بيسجل الطالب مجاناً في أي بيئة (مش dev بس) — المفروض يتعطل في production |
-| 4 | **أي مستخدم يقدر يحذف أي صورة** | `Back-End/routes/uploadRoutes.js` | حذف صور Cloudinary بالـ `publicId` بدون التحقق من الملكية |
-| 5 | **`collection.insertOne` بيتجاوز Mongoose** | `Back-End/controllers/instructorApplicationController.js` | إنشاء حساب المدرب الجديد بيتجاوز كل الـ validation والـ middleware |
-| 6 | **لا يوجد حد لحجم الـ request body** | `Back-End/server.js` | `express.json()` بدون `limit` — ممكن يسبب استهلاك ذاكرة |
-| 7 | **الملفات المرفوعة متاحة للجميع** | `Back-End/server.js` | `app.use("/uploads", express.static("uploads"))` — بدون أي تحقق |
+| 1 | ~~**JWT يحتوي بيانات شخصية**~~ ✅ **تم الإصلاح** | `Back-End/utils/authHelpers.js` | ~~الـ token payload فيه `name` و `phone` — JWT بيتفك بـ base64 بسهولة.~~ دلوقتي فيه `id` و `role` بس |
+| 2 | ~~**كلمة المرور بتتخزن في localStorage كنص عادي**~~ ✅ **تم الإصلاح** | `Front-End/src/app/login/page.tsx` | ~~ميزة "تذكرني" بتحفظ الباسورد الفعلي في cleartext في localStorage.~~ دلوقتي بتحفظ الإيميل بس |
+| 3 | ~~**Sandbox Payment بدون حماية بيئة**~~ ✅ **تم الإصلاح** | `Back-End/controllers/sandboxController.js` | ~~`POST /api/orders/sandbox/pay` بيسجل الطالب مجاناً في أي بيئة.~~ دلوقتي محظور في `production` |
+| 4 | ~~**أي مستخدم يقدر يحذف أي صورة**~~ ✅ **تم الإصلاح** | `Back-End/routes/uploadRoutes.js` | ~~حذف صور Cloudinary بالـ `publicId` بدون التحقق من الملكية.~~ دلوقتي بيتأكد من الملكية قبل الحذف |
+| 5 | ~~**`collection.insertOne` بيتجاوز Mongoose**~~ ✅ **تم الإصلاح** | `Back-End/controllers/instructorApplicationController.js` | ~~إنشاء حساب المدرب الجديد بيتجاوز كل الـ validation والـ middleware.~~ دلوقتي بيستخدم `User.create()` |
+| 6 | ~~**لا يوجد حد لحجم الـ request body**~~ ✅ **تم الإصلاح** | `Back-End/server.js` | ~~`express.json()` بدون `limit`.~~ دلوقتي `limit: '5mb'` |
+| 7 | ~~**الملفات المرفوعة متاحة للجميع**~~ ✅ **تم الإصلاح** | `Back-End/server.js` | ~~`app.use("/uploads", express.static("uploads"))` — بدون أي تحقق.~~ دلوقتي متاح في development بس |
 
 ### 🟠 متوسطة (Moderate)
 

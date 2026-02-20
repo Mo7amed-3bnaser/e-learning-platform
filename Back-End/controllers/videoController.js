@@ -181,10 +181,17 @@ export const getVideoById = asyncHandler(async (req, res) => {
     throw new Error("يجب شراء الكورس لمشاهدة هذا الفيديو");
   }
 
+  // Strip bunnyVideoId for non-admin/non-instructor to prevent direct access
+  const isAdminOrInstructor = req.user.role === 'admin' || req.user.role === 'instructor';
+  const videoData = video.toObject();
+  if (!isAdminOrInstructor) {
+    delete videoData.bunnyVideoId;
+  }
+
   res.json({
     success: true,
     message: "تم جلب بيانات الفيديو بنجاح",
-    data: video,
+    data: videoData,
   });
 });
 
