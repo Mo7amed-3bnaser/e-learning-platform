@@ -2,6 +2,37 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
+// ── Sub-schema: individual video progress ──────────────────────────
+const videoProgressSchema = new mongoose.Schema(
+  {
+    video: { type: mongoose.Schema.Types.ObjectId, ref: "Video" },
+    completed: { type: Boolean, default: false },
+    completedAt: { type: Date },
+    watchDuration: { type: Number, default: 0 },
+    lastWatchedAt: { type: Date },
+  },
+  { _id: false },
+);
+
+// ── Sub-schema: enrolled course entry ──────────────────────────────
+const enrolledCourseSchema = new mongoose.Schema(
+  {
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: true,
+    },
+    enrolledAt: { type: Date, default: Date.now },
+    videoProgress: { type: [videoProgressSchema], default: [] },
+    lastWatchedVideo: { type: mongoose.Schema.Types.ObjectId, ref: "Video" },
+    lastWatchedAt: { type: Date },
+    certificateId: { type: String },
+    certificateUrl: { type: String },
+    completedAt: { type: Date },
+  },
+  { _id: false },
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -62,7 +93,7 @@ const userSchema = new mongoose.Schema(
       },
     },
     enrolledCourses: {
-      type: [mongoose.Schema.Types.Mixed],
+      type: [enrolledCourseSchema],
       default: [],
     },
     wishlist: [

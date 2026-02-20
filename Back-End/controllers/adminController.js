@@ -18,9 +18,12 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
   const pendingOrders = await Order.countDocuments({ status: 'pending' });
   const approvedOrders = await Order.countDocuments({ status: 'approved' });
 
-  // إجمالي المبيعات
-  const approvedOrdersData = await Order.find({ status: 'approved' });
-  const totalRevenue = approvedOrdersData.reduce((sum, order) => sum + order.price, 0);
+  // إجمالي المبيعات (via aggregation — no need to load all orders into memory)
+  const revenueResult = await Order.aggregate([
+    { $match: { status: 'approved' } },
+    { $group: { _id: null, total: { $sum: '$price' } } },
+  ]);
+  const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
 
   // آخر الطلبات
   const recentOrders = await Order.find()
@@ -55,7 +58,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 export const getAllStudents = asyncHandler(async (req, res) => {
   // بناء الـ filter
   const filter = { role: 'student' };
-  
+
   // البحث
   if (req.query.search) {
     filter.$or = [
@@ -64,7 +67,7 @@ export const getAllStudents = asyncHandler(async (req, res) => {
       { phone: { $regex: req.query.search, $options: 'i' } }
     ];
   }
-  
+
   // استخدام pagination helper
   const result = await paginateQuery(User, filter, req, {
     populate: { path: 'enrolledCourses', select: 'title thumbnail' },
@@ -162,7 +165,7 @@ export const searchStudents = asyncHandler(async (req, res) => {
       { phone: { $regex: q, $options: 'i' } }
     ]
   };
-  
+
   // استخدام pagination helper
   const result = await paginateQuery(User, filter, req, {
     populate: { path: 'enrolledCourses', select: 'title' },

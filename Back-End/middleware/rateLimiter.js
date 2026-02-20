@@ -1,5 +1,12 @@
 import rateLimit from 'express-rate-limit';
 
+// Helper: normalize IP for both IPv4 and IPv6
+const normalizeIp = (req) => {
+  const ip = req.ip || '';
+  // Strip IPv6-mapped-IPv4 prefix
+  return ip.replace(/^::ffff:/, '');
+};
+
 /**
  * Rate Limiter للـ Login - منع Brute Force
  * 5 محاولات كل 15 دقيقة
@@ -10,7 +17,7 @@ export const loginLimiter = rateLimit({
   // Key by IP + email (email comes from body) to prevent VPN bypass
   keyGenerator: (req) => {
     const email = (req.body?.email || '').toLowerCase().trim();
-    return `${req.ip}_${email}`;
+    return `${normalizeIp(req)}_${email}`;
   },
   message: {
     success: false,
@@ -18,6 +25,7 @@ export const loginLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, default: true },
 });
 
 /**
@@ -29,7 +37,7 @@ export const forgotPasswordLimiter = rateLimit({
   max: 3,
   keyGenerator: (req) => {
     const email = (req.body?.email || '').toLowerCase().trim();
-    return `${req.ip}_${email}`;
+    return `${normalizeIp(req)}_${email}`;
   },
   message: {
     success: false,
@@ -37,6 +45,7 @@ export const forgotPasswordLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, default: true },
 });
 
 /**

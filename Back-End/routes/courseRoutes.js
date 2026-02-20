@@ -12,7 +12,7 @@ import {
 } from '../controllers/courseController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
-import { createCourseValidation, validate } from '../middleware/validation.js';
+import { createCourseValidation, validate, validateIdParam } from '../middleware/validation.js';
 import {
   instructorOrAdmin,
   isInstructorOfCourse,
@@ -20,23 +20,31 @@ import {
 
 const router = express.Router();
 
-// Public routes
+// ── Static routes FIRST (must come before /:id to avoid being consumed by the param) ──
+
+// Public: list all courses
 router.get('/', getCourses);
-router.get('/:id', optionalAuth, getCourseById);
 
-// Instructor routes
-router.get('/instructor/my-courses', protect, instructorOrAdmin, getInstructorCourses);
-router.get('/instructor/:id/stats', protect, isInstructorOfCourse, getCourseStats);
-
-// Instructor/Admin routes
-router.post('/', protect, instructorOrAdmin, createCourseValidation, validate, createCourse);
-router.put('/:id', protect, isInstructorOfCourse, updateCourse);
-router.delete('/:id', protect, isInstructorOfCourse, deleteCourse);
-
-// Instructor (owner) / Admin routes
-router.patch('/:id/publish', protect, isInstructorOfCourse, togglePublishCourse);
-
-// Admin only routes
+// Admin only: get all courses (admin panel)
 router.get('/admin/all', protect, admin, getAllCoursesAdmin);
+
+// Instructor: get my courses
+router.get('/instructor/my-courses', protect, instructorOrAdmin, getInstructorCourses);
+
+// Instructor: get stats for a specific course
+router.get('/instructor/:id/stats', protect, validateIdParam, validate, isInstructorOfCourse, getCourseStats);
+
+// ── Dynamic /:id routes AFTER static ones ──
+
+// Public: get single course by id
+router.get('/:id', validateIdParam, validate, optionalAuth, getCourseById);
+
+// Instructor/Admin: create / update / delete
+router.post('/', protect, instructorOrAdmin, createCourseValidation, validate, createCourse);
+router.put('/:id', protect, validateIdParam, validate, isInstructorOfCourse, updateCourse);
+router.delete('/:id', protect, validateIdParam, validate, isInstructorOfCourse, deleteCourse);
+
+// Instructor (owner) / Admin: toggle publish
+router.patch('/:id/publish', protect, validateIdParam, validate, isInstructorOfCourse, togglePublishCourse);
 
 export default router;

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
@@ -27,9 +28,6 @@ import instructorApplicationRoutes from "./routes/instructorApplicationRoutes.js
 import notificationRoutes from "./routes/notificationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
-
-// Connect to MongoDB
-connectDB();
 
 // Initialize Express
 const app = express();
@@ -106,13 +104,42 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// Start Server (only if not in test mode)
+// ── Start Server (await DB connection first) ─────────────────────
 if (process.env.NODE_ENV !== 'test') {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    logger.info(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-  });
+  (async () => {
+    // Task 4.10: Await DB connection before accepting requests
+    await connectDB();
+
+    const PORT = process.env.PORT || 5000;
+    const server = app.listen(PORT, () => {
+      logger.info(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    });
+
+    // ── Graceful Shutdown ──────────────────────────────────────────
+    const shutdown = async (signal) => {
+      logger.info(`\n🛑 ${signal} received — shutting down gracefully…`);
+
+      // 1. Stop accepting new connections
+      server.close(() => {
+        logger.info('🔒 HTTP server closed');
+      });
+
+      // 2. Close MongoDB connection
+      try {
+        await mongoose.connection.close();
+        logger.info('🗄️  MongoDB connection closed');
+      } catch (err) {
+        logger.error('Error closing MongoDB connection:', err);
+      }
+
+      process.exit(0);
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+  })();
 }
 
 // Export app for testing
 export default app;
+

@@ -1,4 +1,21 @@
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
+
+/**
+ * Reusable: validates that a route param is a valid MongoDB ObjectId
+ * Usage: router.get('/:id', validateMongoId('id'), validate, controller)
+ */
+export const validateMongoId = (paramName = 'id') =>
+  param(paramName)
+    .isMongoId()
+    .withMessage(`المعرف (${paramName}) غير صحيح`);
+
+/**
+ * Convenience: validate the standard :id param
+ * Usage: router.get('/:id', validateIdParam, validate, handler)
+ */
+export const validateIdParam = [
+  validateMongoId('id'),
+];
 
 /**
  * Middleware للتحقق من نتائج الـ Validation

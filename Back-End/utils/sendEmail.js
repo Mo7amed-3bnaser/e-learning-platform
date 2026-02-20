@@ -1,5 +1,24 @@
 import nodemailer from 'nodemailer';
 
+// ── Singleton transporter with connection pooling ──────────────────
+let _transporter = null;
+
+const getTransporter = () => {
+  if (!_transporter) {
+    _transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      pool: true,          // reuse connections
+      maxConnections: 5,   // limit concurrent SMTP connections
+      maxMessages: 100,    // messages per connection before reconnect
+    });
+  }
+  return _transporter;
+};
+
 /**
  * Send email using Nodemailer + Gmail
  * @param {Object} options - Email options
@@ -8,14 +27,7 @@ import nodemailer from 'nodemailer';
  * @param {string} options.html - Email HTML content
  */
 const sendEmail = async (options) => {
-  // Create transporter using Gmail SMTP
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const transporter = getTransporter();
 
   // Email options
   const mailOptions = {

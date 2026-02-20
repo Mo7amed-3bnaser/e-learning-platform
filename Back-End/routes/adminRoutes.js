@@ -9,6 +9,7 @@ import {
   demoteInstructor,
 } from '../controllers/adminController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
+import { validate, validateIdParam } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -18,11 +19,11 @@ router.use(protect, admin);
 router.get('/stats', getDashboardStats);
 router.get('/students', getAllStudents);
 router.get('/students/search', searchStudents);
-router.patch('/students/:id/block', toggleBlockStudent);
-router.delete('/students/:id', deleteStudent);
+router.patch('/students/:id/block', validateIdParam, validate, toggleBlockStudent);
+router.delete('/students/:id', validateIdParam, validate, deleteStudent);
 
 // Instructor management
 router.get('/instructors', getInstructors);
-router.patch('/instructors/:id/demote', demoteInstructor);
+router.patch('/instructors/:id/demote', validateIdParam, validate, demoteInstructor);
 
 export default router;

@@ -5,6 +5,9 @@ import User from "../models/User.js";
 import { paginateQuery } from '../utils/pagination.js';
 import { createNotification } from './notificationController.js';
 import sendEmail, { getOrderApprovedTemplate, getOrderRejectedTemplate } from '../utils/sendEmail.js';
+import logger from '../config/logger.js';
+import { isUserEnrolled } from '../utils/enrollmentHelper.js';
+import { ROLES, ORDER_STATUS, NOTIFICATION_TYPE, ERROR_MESSAGES } from '../utils/constants.js';
 
 /**
  * @desc    إنشاء طلب شراء جديد
@@ -34,9 +37,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   }
 
   // التحقق من عدم شراء الكورس مسبقاً
-  const isAlreadyEnrolled = req.user.enrolledCourses.some(
-    (id) => id.toString() === courseId.toString(),
-  );
+  const isAlreadyEnrolled = isUserEnrolled(req.user, courseId);
 
   if (isAlreadyEnrolled) {
     res.status(400);
@@ -208,7 +209,7 @@ export const approveOrder = asyncHandler(async (req, res) => {
       html: getOrderApprovedTemplate(order.userId.name, order.courseId.title, courseUrl),
     });
   } catch (emailError) {
-    console.error('خطأ في إرسال الإيميل:', emailError);
+    logger.error('خطأ في إرسال الإيميل:', emailError);
     // لا نرمي خطأ لأن العملية الأساسية نجحت
   }
 
@@ -260,7 +261,7 @@ export const rejectOrder = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(order.userId);
     const course = await Course.findById(order.courseId);
-    
+
     if (user && course) {
       await sendEmail({
         to: user.email,
@@ -269,7 +270,7 @@ export const rejectOrder = asyncHandler(async (req, res) => {
       });
     }
   } catch (emailError) {
-    console.error('خطأ في إرسال الإيميل:', emailError);
+    logger.error('خطأ في إرسال الإيميل:', emailError);
   }
 
   res.json({

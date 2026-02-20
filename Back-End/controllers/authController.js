@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import { generateToken, formatUserResponse } from '../utils/authHelpers.js';
 import { deleteImage } from '../config/cloudinary.js';
 import sendEmail, { getResetPasswordTemplate, getEmailVerificationTemplate } from '../utils/sendEmail.js';
+import logger from '../config/logger.js';
 
 /**
  * @desc    تسجيل مستخدم جديد (مع إرسال إيميل تأكيد)
@@ -63,7 +64,7 @@ export const register = asyncHandler(async (req, res) => {
       user.emailVerificationExpire = undefined;
       await user.save({ validateBeforeSave: false });
 
-      console.error('Email send error:', error);
+      logger.error('Email send error:', error);
       res.status(500);
       throw new Error('تم إنشاء الحساب لكن فشل إرسال البريد الإلكتروني. حاول إعادة إرسال رابط التأكيد');
     }
@@ -362,7 +363,7 @@ export const updateAvatar = asyncHandler(async (req, res) => {
       const publicId = `e-learning/${publicIdWithExt.split('.')[0]}`;
       await deleteImage(publicId);
     } catch (error) {
-      console.error('خطأ في حذف الصورة القديمة:', error);
+      logger.error('خطأ في حذف الصورة القديمة:', error);
     }
   }
 

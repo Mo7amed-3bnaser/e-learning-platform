@@ -8,6 +8,7 @@ import {
   deleteAllRead,
 } from '../controllers/notificationController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validate, validateIdParam } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -27,9 +28,9 @@ router.patch('/read-all', markAllAsRead);
 router.delete('/read', deleteAllRead);
 
 // تحديد إشعار معين كمقروء
-router.patch('/:id/read', markAsRead);
+router.patch('/:id/read', validateIdParam, validate, markAsRead);
 
 // حذف إشعار معين
-router.delete('/:id', deleteNotification);
+router.delete('/:id', validateIdParam, validate, deleteNotification);
 
 export default router;

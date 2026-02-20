@@ -7,17 +7,17 @@ import {
   canReview,
 } from "../controllers/reviewController.js";
 import { protect } from "../middleware/authMiddleware.js";
-import { reviewValidation, validate } from "../middleware/validation.js";
+import { reviewValidation, validate, validateMongoId } from "../middleware/validation.js";
 
 const router = express.Router();
 
 // Protected routes (must come BEFORE /:courseId)
 router.post("/", protect, reviewValidation, validate, addOrUpdateReview);
-router.get("/my-review/:courseId", protect, getMyReview);
-router.get("/can-review/:courseId", protect, canReview);
-router.delete("/:reviewId", protect, deleteReview);
+router.get("/my-review/:courseId", protect, validateMongoId('courseId'), validate, getMyReview);
+router.get("/can-review/:courseId", protect, validateMongoId('courseId'), validate, canReview);
+router.delete("/:reviewId", protect, validateMongoId('reviewId'), validate, deleteReview);
 
 // Public routes (dynamic param must come last)
-router.get("/:courseId", getCourseReviews);
+router.get("/:courseId", validateMongoId('courseId'), validate, getCourseReviews);
 
 export default router;

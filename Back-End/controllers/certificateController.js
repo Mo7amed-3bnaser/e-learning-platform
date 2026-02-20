@@ -8,6 +8,9 @@ import {
 } from "../utils/certificateGenerator.js";
 import { createNotification } from './notificationController.js';
 import sendEmail, { getCertificateIssuedTemplate } from '../utils/sendEmail.js';
+import logger from '../config/logger.js';
+import { findEnrollment } from '../utils/enrollmentHelper.js';
+import { ERROR_MESSAGES, NOTIFICATION_TYPE } from '../utils/constants.js';
 
 /**
  * @desc    Get certificate for a course (if student has completed it)
@@ -24,10 +27,7 @@ export const downloadCertificate = asyncHandler(async (req, res) => {
     throw new Error("المستخدم غير موجود");
   }
 
-  const enrollment = user.enrolledCourses.find((e) => {
-    if (e.course) return e.course.toString() === courseId;
-    return e.toString() === courseId;
-  });
+  const { enrollment } = findEnrollment(user, courseId);
 
   if (!enrollment) {
     res.status(403);
@@ -69,17 +69,14 @@ export const generateCertificate = asyncHandler(async (req, res) => {
     throw new Error("المستخدم أو الكورس غير موجود");
   }
 
-  const enrollmentIndex = user.enrolledCourses.findIndex((e) => {
-    if (e.course) return e.course.toString() === courseId;
-    return e.toString() === courseId;
-  });
+  const { enrollment, index: enrollmentIndex } = findEnrollment(user, courseId);
 
   if (enrollmentIndex === -1) {
     res.status(403);
     throw new Error("يجب التسجيل في الكورس أولاً");
   }
 
-  const enrollment = user.enrolledCourses[enrollmentIndex];
+  // The enrollment reference is from the helper
 
   // Return existing certificate if already generated
   if (enrollment.certificateId) {
@@ -110,7 +107,7 @@ export const generateCertificate = asyncHandler(async (req, res) => {
     });
     certificateUrl = await uploadCertificateToCloudinary(pdfBuffer, certificateId);
   } catch (pdfError) {
-    console.error("PDF generation failed (non-fatal):", pdfError.message);
+    logger.error("PDF generation failed (non-fatal):", pdfError.message);
   }
 
   // Save certificate data regardless of PDF success
@@ -208,14 +205,11 @@ export const generateCertificateForStudent = async (userId, courseId) => {
       });
       certificateUrl = await uploadCertificateToCloudinary(pdfBuffer, certificateId);
     } catch (pdfError) {
-      console.error("PDF/Cloudinary failed (non-fatal):", pdfError.message);
+      logger.error("PDF/Cloudinary failed (non-fatal):", pdfError.message);
     }
 
     // Save certificate data regardless of PDF success
-    const enrollmentIndex = user.enrolledCourses.findIndex((e) => {
-      if (e.course) return e.course.toString() === courseId;
-      return e.toString() === courseId;
-    });
+    const { index: enrollmentIndex } = findEnrollment(user, courseId);
 
     if (enrollmentIndex !== -1) {
       user.enrolledCourses[enrollmentIndex].certificateId = certificateId;
@@ -248,7 +242,7 @@ export const generateCertificateForStudent = async (userId, courseId) => {
         html: getCertificateIssuedTemplate(user.name, course.title, certificateUrl),
       });
     } catch (emailError) {
-      console.error('خطأ في إرسال الإيميل:', emailError);
+      logger.error('خطأ في إرسال الإيميل:', emailError);
     }
 
     return {
@@ -257,7 +251,7 @@ export const generateCertificateForStudent = async (userId, courseId) => {
       completedAt,
     };
   } catch (error) {
-    console.error("Error generating certificate:", error);
+    logger.error("Error generating certificate:", error);
     throw error;
   }
 };
