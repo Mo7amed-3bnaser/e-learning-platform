@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/authStore';
 
 // إنشاء instance من axios
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,34 +23,47 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - معالجة الأخطاء
+// Response interceptor - معالجة الأخطاء + Retry logic
+const MAX_RETRIES = 2;
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // لو السيرفر مش متاح أصلاً - لا نسجل خروج
-    if (!error.response) {
-      // السيرفر مش متاح أو مشكلة في الشبكة
+  async (error) => {
+    const config = error.config as typeof error.config & { _retryCount?: number };
+
+    // Network errors or 5xx — retry up to MAX_RETRIES times
+    const isNetworkError = !error.response;
+    const isServerError = error.response?.status >= 500;
+    const isRetryable = isNetworkError || isServerError;
+    const retryCount = config._retryCount ?? 0;
+
+    if (isRetryable && retryCount < MAX_RETRIES) {
+      config._retryCount = retryCount + 1;
+      const delay = 500 * Math.pow(2, retryCount); // exponential backoff: 500ms, 1s
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return api(config);
+    }
+
+    if (isNetworkError) {
       console.warn('Server is not available or network error');
       return Promise.reject(error);
     }
-    
-    // لو التوكن منتهي أو غير صالح فقط في طلبات محمية
-    // نتحقق من رسالة الخطأ للتأكد أنها مشكلة توكن وليس مشكلة أخرى
+
+    // لو التوكن منتهي أو غير صالح
     if (error.response?.status === 401) {
       const errorMessage = error.response?.data?.message || '';
-      const isTokenError = 
-        errorMessage.includes('توكن') || 
+      const isTokenError =
+        errorMessage.includes('توكن') ||
         errorMessage.includes('token') ||
         errorMessage.includes('مصرح') ||
         errorMessage.includes('unauthorized');
-      
-      // فقط نسجل خروج لو المشكلة فعلاً في التوكن
-      // ولو كان في توكن محفوظ (يعني المستخدم كان مسجل دخول)
+
       if (isTokenError && useAuthStore.getState().token) {
         useAuthStore.getState().logout();
         window.location.href = '/login';
       }
     }
+
     return Promise.reject(error);
   }
 );

@@ -402,14 +402,14 @@
 | # | Task | الملف المطلوب تعديله | الحالة |
 |---|------|----------------------|--------|
 | 2.1 | إصلاح `isEmailVerified` — يرجع `false` لما المستخدم يغير إيميله | `Back-End/controllers/authController.js` | ✅ |
-| 2.2 | إصلاح `addVideoValidation` — `bunnyVideoId` يبقى optional لو `videoProvider === 'youtube'` | `Back-End/middleware/validation.js` | ⬜ |
+| 2.2 | إصلاح `addVideoValidation` — `bunnyVideoId` يبقى optional لو `videoProvider === 'youtube'` | `Back-End/middleware/validation.js` | ✅ |
 | 2.3 | إخفاء الإيميل في `getUserById` — عدم إرجاع `email` في الـ public endpoint | `Back-End/controllers/authController.js` | ✅ |
 | 2.4 | إضافة enrollment check على التعليقات — التحقق إن المستخدم مشترك قبل التعليق | `Back-End/controllers/commentController.js` | ✅ |
-| 2.5 | إصلاح Race Condition في الأوردرات — استخدام `findOneAndUpdate` مع `{ status: 'pending' }` | `Back-End/controllers/orderController.js` | ⬜ |
+| 2.5 | إصلاح Race Condition في الأوردرات — استخدام `findOneAndUpdate` مع `{ status: 'pending' }` | `Back-End/controllers/orderController.js` | ✅ |
 | 2.6 | إضافة XSS sanitization — تنصيب واستخدام `xss-clean` أو `sanitize-html` | `Back-End/server.js` + `package.json` | ✅ |
 | 2.7 | توحيد طول كلمة المرور — Model و Validation يكونوا نفس القيمة (10 حروف) | `Back-End/models/User.js` + `Back-End/middleware/validation.js` | ✅ |
 | 2.8 | إخفاء `bunnyVideoId` من الـ response — عمل proxy أو عدم إرجاعه | `Back-End/controllers/videoController.js` | ✅ |
-| 2.9 | منع الاشتراك في كورسات غير منشورة — إضافة `isPublished` check في الطلبات | `Back-End/controllers/orderController.js` | ⬜ |
+| 2.9 | منع الاشتراك في كورسات غير منشورة — إضافة `isPublished` check في الطلبات | `Back-End/controllers/orderController.js` | ✅ |
 
 ---
 
@@ -420,11 +420,11 @@
 | # | Task | الملف المطلوب تعديله | الحالة |
 |---|------|----------------------|--------|
 | 3.1 | توحيد استرجاع Auth Token — الـ 3 ملفات API تستخدم نفس الطريقة من Zustand store | `Front-End/src/lib/api.ts` + `instructorApi.ts` + `notificationsApi.ts` | ✅ |
-| 3.2 | إصلاح API URL hardcoded — استخدام `NEXT_PUBLIC_API_URL` env variable | `Front-End/src/lib/api.ts` | ⬜ |
+| 3.2 | إصلاح API URL hardcoded — استخدام `NEXT_PUBLIC_API_URL` env variable | `Front-End/src/lib/api.ts` | ✅ |
 | 3.3 | إصلاح Notification API auth — قراءة التوكن من `auth-storage` بشكل صحيح | `Front-End/src/lib/notificationsApi.ts` | ✅ |
-| 3.4 | إضافة Pagination في صفحة الكورسات — تحميل الكورسات على دفعات | `Front-End/src/app/courses/page.tsx` | ⬜ |
-| 3.5 | إنشاء ملف `.env.example` للفرونت والباكند — توثيق كل المتغيرات المطلوبة | `Front-End/.env.example` + `Back-End/.env.example` | ⬜ |
-| 3.6 | إضافة Error Recovery — retry mechanisms في API calls الفاشلة | `Front-End/src/lib/api.ts` | ⬜ |
+| 3.4 | إضافة Pagination في صفحة الكورسات — تحميل الكورسات على دفعات | `Front-End/src/app/courses/page.tsx` | ✅ |
+| 3.5 | إنشاء ملف `.env.example` للفرونت والباكند — توثيق كل المتغيرات المطلوبة | `Front-End/.env.example` + `Back-End/.env.example` | ✅ |
+| 3.6 | إضافة Error Recovery — retry mechanisms في API calls الفاشلة | `Front-End/src/lib/api.ts` | ✅ |
 
 ---
 
@@ -554,14 +554,14 @@
 | Phase | عدد التاسكات | المنجز | الوقت المقدر | الأولوية |
 |-------|-------------|--------|-------------|----------|
 | **Phase 1** — إصلاحات أمنية حرجة | 7 | ✅ 7/7 **مكتملة** | 1-2 يوم | 🔴 حرجة |
-| **Phase 2** — إصلاحات أمنية + Bugs | 9 | 🔄 7/9 (2.2، 2.5 ناقصين) | 2-3 أيام | 🟠 عالية |
-| **Phase 3** — إصلاحات الفرونت | 6 | 🔄 2/6 (3.2، 3.4، 3.5، 3.6 ناقصين) | 2-3 أيام | 🟡 متوسطة-عالية |
+| **Phase 2** — إصلاحات أمنية + Bugs | 9 | ✅ 9/9 **مكتملة** | 2-3 أيام | 🟠 عالية |
+| **Phase 3** — إصلاحات الفرونت | 6 | ✅ 6/6 **مكتملة** | 2-3 أيام | 🟡 متوسطة-عالية |
 | **Phase 4** — تنظيف الكود | 10 | ⬜ 0/10 | 3-4 أيام | 🔵 متوسطة |
 | **Phase 5** — البنية التحتية | 8 | 🔄 1/8 (5.2 مكتمل) | 2-3 أيام | 🟣 متوسطة |
 | **Phase 6** — الاختبارات | 23 | ⬜ 0/23 | 5-7 أيام | ⚪ متوسطة-منخفضة |
 | **Phase 7** — الأداء والـ UX | 6 | ⬜ 0/6 | 3-4 أيام | 🌟 منخفضة |
 | **Phase 8** — ميزات جديدة | 17 | ⬜ 0/17 | حسب الميزة | 🚀 اختياري |
-| **الإجمالي** | **86 تاسك** | **17/86 منجزة (20%)** | **~20-30 يوم** | — |
+| **الإجمالي** | **86 تاسك** | **23/86 منجزة (27%)** | **~20-30 يوم** | — |
 
 ---
 

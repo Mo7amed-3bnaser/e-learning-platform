@@ -34,12 +34,15 @@ interface Course {
   createdAt: string;
 }
 
+const PAGE_SIZE = 9;
+
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [purchasedCourseIds, setPurchasedCourseIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [filters, setFilters] = useState<CourseFilters>({
     sortBy: 'newest',
     priceRange: 'all',
@@ -49,6 +52,11 @@ export default function CoursesPage() {
     fetchCourses();
     fetchPurchasedCourses();
   }, []);
+
+  // Reset visible count when filters/search change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery, filters]);
 
   const fetchCourses = async () => {
     try {
@@ -145,6 +153,9 @@ export default function CoursesPage() {
 
     return filtered;
   }, [courses, searchQuery, filters]);
+
+  const visibleCourses = useMemo(() => filteredCourses.slice(0, visibleCount), [filteredCourses, visibleCount]);
+  const hasMore = visibleCount < filteredCourses.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
@@ -248,23 +259,40 @@ export default function CoursesPage() {
             searchTerm={searchQuery || filters.category || ''}
           />
         ) : (
-          <div
-            className={`grid gap-6 ${viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-1'
-              }`}
-            role="list"
-            aria-label="قائمة الكورسات"
-          >
-            {filteredCourses.map((course) => (
-              <div key={course._id} role="listitem">
-                <CourseCard
-                  course={course}
-                  isPurchased={purchasedCourseIds.includes(course._id)}
-                />
+          <>
+            <div
+              className={`grid gap-6 ${viewMode === 'grid'
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                  : 'grid-cols-1'
+                }`}
+              role="list"
+              aria-label="قائمة الكورسات"
+            >
+              {visibleCourses.map((course) => (
+                <div key={course._id} role="listitem">
+                  <CourseCard
+                    course={course}
+                    isPurchased={purchasedCourseIds.includes(course._id)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="mt-10 text-center">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                  عرض {visibleCount} من {filteredCourses.length} كورس
+                </p>
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                  className="px-8 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors shadow-sm"
+                >
+                  تحميل المزيد
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>

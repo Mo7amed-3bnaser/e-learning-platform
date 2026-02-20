@@ -27,6 +27,12 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error("الكورس غير موجود");
   }
 
+  // منع الاشتراك في كورسات غير منشورة
+  if (!course.isPublished) {
+    res.status(400);
+    throw new Error("هذا الكورس غير متاح للشراء حالياً");
+  }
+
   // التحقق من عدم شراء الكورس مسبقاً
   const isAlreadyEnrolled = req.user.enrolledCourses.some(
     (id) => id.toString() === courseId.toString(),
@@ -145,45 +151,40 @@ export const getAllOrders = asyncHandler(async (req, res) => {
  * @access  Private/Admin
  */
 export const approveOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate("userId courseId");
+  // Atomic update: only transitions from 'pending' → 'approved' to prevent race conditions
+  const order = await Order.findOneAndUpdate(
+    { _id: req.params.id, status: "pending" },
+    { status: "approved", approvedBy: req.user._id, approvedAt: Date.now() },
+    { new: true }
+  ).populate("userId courseId");
 
   if (!order) {
-    res.status(404);
-    throw new Error("الطلب غير موجود");
-  }
-
-  if (order.status !== "pending") {
+    // Either order doesn't exist or was already processed by another admin
+    const exists = await Order.findById(req.params.id);
+    if (!exists) {
+      res.status(404);
+      throw new Error("الطلب غير موجود");
+    }
     res.status(400);
     throw new Error("هذا الطلب تم معالجته بالفعل");
   }
 
-  // تحديث حالة الطلب
-  order.status = "approved";
-  order.approvedBy = req.user._id;
-  order.approvedAt = Date.now();
-  await order.save();
-
-  // إضافة الكورس لقائمة الطالب
-  const user = await User.findById(order.userId._id);
-  const isAlreadyEnrolled = user.enrolledCourses.some(
-    (enrollment) =>
-      enrollment.course &&
-      enrollment.course.toString() === order.courseId._id.toString(),
+  // إضافة الكورس لقائمة الطالب (atomic push with $addToSet to prevent duplicates)
+  await User.findByIdAndUpdate(
+    order.userId._id,
+    {
+      $addToSet: {
+        enrolledCourses: {
+          course: order.courseId._id,
+          enrolledAt: new Date(),
+          videoProgress: [],
+        },
+      },
+    }
   );
 
-  if (!isAlreadyEnrolled) {
-    user.enrolledCourses.push({
-      course: order.courseId._id,
-      enrolledAt: new Date(),
-      videoProgress: [],
-    });
-    await user.save();
-  }
-
   // زيادة عدد الطلاب المسجلين
-  const course = await Course.findById(order.courseId._id);
-  course.enrolledStudents += 1;
-  await course.save();
+  await Course.findByIdAndUpdate(order.courseId._id, { $inc: { enrolledStudents: 1 } });
 
   // إنشاء إشعار للطالب
   await createNotification({

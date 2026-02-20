@@ -120,7 +120,22 @@ export const addVideoValidation = [
 
   body("title").trim().notEmpty().withMessage("عنوان الفيديو مطلوب"),
 
-  body("bunnyVideoId").trim().notEmpty().withMessage("معرف فيديو Bunny مطلوب"),
+  body("videoProvider")
+    .optional()
+    .isIn(["youtube", "bunny"])
+    .withMessage("مزود الفيديو يجب أن يكون youtube أو bunny"),
+
+  body("youtubeVideoId")
+    .if(body("videoProvider").equals("youtube"))
+    .trim()
+    .notEmpty()
+    .withMessage("معرف فيديو YouTube مطلوب عند اختيار youtube كمزود"),
+
+  body("bunnyVideoId")
+    .if(body("videoProvider").equals("bunny"))
+    .trim()
+    .notEmpty()
+    .withMessage("معرف فيديو Bunny مطلوب عند اختيار bunny كمزود"),
 
   body("duration")
     .notEmpty()
