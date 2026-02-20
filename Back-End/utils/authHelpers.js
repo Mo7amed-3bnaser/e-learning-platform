@@ -13,13 +13,11 @@ export const generateToken = (user) => {
   return jwt.sign(
     {
       id: user._id,
-      name: user.name,
-      phone: user.phone,
       role: user.role
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '1h' // تم التقليل من 30d إلى 1h للأمان
+      expiresIn: '1h'
     }
   );
 };

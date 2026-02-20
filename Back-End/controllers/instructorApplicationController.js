@@ -178,25 +178,20 @@ export const reviewApplication = asyncHandler(async (req, res) => {
       },
     });
 
-    // Set hashed password directly to avoid double-hashing
-    newUser.password = application.password;
-    // Mark password as not modified so pre-save hook doesn't re-hash
-    newUser.markModified('password');
-    
-    // Save without triggering the password hash again
-    // We need to use a workaround: save with validateBeforeSave
-    await User.collection.insertOne({
-      name: newUser.name,
-      email: newUser.email,
-      phone: newUser.phone,
-      password: application.password, // already hashed
+    // Create via Mongoose then immediately overwrite with already-hashed password
+    // to avoid double-hashing by pre-save hook
+    const createdUser = await User.create({
+      name: `${application.firstName} ${application.lastName}`,
+      email: application.email,
+      phone: application.phone,
+      password: 'placeholder_replaced_below',
       role: 'instructor',
+      isEmailVerified: true,
       instructorProfile: newUser.instructorProfile,
-      enrolledCourses: [],
-      isBlocked: false,
-      avatar: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    });
+
+    await User.findByIdAndUpdate(createdUser._id, {
+      $set: { password: application.password }
     });
   }
 

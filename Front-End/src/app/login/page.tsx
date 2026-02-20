@@ -23,7 +23,7 @@ export default function LoginPage() {
         const parsed = JSON.parse(saved);
         return {
           email: parsed.email || '',
-          password: parsed.password || '',
+          password: '',
           rememberMe: true,
         };
       }
@@ -49,11 +49,10 @@ export default function LoginPage() {
 
       const { data } = response.data;
 
-      // حفظ البيانات للمرة القادمة إذا كان "تذكرني" مفعل
+      // حفظ الإيميل فقط (بدون كلمة المرور) إذا كان "تذكرني" مفعل
       if (formData.rememberMe) {
         localStorage.setItem('remembered-login', JSON.stringify({
           email: formData.email,
-          password: formData.password,
         }));
       } else {
         localStorage.removeItem('remembered-login');

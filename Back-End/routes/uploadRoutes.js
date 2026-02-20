@@ -76,12 +76,37 @@ router.post(
  * @desc    حذف صورة من Cloudinary
  * @route   DELETE /api/upload/:publicId
  * @access  Private
+ * @security Only the owner (matching avatar/thumbnail) or admin can delete
  */
 router.delete(
   "/:publicId",
   protect,
   asyncHandler(async (req, res) => {
-    const publicId = req.params.publicId;
+    const publicId = decodeURIComponent(req.params.publicId);
+    const userId = req.user._id.toString();
+    const userRole = req.user.role;
+
+    // Admin can delete any image
+    if (userRole !== 'admin') {
+      // Check if the publicId belongs to the requesting user's avatar
+      const User = (await import('../models/User.js')).default;
+      const Course = (await import('../models/Course.js')).default;
+
+      const userOwnsImage = await User.findOne({
+        _id: userId,
+        avatar: { $regex: publicId, $options: 'i' },
+      });
+
+      const instructorOwnsCourse = await Course.findOne({
+        instructor: userId,
+        thumbnail: { $regex: publicId, $options: 'i' },
+      });
+
+      if (!userOwnsImage && !instructorOwnsCourse) {
+        res.status(403);
+        throw new Error('غير مصرح لك بحذف هذه الصورة');
+      }
+    }
 
     try {
       const result = await deleteImage(publicId);
