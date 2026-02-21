@@ -29,7 +29,6 @@ import {
   FiPhone,
   FiMapPin,
   FiChevronLeft,
-  FiHeart,
 } from "react-icons/fi";
 import { useAuthStore } from "@/store/authStore";
 import Logo from "@/components/Logo";
@@ -768,16 +767,7 @@ export default function Home() {
           <ScrollReveal preset="fadeUp" delay={0.2}>
             <div className="border-t border-slate-800 pt-7 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-xs">
               <p>© 2026 منصة مسار — جميع الحقوق محفوظة</p>
-              <p className="flex items-center gap-1.5">
-                صُنع بـ
-                <motion.span
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <FiHeart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
-                </motion.span>
-                بواسطة يسي ومحمد
-              </p>
+              <p>صُنع بواسطة يسي ومحمد</p>
             </div>
           </ScrollReveal>
 
