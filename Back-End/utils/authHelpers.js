@@ -1,25 +1,31 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 /**
- * Generate JWT Token
- * التوكن هيحتوي على (ID, Name, Phone, Role) عشان الفرونت يستخدمهم في العلامة المائية
- * 
- * ملاحظة أمنية: تم تقليل مدة الـ Token من 30 يوم إلى 1 ساعة
- * في المستقبل، يُنصح بتنفيذ نظام Refresh Token:
- * - Access Token: 1 ساعة (للطلبات العادية)
- * - Refresh Token: 7 أيام (لتجديد الـ Access Token)
+ * Generate short-lived Access Token (1 hour)
+ * Payload contains only id and role — no personal data
  */
 export const generateToken = (user) => {
   return jwt.sign(
-    {
-      id: user._id,
-      role: user.role
-    },
+    { id: user._id, role: user.role },
     process.env.JWT_SECRET,
-    {
-      expiresIn: '1h'
-    }
+    { expiresIn: '1h' }
   );
+};
+
+/**
+ * Generate opaque Refresh Token (random 64-byte hex string)
+ * Stored hashed in DB, sent as plain text to client
+ */
+export const generateRefreshToken = () => {
+  return crypto.randomBytes(64).toString('hex');
+};
+
+/**
+ * Hash a refresh token before storing in DB
+ */
+export const hashRefreshToken = (token) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
 };
 
 /**

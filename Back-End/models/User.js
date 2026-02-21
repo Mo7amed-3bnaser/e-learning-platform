@@ -145,6 +145,12 @@ const userSchema = new mongoose.Schema(
       default: undefined,
       select: false,
     },
+    // Refresh Token (hashed) for persistent sessions
+    refreshToken: {
+      type: String,
+      default: undefined,
+      select: false,
+    },
   },
   {
     timestamps: true, // createdAt & updatedAt

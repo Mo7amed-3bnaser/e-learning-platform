@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import crypto from 'crypto';
 import User from '../models/User.js';
-import { generateToken, formatUserResponse } from '../utils/authHelpers.js';
+import { generateToken, generateRefreshToken, hashRefreshToken, formatUserResponse } from '../utils/authHelpers.js';
 import { deleteImage } from '../config/cloudinary.js';
 import sendEmail, { getResetPasswordTemplate, getEmailVerificationTemplate } from '../utils/sendEmail.js';
 import logger from '../config/logger.js';
@@ -236,8 +236,21 @@ export const login = asyncHandler(async (req, res) => {
     await user.resetLoginAttempts();
   }
 
-  // إنشاء التوكن
+  // Generate access token + refresh token
   const token = generateToken(user);
+  const refreshToken = generateRefreshToken();
+
+  // Store hashed refresh token in DB
+  user.refreshToken = hashRefreshToken(refreshToken);
+  await user.save({ validateBeforeSave: false });
+
+  // Send refresh token as HttpOnly cookie (7 days)
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
 
   res.json({
     success: true,
@@ -527,5 +540,60 @@ export const getUserById = asyncHandler(async (req, res) => {
       createdAt: user.createdAt,
     },
   });
+});
+
+/**
+ * @desc    تجديد الـ Access Token باستخدام الـ Refresh Token
+ * @route   POST /api/auth/refresh
+ * @access  Public (cookie required)
+ */
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const token = req.cookies?.refreshToken;
+
+  if (!token) {
+    res.status(401);
+    throw new Error('لا يوجد Refresh Token');
+  }
+
+  const hashed = hashRefreshToken(token);
+  const user = await User.findOne({ refreshToken: hashed }).select('+refreshToken');
+
+  if (!user) {
+    res.status(401);
+    throw new Error('Refresh Token غير صالح أو منتهي الصلاحية');
+  }
+
+  if (user.isBlocked) {
+    res.status(403);
+    throw new Error('تم حظر حسابك');
+  }
+
+  // Issue new access token
+  const newAccessToken = generateToken(user);
+
+  res.json({
+    success: true,
+    message: 'تم تجديد التوكن بنجاح',
+    data: { token: newAccessToken },
+  });
+});
+
+/**
+ * @desc    تسجيل الخروج وحذف الـ Refresh Token
+ * @route   POST /api/auth/logout
+ * @access  Private
+ */
+export const logout = asyncHandler(async (req, res) => {
+  // Clear refresh token from DB
+  await User.findByIdAndUpdate(req.user._id, { $unset: { refreshToken: 1 } });
+
+  // Clear the cookie
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+
+  res.json({ success: true, message: 'تم تسجيل الخروج بنجاح' });
 });
 

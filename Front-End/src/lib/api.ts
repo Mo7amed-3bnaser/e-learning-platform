@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // required for refresh token cookie
 });
 
 // Request interceptor - إضافة التوكن تلقائياً
@@ -49,18 +50,32 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // لو التوكن منتهي أو غير صالح
-    if (error.response?.status === 401) {
+    // لو التوكن منتهي — جرّب تجدده بالـ Refresh Token
+    if (error.response?.status === 401 && !config._isRefreshRetry) {
       const errorMessage = error.response?.data?.message || '';
-      const isTokenError =
+      const isTokenExpired =
         errorMessage.includes('توكن') ||
         errorMessage.includes('token') ||
         errorMessage.includes('مصرح') ||
         errorMessage.includes('unauthorized');
 
-      if (isTokenError && useAuthStore.getState().token) {
-        useAuthStore.getState().logout();
-        window.location.href = '/login';
+      if (isTokenExpired && useAuthStore.getState().token) {
+        try {
+          // Try to refresh the access token silently
+          config._isRefreshRetry = true;
+          const refreshRes = await api.post('/auth/refresh', {}, { withCredentials: true });
+          const newToken = refreshRes.data?.data?.token;
+
+          if (newToken) {
+            useAuthStore.getState().setToken(newToken);
+            config.headers.Authorization = `Bearer ${newToken}`;
+            return api(config); // retry original request
+          }
+        } catch {
+          // Refresh failed — logout
+          useAuthStore.getState().logout();
+          if (typeof window !== 'undefined') window.location.href = '/login';
+        }
       }
     }
 

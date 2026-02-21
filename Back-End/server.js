@@ -8,10 +8,18 @@ import mongoose from "mongoose";
 import cors from "cors";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import cron from "node-cron";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/database.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import logger from "./config/logger.js";
 import httpLogger from "./middleware/httpLogger.js";
+import { validateEnv } from "./utils/validateEnv.js";
+import { apiLimiter } from "./middleware/rateLimiter.js";
+import Notification from "./models/Notification.js";
+
+// Validate required env vars before anything else
+validateEnv();
 
 // Import Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -32,20 +40,32 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 // Initialize Express
 const app = express();
 
+// 5.8 — CORS: build allowed origins dynamically from env
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  process.env.CLIENT_URL,
+  process.env.CLIENT_URL_PROD,
+].filter(Boolean);
+
 // Security & Middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      process.env.CLIENT_URL,
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.use(cookieParser());
 
 // HTTP Request Logging
 app.use(httpLogger);
@@ -57,6 +77,28 @@ app.use(mongoSanitize());
 if (process.env.NODE_ENV !== 'production') {
   app.use("/uploads", express.static("uploads"));
 }
+
+// 5.5 — Global Rate Limiting on all /api routes
+app.use('/api', apiLimiter);
+
+// 5.3 — Health Check endpoint
+app.get('/api/health', async (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  const isHealthy = dbState === 1;
+
+  res.status(isHealthy ? 200 : 503).json({
+    success: isHealthy,
+    status: isHealthy ? 'healthy' : 'unhealthy',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    environment: process.env.NODE_ENV,
+    database: {
+      status: dbStatus[dbState] || 'unknown',
+      host: mongoose.connection.host || null,
+    },
+  });
+});
 
 // Welcome Route
 app.get("/", (req, res) => {
@@ -113,6 +155,16 @@ if (process.env.NODE_ENV !== 'test') {
     const PORT = process.env.PORT || 5000;
     const server = app.listen(PORT, () => {
       logger.info(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    });
+
+    // 5.6 — Cron Job: delete read notifications older than 30 days (runs daily at 2am)
+    cron.schedule('0 2 * * *', async () => {
+      try {
+        const result = await Notification.deleteOldNotifications();
+        logger.info(`🗑️  Cron: deleted ${result.deletedCount} old notifications`);
+      } catch (err) {
+        logger.error('Cron job error (deleteOldNotifications):', err);
+      }
     });
 
     // ── Graceful Shutdown ──────────────────────────────────────────
