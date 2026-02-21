@@ -203,8 +203,8 @@ export const createCouponValidation = [
     .withMessage('كود الكوبون مطلوب')
     .isLength({ min: 3, max: 20 })
     .withMessage('كود الكوبون يجب أن يكون بين 3 و 20 حرف')
-    .matches(/^[A-Za-z0-9_-]+$/)
-    .withMessage('كود الكوبون يجب أن يحتوي على أحرف وأرقام فقط'),
+    .matches(/^[A-Za-z0-9_%.-]+$/)
+    .withMessage('كود الكوبون يجب أن يحتوي على أحرف وأرقام ورموز مسموحة فقط (% _ - .)'),
 
   body('discountType')
     .trim()
