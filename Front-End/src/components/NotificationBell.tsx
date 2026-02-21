@@ -195,14 +195,14 @@ export default function NotificationBell() {
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute left-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[500px] flex flex-col">
+                <div className="absolute left-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 z-50 max-h-[500px] flex flex-col">
                     {/* Header */}
-                    <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">الإشعارات</h3>
+                    <div className="p-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">الإشعارات</h3>
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllAsRead}
-                                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                                className="text-sm text-primary hover:text-primary-dark font-medium transition-colors"
                             >
                                 تحديد الكل كمقروء
                             </button>
@@ -213,12 +213,12 @@ export default function NotificationBell() {
                     <div className="flex-1 overflow-y-auto">
                         {loading ? (
                             <div className="p-8 text-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                             </div>
                         ) : notifications.length === 0 ? (
-                            <div className="p-8 text-center text-gray-500">
+                            <div className="p-8 text-center text-gray-500 dark:text-slate-400">
                                 <svg
-                                    className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                                    className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-slate-600"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -233,29 +233,32 @@ export default function NotificationBell() {
                                 <p className="text-sm">لا توجد إشعارات</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-gray-100 dark:divide-slate-700">
                                 {notifications.map((notification) => (
                                     <div
                                         key={notification._id}
                                         onClick={() => handleMarkAsRead(notification._id, notification.link)}
-                                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${!notification.isRead ? 'bg-blue-50' : ''
-                                            }`}
+                                        className={`p-4 cursor-pointer transition-colors ${
+                                            !notification.isRead
+                                                ? 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30'
+                                                : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                                        }`}
                                     >
                                         <div className="flex items-start gap-3">
                                             {/* Icon */}
-                                            <div className="text-2xl flex-shrink-0">
+                                            <div className="text-2xl shrink-0">
                                                 {getNotificationIcon(notification.type)}
                                             </div>
 
                                             {/* Content */}
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold text-gray-900 mb-1">
+                                                <p className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-1">
                                                     {notification.title}
                                                 </p>
-                                                <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                                                <p className="text-sm text-gray-600 dark:text-slate-400 mb-2 line-clamp-2">
                                                     {notification.message}
                                                 </p>
-                                                <p className="text-xs text-gray-400">
+                                                <p className="text-xs text-gray-400 dark:text-slate-500">
                                                     {formatTimeAgo(notification.createdAt)}
                                                 </p>
                                             </div>
@@ -263,7 +266,7 @@ export default function NotificationBell() {
                                             {/* Delete Button */}
                                             <button
                                                 onClick={(e) => handleDelete(notification._id, e)}
-                                                className="flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors"
+                                                className="shrink-0 text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                                                 aria-label="حذف الإشعار"
                                             >
                                                 <svg
@@ -283,7 +286,7 @@ export default function NotificationBell() {
 
                                             {/* Unread Indicator */}
                                             {!notification.isRead && (
-                                                <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>
+                                                <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full shrink-0 mt-1"></div>
                                             )}
                                         </div>
                                     </div>
@@ -294,11 +297,11 @@ export default function NotificationBell() {
 
                     {/* Footer */}
                     {notifications.length > 0 && (
-                        <div className="p-3 border-t border-gray-200">
+                        <div className="p-3 border-t border-gray-200 dark:border-slate-700">
                             <Link
                                 href="/notifications"
                                 onClick={() => setIsOpen(false)}
-                                className="block text-center text-sm text-primary-600 hover:text-primary-700 font-medium"
+                                className="block text-center text-sm text-primary hover:text-primary-dark dark:text-primary dark:hover:text-primary/80 font-medium transition-colors"
                             >
                                 عرض جميع الإشعارات
                             </Link>

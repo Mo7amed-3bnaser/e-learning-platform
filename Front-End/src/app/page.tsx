@@ -685,19 +685,6 @@ export default function Home() {
                   منصة مسار — نحو تعليم عربي احترافي يصنع الفارق في حياتك المهنية.
                 </p>
 
-                {/* Stats mini */}
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  {[
-                    { value: "500+", label: "كورس" },
-                    { value: "10k+", label: "طالب" },
-                  ].map((s) => (
-                    <div key={s.label} className="bg-slate-800/60 rounded-xl p-3 text-center border border-slate-700/50">
-                      <p className="text-primary font-bold text-base">{s.value}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-
                 {/* Social icons */}
                 <div className="flex items-center gap-3 pt-1">
                   {[
