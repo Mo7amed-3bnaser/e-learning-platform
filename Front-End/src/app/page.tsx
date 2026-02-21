@@ -510,7 +510,7 @@ export default function Home() {
                 duration={1}
                 delay={0.3}
                 className="hidden lg:block absolute top-10 right-[16.5%] left-[16.5%] h-0.5 bg-linear-to-l from-primary/20 via-accent/40 to-primary/20 origin-right"
-              />
+              >{null}</ScrollReveal>
 
               <StaggerContainer
                 stagger={0.2}
@@ -693,8 +693,10 @@ export default function Home() {
                   {[
                     { href: "/courses", label: "تصفح الكورسات" },
                     { href: "/about", label: "عن المنصة" },
-                    { href: "/register", label: "إنشاء حساب" },
-                    { href: "/login", label: "تسجيل الدخول" },
+                    ...(!isAuthenticated ? [
+                      { href: "/register", label: "إنشاء حساب" },
+                      { href: "/login", label: "تسجيل الدخول" },
+                    ] : []),
                   ].map((l) => (
                     <li key={l.href}>
                       <motion.div whileHover={{ x: -4 }} transition={{ type: "spring", stiffness: 400 }}>

@@ -38,7 +38,7 @@ const presets = {
 type PresetName = keyof typeof presets;
 
 interface ScrollRevealProps {
-  children: ReactNode;
+  children?: ReactNode;
   preset?: PresetName;
   custom?: { hidden: Variant; visible: Variant };
   delay?: number;
