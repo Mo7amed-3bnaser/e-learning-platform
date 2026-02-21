@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import AuthInitializer from "@/components/AuthInitializer";
 import ThemeProvider from "@/components/ThemeProvider";
 import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { SkipToMainContent } from "@/lib/accessibility";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,18 +18,49 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
-  title: "منصة مسار التعليمية",
-  description: "منصة تعليمية متطورة لتقديم أفضل تجربة تعليمية",
+  title: {
+    default: "منصة مسار التعليمية",
+    template: "%s | مسار التعليمية",
+  },
+  description: "منصة تعليمية عربية متكاملة تقدم كورسات احترافية في البرمجة والتصميم والأعمال. ابدأ رحلتك التعليمية مع أفضل المدربين.",
+  keywords: ["تعليم", "كورسات", "برمجة", "تصميم", "مسار", "تعلم عربي", "دورات تدريبية"],
+  authors: [{ name: "فريق مسار" }],
   icons: {
     icon: "/favicon.svg",
     apple: "/favicon.svg",
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
+  openGraph: {
+    type: "website",
+    locale: "ar_EG",
+    siteName: "منصة مسار التعليمية",
+    title: "منصة مسار التعليمية",
+    description: "منصة تعليمية عربية متكاملة تقدم كورسات احترافية في البرمجة والتصميم والأعمال.",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "منصة مسار التعليمية",
+    description: "منصة تعليمية عربية متكاملة تقدم كورسات احترافية في البرمجة والتصميم والأعمال.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+// JSON-LD Structured Data for the platform
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: "منصة مسار التعليمية",
+  description: "منصة تعليمية عربية متكاملة تقدم كورسات احترافية",
+  url: typeof window !== "undefined" ? window.location.origin : "",
 };
 
 export default function RootLayout({
@@ -39,6 +71,10 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var s=localStorage.getItem('masar-theme');if(s){var p=JSON.parse(s);if(p&&p.state&&p.state.theme==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}else document.documentElement.classList.remove('dark');}catch(e){document.documentElement.classList.remove('dark');}})();`,
@@ -51,6 +87,7 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <ThemeProvider>
+            <SkipToMainContent />
             <AuthInitializer>
               {children}
             </AuthInitializer>

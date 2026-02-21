@@ -100,7 +100,6 @@ function VerifyEmailContent() {
     if (token && isVerifying) {
         return <PageLoader message="جاري تأكيد البريد الإلكتروني..." />;
     }
-    }
 
     // ===== State: Token verified successfully =====
     if (token && isVerified) {

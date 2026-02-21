@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { OrderCardSkeleton, NoOrdersFound } from '@/components/ui';
 import Link from 'next/link';
 import { FiShoppingBag, FiArrowRight, FiFilter, FiClock, FiCheckCircle, FiXCircle, FiPackage } from 'react-icons/fi';
+import Image from 'next/image';
 import Breadcrumb from '@/components/Breadcrumb';
 
 interface Order {
@@ -126,11 +127,11 @@ export default function OrdersPage() {
                 <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
                     <div className="max-w-5xl mx-auto px-4 py-8">
                         <div className="flex items-center justify-between mb-4">
-                        <Breadcrumb
-                            items={[{ label: 'لوحتي', href: '/dashboard' }, { label: 'طلباتي' }]}
-                            variant="dark"
-                            className="opacity-80"
-                        />
+                            <Breadcrumb
+                                items={[{ label: 'لوحتي', href: '/dashboard' }, { label: 'طلباتي' }]}
+                                variant="dark"
+                                className="opacity-80"
+                            />
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -180,12 +181,15 @@ export default function OrdersPage() {
                                 >
                                     <div className="flex gap-4">
                                         {/* Course Thumbnail */}
-                                        <div className="w-20 h-20 bg-slate-100 rounded-xl overflow-hidden flex-shrink-0">
+                                        <div className="relative w-20 h-20 bg-slate-100 rounded-xl overflow-hidden flex-shrink-0">
                                             {order.courseId?.thumbnail ? (
-                                                <img
+                                                <Image
                                                     src={order.courseId.thumbnail}
                                                     alt={order.courseId.title}
-                                                    className="w-full h-full object-cover"
+                                                    fill
+                                                    sizes="80px"
+                                                    className="object-cover"
+                                                    loading="lazy"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">

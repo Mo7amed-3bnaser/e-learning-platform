@@ -161,7 +161,7 @@ export default function Home() {
   const blobY2 = useTransform(scrollYProgress, [0, 1], [0, -80]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground" dir="rtl">
+    <div className="min-h-screen bg-background text-foreground" dir="rtl" id="main-content">
       <Header />
 
       {/* ══════════════════════════════════════

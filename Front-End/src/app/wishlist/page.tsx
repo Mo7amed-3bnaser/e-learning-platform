@@ -9,6 +9,7 @@ import PageLoader from '@/components/PageLoader';
 import EmptyState from '@/components/EmptyState';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
+import { CourseCardSkeleton } from '@/components/Skeleton';
 import { FiHeart } from 'react-icons/fi';
 
 export default function WishlistPage() {
@@ -41,7 +42,27 @@ export default function WishlistPage() {
 
   // شاشة التحميل
   if (isLoading) {
-    return <PageLoader message="جاري تحميل قائمة الرغبات..." />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <Header />
+        <div className="container mx-auto px-4 py-12">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
+                <FiHeart className="w-6 h-6 text-white" />
+              </div>
+              <div className="h-10 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            </div>
+            <div className="h-5 w-72 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mr-16" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <CourseCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -98,9 +119,9 @@ export default function WishlistPage() {
                     category: course.category,
                     instructor: course.instructor
                       ? {
-                          name: course.instructor.name,
-                          avatar: course.instructor.avatar,
-                        }
+                        name: course.instructor.name,
+                        avatar: course.instructor.avatar,
+                      }
                       : null,
                     studentsCount: course.enrolledStudents,
                     isPublished: true,

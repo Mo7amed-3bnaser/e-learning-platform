@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FiArrowRight, FiClock, FiUsers, FiBookOpen, FiShoppingCart, FiCheck, FiPlay, FiPlayCircle, FiX, FiLock, FiInfo } from 'react-icons/fi';
 import Header from '@/components/Header';
+import Image from 'next/image';
 import YouTubePlayer from '@/components/YouTubePlayer';
 import { coursesAPI, ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
@@ -130,11 +131,76 @@ export default function CourseDetailsPage() {
       <>
         <Header />
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20">
-          <div className="container mx-auto px-4 py-8">
-            <div className="animate-pulse space-y-6">
-              <div className="h-64 bg-slate-200 rounded-2xl"></div>
-              <div className="h-10 bg-slate-200 rounded w-3/4"></div>
-              <div className="h-6 bg-slate-200 rounded w-1/2"></div>
+          <div className="container mx-auto px-4 py-8 max-w-7xl">
+            {/* Breadcrumb skeleton */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              <div className="h-4 w-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              <div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Main content skeleton */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Image skeleton */}
+                <div className="h-80 bg-slate-200 dark:bg-slate-700 rounded-2xl animate-pulse" />
+
+                {/* What you'll learn skeleton */}
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 space-y-4">
+                  <div className="h-7 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="w-5 h-5 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                        <div className="h-4 flex-1 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Course content skeleton */}
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 space-y-3">
+                  <div className="h-7 w-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
+                        <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                      </div>
+                      <div className="h-4 w-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sidebar skeleton */}
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg space-y-4">
+                  <div className="h-10 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mx-auto" />
+                  <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mx-auto" />
+                  <div className="h-14 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+                  <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                        <div className="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Instructor skeleton */}
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 space-y-4">
+                  <div className="h-5 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
+                    <div className="space-y-2 flex-1">
+                      <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                      <div className="h-3 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -165,10 +231,13 @@ export default function CourseDetailsPage() {
             <div className="lg:col-span-2 space-y-6" id="course-details">
               {/* صورة الكورس */}
               <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
-                <img
+                <Image
                   src={course.thumbnail}
                   alt={course.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  className="object-cover"
+                  priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-6 left-6 right-6">
@@ -208,14 +277,14 @@ export default function CourseDetailsPage() {
                             key={video._id}
                             onClick={() => canWatch && video.isFreePreview && !isEnrolled ? setPreviewVideo(video) : null}
                             className={`flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-700 transition-all ${canWatch && video.isFreePreview && !isEnrolled
-                                ? 'hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-200 dark:hover:border-green-800 cursor-pointer group'
-                                : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                              ? 'hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-200 dark:hover:border-green-800 cursor-pointer group'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
                               }`}
                           >
                             <div className="flex items-center gap-3">
                               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${video.isFreePreview
-                                  ? 'bg-green-100 group-hover:bg-green-200'
-                                  : 'bg-primary/10'
+                                ? 'bg-green-100 group-hover:bg-green-200'
+                                : 'bg-primary/10'
                                 }`}>
                                 {video.isFreePreview ? (
                                   <FiPlayCircle className="w-5 h-5 text-green-600" />
@@ -383,16 +452,20 @@ export default function CourseDetailsPage() {
                     <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-4">المدرب</h3>
                     <div className="flex items-center gap-3">
                       {course.instructor.channelLogo ? (
-                        <img
+                        <Image
                           src={course.instructor.channelLogo}
                           alt={course.instructor.name}
-                          className="w-12 h-12 rounded object-cover"
+                          width={48}
+                          height={48}
+                          className="rounded object-cover"
                         />
                       ) : course.instructor.avatar ? (
-                        <img
+                        <Image
                           src={course.instructor.avatar}
                           alt={course.instructor.name}
-                          className="w-12 h-12 rounded-full object-cover"
+                          width={48}
+                          height={48}
+                          className="rounded-full object-cover"
                         />
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-xl font-bold">

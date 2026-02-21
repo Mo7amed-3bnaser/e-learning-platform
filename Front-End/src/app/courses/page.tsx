@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { FiSearch, FiGrid, FiList } from 'react-icons/fi';
-import { coursesAPI, ordersAPI } from '@/lib/api';
-import { handleApiError } from '@/lib/toast';
 import CourseCard from '@/components/CourseCard';
 import { CourseCardSkeleton, NoCoursesFound } from '@/components/ui';
 import CourseFiltersComponent, { CourseFilters } from '@/components/CourseFilters';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
+import { useAllCourses, useMyOrders } from '@/hooks/useSWRApi';
 
 interface Course {
   _id: string;
@@ -37,9 +36,26 @@ interface Course {
 const PAGE_SIZE = 9;
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [purchasedCourseIds, setPurchasedCourseIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // SWR for courses — automatic caching + revalidation
+  const { data: coursesData, isLoading: coursesLoading } = useAllCourses();
+  const { data: ordersData } = useMyOrders({ errorRetryCount: 0 });
+
+  const courses: Course[] = (coursesData as any)?.data || [];
+  const purchasedCourseIds: string[] = useMemo(() => {
+    const orders = (ordersData as any)?.data || [];
+    return orders
+      .filter((order: any) => order.status === 'approved')
+      .map((order: any) => {
+        const id = typeof order.courseId === 'string'
+          ? order.courseId
+          : order.courseId?._id;
+        return id;
+      })
+      .filter(Boolean);
+  }, [ordersData]);
+
+  const isLoading = coursesLoading;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -48,47 +64,10 @@ export default function CoursesPage() {
     priceRange: 'all',
   });
 
-  useEffect(() => {
-    fetchCourses();
-    fetchPurchasedCourses();
-  }, []);
-
   // Reset visible count when filters/search change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [searchQuery, filters]);
-
-  const fetchCourses = async () => {
-    try {
-      setIsLoading(true);
-      const response = await coursesAPI.getAllCourses();
-      const coursesData = response.data.data || [];
-      setCourses(coursesData);
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchPurchasedCourses = async () => {
-    try {
-      const response = await ordersAPI.getMyOrders();
-      const orders = response.data.data || [];
-      const purchasedIds = orders
-        .filter((order: any) => order.status === 'approved')
-        .map((order: any) => {
-          const id = typeof order.courseId === 'string'
-            ? order.courseId
-            : order.courseId?._id;
-          return id;
-        })
-        .filter(Boolean);
-      setPurchasedCourseIds(purchasedIds);
-    } catch (error) {
-      // Ignore error if user is not logged in
-    }
-  };
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -158,7 +137,7 @@ export default function CoursesPage() {
   const hasMore = visibleCount < filteredCourses.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800" id="main-content">
       {/* Header */}
       <Header />
 
@@ -197,8 +176,8 @@ export default function CoursesPage() {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                  ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                   }`}
                 aria-label="عرض شبكي"
                 aria-pressed={viewMode === 'grid'}
@@ -208,8 +187,8 @@ export default function CoursesPage() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded transition-colors ${viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                  ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                   }`}
                 aria-label="عرض قائمة"
                 aria-pressed={viewMode === 'list'}
@@ -246,8 +225,8 @@ export default function CoursesPage() {
         {isLoading ? (
           <div
             className={`grid gap-6 ${viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-1'
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
               }`}
           >
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -262,8 +241,8 @@ export default function CoursesPage() {
           <>
             <div
               className={`grid gap-6 ${viewMode === 'grid'
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                  : 'grid-cols-1'
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-1'
                 }`}
               role="list"
               aria-label="قائمة الكورسات"

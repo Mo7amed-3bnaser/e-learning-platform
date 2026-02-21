@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { FiFilter, FiX, FiChevronDown } from 'react-icons/fi';
 
 export interface CourseFilters {
@@ -17,7 +17,7 @@ interface CourseFiltersProps {
     categories: string[];
 }
 
-export default function CourseFiltersComponent({
+function CourseFiltersComponent({
     filters,
     onFiltersChange,
     categories,
@@ -275,3 +275,5 @@ export default function CourseFiltersComponent({
         </div>
     );
 }
+
+export default memo(CourseFiltersComponent);

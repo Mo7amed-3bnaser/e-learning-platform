@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiPlay, FiClock, FiBookOpen, FiGrid, FiList, FiBook, FiInfo } from 'react-icons/fi';
+import Image from 'next/image';
 import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import Header from '@/components/Header';
@@ -74,7 +75,32 @@ export default function MyCoursesPage() {
   };
 
   if (isLoading) {
-    return <FullPageLoading message="جاري تحميل كورساتك..." />;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+        <Header />
+        {/* Header skeleton */}
+        <div className="bg-gradient-to-l from-primary to-primary-dark text-white">
+          <div className="max-w-7xl mx-auto px-4 pt-10 pb-14">
+            <div className="h-4 w-20 bg-white/20 rounded animate-pulse mb-5" />
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 bg-white/10 rounded-2xl animate-pulse" />
+              <div>
+                <div className="h-10 w-48 bg-white/20 rounded animate-pulse mb-2" />
+                <div className="h-5 w-64 bg-white/10 rounded animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Course cards skeleton */}
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <CourseCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -115,8 +141,8 @@ export default function MyCoursesPage() {
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'grid'
-                  ? 'bg-primary text-white'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
+                ? 'bg-primary text-white'
+                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
                 }`}
               title="عرض شبكي"
             >
@@ -125,8 +151,8 @@ export default function MyCoursesPage() {
             <button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'list'
-                  ? 'bg-primary text-white'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
+                ? 'bg-primary text-white'
+                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
                 }`}
               title="عرض قائمة"
             >
@@ -142,8 +168,8 @@ export default function MyCoursesPage() {
           /* Courses Grid/List */
           <div
             className={`grid gap-6 ${viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-1'
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
               }`}
           >
             {orders.map((order) => (
@@ -158,10 +184,13 @@ export default function MyCoursesPage() {
                     }`}
                 >
                   {order.courseId?.thumbnail ? (
-                    <img
+                    <Image
                       src={order.courseId.thumbnail}
                       alt={order.courseId.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center min-h-[12rem]">
@@ -203,10 +232,12 @@ export default function MyCoursesPage() {
                   {order.courseId?.instructor && (
                     <div className="flex items-center gap-2 mb-4">
                       {order.courseId.instructor.avatar ? (
-                        <img
+                        <Image
                           src={order.courseId.instructor.avatar}
                           alt={order.courseId.instructor.name}
-                          className="w-6 h-6 rounded-full object-cover"
+                          width={24}
+                          height={24}
+                          className="rounded-full object-cover"
                         />
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-xs font-bold">
