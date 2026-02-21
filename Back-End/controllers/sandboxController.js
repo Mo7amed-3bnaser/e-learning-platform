@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/Order.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
+import Coupon from "../models/Coupon.js";
 
 /**
  * @desc    محاكاة دفع فوري (Sandbox Payment Gateway)
@@ -16,7 +17,7 @@ export const sandboxPayment = asyncHandler(async (req, res) => {
     throw new Error('Sandbox payment is disabled in production');
   }
 
-  const { courseId, paymentMethod = "sandbox" } = req.body;
+  const { courseId, paymentMethod = "sandbox", couponCode } = req.body;
 
   // التحقق من وجود الكورس
   const course = await Course.findById(courseId);
@@ -43,6 +44,28 @@ export const sandboxPayment = asyncHandler(async (req, res) => {
     throw new Error("أنت مسجل في هذا الكورس بالفعل");
   }
 
+  // حساب الخصم بالكوبون (لو موجود)
+  let discount = 0;
+  let appliedCouponCode = null;
+
+  if (couponCode) {
+    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+    if (coupon) {
+      const validity = coupon.isValid();
+      if (validity.valid && !coupon.isUsedByUser(req.user._id) && coupon.isApplicableToCourse(courseId)) {
+        if (course.price >= (coupon.minOrderAmount || 0)) {
+          discount = coupon.calculateDiscount(course.price);
+          appliedCouponCode = coupon.code;
+          coupon.usedCount += 1;
+          coupon.usedBy.push({ user: req.user._id });
+          await coupon.save();
+        }
+      }
+    }
+  }
+
+  const finalPrice = Math.round((course.price - discount) * 100) / 100;
+
   // إنشاء Order وهمي مع الموافقة التلقائية
   const order = await Order.create({
     userId: req.user._id,
@@ -51,6 +74,9 @@ export const sandboxPayment = asyncHandler(async (req, res) => {
     screenshotUrl: "https://placehold.co/600x400/png?text=Sandbox+Payment", // صورة وهمية
     status: "approved", // موافقة تلقائية
     price: course.price,
+    couponCode: appliedCouponCode,
+    discount,
+    finalPrice,
     approvedBy: req.user._id, // المستخدم نفسه (simulation)
     approvedAt: new Date(),
   });

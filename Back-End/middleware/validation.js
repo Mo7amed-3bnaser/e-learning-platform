@@ -194,6 +194,92 @@ export const createOrderValidation = [
 ];
 
 /**
+ * Validation لإنشاء كوبون
+ */
+export const createCouponValidation = [
+  body('code')
+    .trim()
+    .notEmpty()
+    .withMessage('كود الكوبون مطلوب')
+    .isLength({ min: 3, max: 20 })
+    .withMessage('كود الكوبون يجب أن يكون بين 3 و 20 حرف')
+    .matches(/^[A-Za-z0-9_-]+$/)
+    .withMessage('كود الكوبون يجب أن يحتوي على أحرف وأرقام فقط'),
+
+  body('discountType')
+    .trim()
+    .notEmpty()
+    .withMessage('نوع الخصم مطلوب')
+    .isIn(['percentage', 'fixed'])
+    .withMessage('نوع الخصم يجب أن يكون percentage أو fixed'),
+
+  body('discountValue')
+    .notEmpty()
+    .withMessage('قيمة الخصم مطلوبة')
+    .isFloat({ min: 0 })
+    .withMessage('قيمة الخصم يجب أن تكون رقم موجب'),
+
+  body('minOrderAmount')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('الحد الأدنى يجب أن يكون رقم موجب'),
+
+  body('maxDiscountAmount')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('الحد الأقصى للخصم يجب أن يكون رقم موجب'),
+
+  body('usageLimit')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('حد الاستخدام يجب أن يكون عدد صحيح أكبر من 0'),
+
+  body('expiryDate')
+    .notEmpty()
+    .withMessage('تاريخ انتهاء الكوبون مطلوب')
+    .isISO8601()
+    .withMessage('تاريخ الانتهاء غير صحيح'),
+
+  body('startDate')
+    .optional()
+    .isISO8601()
+    .withMessage('تاريخ البداية غير صحيح'),
+
+  body('applicableCourses')
+    .optional()
+    .isArray()
+    .withMessage('الكورسات المحددة يجب أن تكون مصفوفة'),
+
+  body('applicableCourses.*')
+    .optional()
+    .isMongoId()
+    .withMessage('معرف الكورس غير صحيح'),
+
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('الوصف يجب أن لا يتجاوز 200 حرف'),
+];
+
+/**
+ * Validation لتطبيق كوبون
+ */
+export const applyCouponValidation = [
+  body('code')
+    .trim()
+    .notEmpty()
+    .withMessage('كود الكوبون مطلوب'),
+
+  body('courseId')
+    .trim()
+    .notEmpty()
+    .withMessage('معرف الكورس مطلوب')
+    .isMongoId()
+    .withMessage('معرف الكورس غير صحيح'),
+];
+
+/**
  * Validation for review
  */
 export const reviewValidation = [

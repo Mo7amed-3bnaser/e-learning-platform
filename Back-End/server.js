@@ -36,6 +36,7 @@ import instructorApplicationRoutes from "./routes/instructorApplicationRoutes.js
 import notificationRoutes from "./routes/notificationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
+import couponRoutes from "./routes/couponRoutes.js";
 
 // Initialize Express
 const app = express();
@@ -121,6 +122,7 @@ app.get("/", (req, res) => {
         notifications: "/api/notifications",
         users: "/api/users",
         wishlist: "/api/wishlist",
+        coupons: "/api/coupons",
       },
     },
   });
@@ -141,6 +143,7 @@ app.use("/api/instructor-applications", instructorApplicationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/coupons", couponRoutes);
 
 // Error Handling
 app.use(notFound);

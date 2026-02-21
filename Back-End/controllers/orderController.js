@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/Order.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
+import Coupon from "../models/Coupon.js";
 import { paginateQuery } from '../utils/pagination.js';
 import { createNotification } from './notificationController.js';
 import sendEmail, { getOrderApprovedTemplate, getOrderRejectedTemplate } from '../utils/sendEmail.js';
@@ -15,7 +16,7 @@ import { ROLES, ORDER_STATUS, NOTIFICATION_TYPE, ERROR_MESSAGES } from '../utils
  * @access  Private
  */
 export const createOrder = asyncHandler(async (req, res) => {
-  const { courseId, paymentMethod, screenshotUrl } = req.body;
+  const { courseId, paymentMethod, screenshotUrl, couponCode } = req.body;
 
   // التحقق من البيانات
   if (!courseId || !paymentMethod || !screenshotUrl) {
@@ -58,6 +59,49 @@ export const createOrder = asyncHandler(async (req, res) => {
     );
   }
 
+  // حساب الخصم بالكوبون (لو موجود)
+  let discount = 0;
+  let appliedCouponCode = null;
+
+  if (couponCode) {
+    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+    if (!coupon) {
+      res.status(404);
+      throw new Error('كود الكوبون غير صحيح');
+    }
+
+    const validity = coupon.isValid();
+    if (!validity.valid) {
+      res.status(400);
+      throw new Error(validity.reason);
+    }
+
+    if (coupon.isUsedByUser(req.user._id)) {
+      res.status(400);
+      throw new Error('لقد استخدمت هذا الكوبون من قبل');
+    }
+
+    if (!coupon.isApplicableToCourse(courseId)) {
+      res.status(400);
+      throw new Error('هذا الكوبون لا ينطبق على هذا الكورس');
+    }
+
+    if (course.price < coupon.minOrderAmount) {
+      res.status(400);
+      throw new Error(`الحد الأدنى لاستخدام هذا الكوبون هو $${coupon.minOrderAmount}`);
+    }
+
+    discount = coupon.calculateDiscount(course.price);
+    appliedCouponCode = coupon.code;
+
+    // تسجيل استخدام الكوبون
+    coupon.usedCount += 1;
+    coupon.usedBy.push({ user: req.user._id });
+    await coupon.save();
+  }
+
+  const finalPrice = Math.round((course.price - discount) * 100) / 100;
+
   // إنشاء الطلب
   const order = await Order.create({
     userId: req.user._id,
@@ -65,6 +109,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     paymentMethod,
     screenshotUrl,
     price: course.price,
+    couponCode: appliedCouponCode,
+    discount,
+    finalPrice,
     status: "pending",
   });
 

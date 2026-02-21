@@ -51,7 +51,11 @@ export const PAGINATION = Object.freeze({
     COURSES_LIMIT: 12,
     ORDERS_LIMIT: 10,
 });
-
+// ── Coupon Discount Types ───────────────────────────────────────
+export const DISCOUNT_TYPE = Object.freeze({
+    PERCENTAGE: 'percentage',
+    FIXED: 'fixed',
+});
 // ── Common Error Messages ───────────────────────────────────────────
 export const ERROR_MESSAGES = Object.freeze({
     USER_NOT_FOUND: 'المستخدم غير موجود',

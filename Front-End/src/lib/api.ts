@@ -201,8 +201,8 @@ export const ordersAPI = {
   getMyOrders: () => api.get('/orders/my-orders'),
 
   // 🎮 Sandbox Payment - دفع تجريبي فوري
-  sandboxPayment: (courseId: string) => 
-    api.post('/orders/sandbox/pay', { courseId }),
+  sandboxPayment: (courseId: string, couponCode?: string) => 
+    api.post('/orders/sandbox/pay', { courseId, couponCode }),
 
   // Student - التحقق من التسجيل في كورس
   checkEnrollment: (courseId: string) => 
@@ -340,6 +340,46 @@ export const reviewsAPI = {
   // Delete review
   deleteReview: (reviewId: string) =>
     api.delete(`/reviews/${reviewId}`),
+};
+
+// ============================================
+// Coupons APIs
+// ============================================
+export const couponsAPI = {
+  // Student - التحقق من كوبون وحساب الخصم
+  applyCoupon: (data: { code: string; courseId: string }) =>
+    api.post('/coupons/apply', data),
+
+  // Admin - إنشاء كوبون
+  createCoupon: (data: {
+    code: string;
+    discountType: 'percentage' | 'fixed';
+    discountValue: number;
+    expiryDate: string;
+    minOrderAmount?: number;
+    maxDiscountAmount?: number;
+    usageLimit?: number;
+    applicableCourses?: string[];
+    startDate?: string;
+    description?: string;
+  }) => api.post('/coupons', data),
+
+  // Admin - جلب جميع الكوبونات
+  getAllCoupons: (params?: { isActive?: string; page?: number; limit?: number }) =>
+    api.get('/coupons', { params }),
+
+  // Admin - جلب كوبون بالمعرف
+  getCouponById: (id: string) => api.get(`/coupons/${id}`),
+
+  // Admin - تحديث كوبون
+  updateCoupon: (id: string, data: Record<string, unknown>) =>
+    api.put(`/coupons/${id}`, data),
+
+  // Admin - حذف كوبون
+  deleteCoupon: (id: string) => api.delete(`/coupons/${id}`),
+
+  // Admin - تفعيل/تعطيل كوبون
+  toggleCoupon: (id: string) => api.patch(`/coupons/${id}/toggle`),
 };
 
 // ============================================
