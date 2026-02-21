@@ -28,10 +28,6 @@ import {
   FiMail,
   FiPhone,
   FiMapPin,
-  FiYoutube,
-  FiLinkedin,
-  FiTwitter,
-  FiInstagram,
   FiChevronLeft,
   FiHeart,
 } from "react-icons/fi";
@@ -685,26 +681,6 @@ export default function Home() {
                   منصة مسار — نحو تعليم عربي احترافي يصنع الفارق في حياتك المهنية.
                 </p>
 
-                {/* Social icons */}
-                <div className="flex items-center gap-3 pt-1">
-                  {[
-                    { Icon: FiYoutube, href: "#", label: "YouTube" },
-                    { Icon: FiLinkedin, href: "#", label: "LinkedIn" },
-                    { Icon: FiTwitter, href: "#", label: "Twitter" },
-                    { Icon: FiInstagram, href: "#", label: "Instagram" },
-                  ].map(({ Icon, href, label }) => (
-                    <motion.a
-                      key={label}
-                      href={href}
-                      aria-label={label}
-                      whileHover={{ y: -3, scale: 1.15 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-primary border border-slate-700 hover:border-primary flex items-center justify-center text-slate-400 hover:text-white transition-colors duration-200"
-                    >
-                      <Icon className="w-4 h-4" />
-                    </motion.a>
-                  ))}
-                </div>
               </div>
             </StaggerItem>
 
