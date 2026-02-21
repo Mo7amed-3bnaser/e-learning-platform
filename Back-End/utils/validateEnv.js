@@ -4,7 +4,7 @@
  * preventing the server from starting with a broken config.
  */
 const REQUIRED_ENV_VARS = [
-  'MONGO_URI',
+  'MONGODB_URI',
   'JWT_SECRET',
 ];
 

@@ -25,6 +25,15 @@ import {
   FiBarChart2,
   FiGlobe,
   FiZap,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiYoutube,
+  FiLinkedin,
+  FiTwitter,
+  FiInstagram,
+  FiChevronLeft,
+  FiHeart,
 } from "react-icons/fi";
 import { useAuthStore } from "@/store/authStore";
 import Logo from "@/components/Logo";
@@ -659,41 +668,109 @@ export default function Home() {
       {/* ══════════════════════════════════════
           FOOTER
       ══════════════════════════════════════ */}
-      <footer className="bg-slate-900 dark:bg-slate-950 text-white">
-        <div className="container mx-auto px-6 py-16">
-          <StaggerContainer
-            stagger={0.15}
-            className="grid md:grid-cols-3 gap-10 mb-12"
-          >
-            {/* Brand */}
+      <footer className="bg-slate-900 dark:bg-slate-950 text-white relative overflow-hidden">
+        {/* Subtle top glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-linear-to-r from-transparent via-primary/50 to-transparent" />
+
+        <div className="container mx-auto px-6 pt-16 pb-8">
+
+          {/* Main grid */}
+          <StaggerContainer stagger={0.12} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+
+            {/* Brand column */}
             <StaggerItem preset="fadeUp">
-              <div className="space-y-4">
+              <div className="space-y-5 lg:col-span-1">
                 <Logo size="md" showText className="text-white" />
-                <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-                  منصة مسار — نحو تعليم عربي احترافي يصنع الفارق في حياتك
-                  المهنية.
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  منصة مسار — نحو تعليم عربي احترافي يصنع الفارق في حياتك المهنية.
                 </p>
+
+                {/* Stats mini */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {[
+                    { value: "500+", label: "كورس" },
+                    { value: "10k+", label: "طالب" },
+                  ].map((s) => (
+                    <div key={s.label} className="bg-slate-800/60 rounded-xl p-3 text-center border border-slate-700/50">
+                      <p className="text-primary font-bold text-base">{s.value}</p>
+                      <p className="text-slate-400 text-xs mt-0.5">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Social icons */}
+                <div className="flex items-center gap-3 pt-1">
+                  {[
+                    { Icon: FiYoutube, href: "#", label: "YouTube" },
+                    { Icon: FiLinkedin, href: "#", label: "LinkedIn" },
+                    { Icon: FiTwitter, href: "#", label: "Twitter" },
+                    { Icon: FiInstagram, href: "#", label: "Instagram" },
+                  ].map(({ Icon, href, label }) => (
+                    <motion.a
+                      key={label}
+                      href={href}
+                      aria-label={label}
+                      whileHover={{ y: -3, scale: 1.15 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-primary border border-slate-700 hover:border-primary flex items-center justify-center text-slate-400 hover:text-white transition-colors duration-200"
+                    >
+                      <Icon className="w-4 h-4" />
+                    </motion.a>
+                  ))}
+                </div>
               </div>
             </StaggerItem>
 
-            {/* Links */}
+            {/* Quick links */}
             <StaggerItem preset="fadeUp">
               <div>
-                <h4 className="font-bold text-slate-200 mb-5">روابط سريعة</h4>
-                <ul className="space-y-3 text-sm">
+                <h4 className="font-bold text-slate-200 mb-5 text-sm uppercase tracking-wider">
+                  روابط سريعة
+                </h4>
+                <ul className="space-y-2.5">
                   {[
                     { href: "/courses", label: "تصفح الكورسات" },
                     { href: "/about", label: "عن المنصة" },
+                    { href: "/register", label: "إنشاء حساب" },
+                    { href: "/login", label: "تسجيل الدخول" },
+                  ].map((l) => (
+                    <li key={l.href}>
+                      <motion.div whileHover={{ x: -4 }} transition={{ type: "spring", stiffness: 400 }}>
+                        <Link
+                          href={l.href}
+                          className="group flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors duration-200"
+                        >
+                          <FiChevronLeft className="w-3 h-3 opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
+                          {l.label}
+                        </Link>
+                      </motion.div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </StaggerItem>
+
+            {/* Legal */}
+            <StaggerItem preset="fadeUp">
+              <div>
+                <h4 className="font-bold text-slate-200 mb-5 text-sm uppercase tracking-wider">
+                  قانوني
+                </h4>
+                <ul className="space-y-2.5">
+                  {[
                     { href: "/privacy", label: "سياسة الخصوصية" },
                     { href: "/terms", label: "الشروط والأحكام" },
                   ].map((l) => (
                     <li key={l.href}>
-                      <Link
-                        href={l.href}
-                        className="text-slate-400 hover:text-white transition-colors"
-                      >
-                        {l.label}
-                      </Link>
+                      <motion.div whileHover={{ x: -4 }} transition={{ type: "spring", stiffness: 400 }}>
+                        <Link
+                          href={l.href}
+                          className="group flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors duration-200"
+                        >
+                          <FiChevronLeft className="w-3 h-3 opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
+                          {l.label}
+                        </Link>
+                      </motion.div>
                     </li>
                   ))}
                 </ul>
@@ -703,22 +780,44 @@ export default function Home() {
             {/* Contact */}
             <StaggerItem preset="fadeUp">
               <div>
-                <h4 className="font-bold text-slate-200 mb-5">تواصل معنا</h4>
-                <ul className="space-y-3 text-sm text-slate-400">
-                  <li>support@masar.edu</li>
-                  <li>+20 100 000 0000</li>
-                  <li>سوهاج، مصر</li>
+                <h4 className="font-bold text-slate-200 mb-5 text-sm uppercase tracking-wider">
+                  تواصل معنا
+                </h4>
+                <ul className="space-y-3">
+                  {[
+                    { Icon: FiMail, text: "support@masar.edu" },
+                    { Icon: FiPhone, text: "+20 100 000 0000" },
+                    { Icon: FiMapPin, text: "سوهاج، مصر" },
+                  ].map(({ Icon, text }) => (
+                    <li key={text} className="flex items-center gap-3 text-slate-400 text-sm group">
+                      <span className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/40 transition-colors">
+                        <Icon className="w-3.5 h-3.5 text-primary" />
+                      </span>
+                      <span className="group-hover:text-slate-300 transition-colors">{text}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </StaggerItem>
           </StaggerContainer>
 
-          <ScrollReveal preset="fadeUp" delay={0.3}>
-            <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-sm">
-              <p>© 2026 مسار — جميع الحقوق محفوظة</p>
-              <p>تم تطوير هذه المنصه بواسطة يسي ومحمد</p>
+          {/* Bottom bar */}
+          <ScrollReveal preset="fadeUp" delay={0.2}>
+            <div className="border-t border-slate-800 pt-7 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-xs">
+              <p>© 2026 منصة مسار — جميع الحقوق محفوظة</p>
+              <p className="flex items-center gap-1.5">
+                صُنع بـ
+                <motion.span
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <FiHeart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
+                </motion.span>
+                بواسطة يسي ومحمد
+              </p>
             </div>
           </ScrollReveal>
+
         </div>
       </footer>
     </div>
