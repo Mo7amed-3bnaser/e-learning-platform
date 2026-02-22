@@ -40,6 +40,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.1",
     "pdf-lib": "^1.17.1",
+    "ua-parser-js": "^2.0.9",
     "winston": "^3.19.0",
     "xss": "^1.0.15"
   },

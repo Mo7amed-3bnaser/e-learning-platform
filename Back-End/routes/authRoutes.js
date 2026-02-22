@@ -13,6 +13,7 @@ import {
   logout,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validateActiveSession } from '../middleware/deviceProtection.js';
 import { registerValidation, loginValidation, validate } from '../middleware/validation.js';
 import { upload } from '../config/cloudinary.js';
 import { loginLimiter, registerLimiter, forgotPasswordLimiter } from '../middleware/rateLimiter.js';
@@ -32,9 +33,9 @@ router.post('/refresh', refreshAccessToken);
 router.post('/logout', protect, logout);
 
 // Protected routes
-router.get('/me', protect, getMe);
-router.put('/profile', protect, updateProfile);
-router.put('/avatar', protect, upload.single('avatar'), updateAvatar);
-router.post('/avatar', protect, upload.single('avatar'), updateAvatar);
+router.get('/me', protect, validateActiveSession, getMe);
+router.put('/profile', protect, validateActiveSession, updateProfile);
+router.put('/avatar', protect, validateActiveSession, upload.single('avatar'), updateAvatar);
+router.post('/avatar', protect, validateActiveSession, upload.single('avatar'), updateAvatar);
 
 export default router;

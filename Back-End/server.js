@@ -37,6 +37,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
 
 // Initialize Express
 const app = express();
@@ -61,7 +62,7 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Device-Fingerprint'],
   }),
 );
 app.use(express.json({ limit: '5mb' }));
@@ -123,6 +124,7 @@ app.get("/", (req, res) => {
         users: "/api/users",
         wishlist: "/api/wishlist",
         coupons: "/api/coupons",
+        sessions: "/api/sessions",
       },
     },
   });
@@ -144,6 +146,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/coupons", couponRoutes);
+app.use("/api/sessions", sessionRoutes);
 
 // Error Handling
 app.use(notFound);

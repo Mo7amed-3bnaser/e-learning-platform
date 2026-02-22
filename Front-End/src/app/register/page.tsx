@@ -31,6 +31,7 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     agreeTerms: false,
+    deviceAgreement: false,
   });
 
   const validateStep1 = () => {
@@ -112,6 +113,12 @@ export default function RegisterPage() {
       return;
     }
 
+    // التحقق من الموافقة على شروط الأجهزة
+    if (!formData.deviceAgreement) {
+      showError('يجب الموافقة على شروط استخدام الأجهزة والحساب');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -120,6 +127,7 @@ export default function RegisterPage() {
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
+        deviceAgreement: true,
       });
 
       // عرض رسالة نجاح
@@ -493,6 +501,56 @@ export default function RegisterPage() {
                     </Link>
                   </label>
                 </div>
+
+                {/* Device Agreement Section */}
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 space-y-3">
+                  <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                    ⚠️ شروط استخدام الحساب - مهم جداً
+                  </h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-400">
+                    لحماية حقوقك وحقوق المحاضرين، يرجى العلم بالآتي:
+                  </p>
+                  <ul className="text-xs text-amber-700 dark:text-amber-400 space-y-1.5 pr-1">
+                    <li className="flex items-start gap-2">
+                      <span>📱</span>
+                      <span>يمكنك تسجيل الدخول من <strong>جهاز واحد فقط</strong> في نفس الوقت</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>📅</span>
+                      <span>يمكنك استخدام <strong>جهازين كحد أقصى</strong> خلال الشهر الواحد</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⏰</span>
+                      <span>عند تبديل الأجهزة، يجب الانتظار <strong>4 ساعات</strong> بين كل جهاز</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>🚫</span>
+                      <span>مشاركة الحساب مع أشخاص آخرين <strong>ممنوعة</strong> ومخالفة للشروط</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span>⛔</span>
+                      <span>في حالة المخالفة، سيتم إيقاف الحساب ولن يتم استرداد المبالغ المدفوعة</span>
+                    </li>
+                  </ul>
+                  <div className="flex items-start gap-3 pt-2 border-t border-amber-200 dark:border-amber-800">
+                    <input
+                      id="deviceAgreement"
+                      type="checkbox"
+                      required
+                      checked={formData.deviceAgreement}
+                      onChange={(e) =>
+                        setFormData({ ...formData, deviceAgreement: e.target.checked })
+                      }
+                      className="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-amber-400 dark:border-amber-600 rounded cursor-pointer"
+                    />
+                    <label
+                      htmlFor="deviceAgreement"
+                      className="text-sm font-medium text-amber-800 dark:text-amber-300 cursor-pointer"
+                    >
+                      أوافق على شروط استخدام الأجهزة والحساب
+                    </label>
+                  </div>
+                </div>
               </>
             )}
 
@@ -509,7 +567,7 @@ export default function RegisterPage() {
               )}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || (currentStep === 2 && (!formData.agreeTerms || !formData.deviceAgreement))}
                 className={`${currentStep === 1 ? "w-full" : "flex-1"
                   } flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-l from-primary to-primary-dark hover:from-primary-dark hover:to-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed`}
               >

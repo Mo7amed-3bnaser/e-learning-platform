@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
+import { getDeviceFingerprint } from '@/utils/deviceFingerprint';
 
 // إنشاء instance من axios
 const api = axios.create({
@@ -10,13 +11,24 @@ const api = axios.create({
   withCredentials: true, // required for refresh token cookie
 });
 
-// Request interceptor - إضافة التوكن تلقائياً
+// Request interceptor - إضافة التوكن + بصمة الجهاز تلقائياً
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // إضافة بصمة الجهاز
+    if (typeof window !== 'undefined') {
+      try {
+        const fingerprint = await getDeviceFingerprint();
+        config.headers['X-Device-Fingerprint'] = fingerprint;
+      } catch {
+        // تجاهل الخطأ - الـ server هيولد fingerprint من الـ user-agent
+      }
+    }
+
     return config;
   },
   (error) => {
@@ -47,6 +59,21 @@ api.interceptors.response.use(
 
     if (isNetworkError) {
       console.warn('Server is not available or network error');
+      return Promise.reject(error);
+    }
+
+    // التحقق من أخطاء حماية الأجهزة
+    const errorCode = error.response?.data?.errorCode;
+
+    if (errorCode === 'SESSION_REVOKED') {
+      useAuthStore.getState().logout();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login?reason=session_revoked';
+      }
+      return Promise.reject(error);
+    }
+
+    if (errorCode === 'MAX_DEVICES_REACHED' || errorCode === 'DEVICE_SWITCH_COOLDOWN') {
       return Promise.reject(error);
     }
 
@@ -92,6 +119,7 @@ export const authAPI = {
     email: string;
     phone: string;
     password: string;
+    deviceAgreement: boolean;
   }) => api.post('/auth/register', data),
 
   login: (data: { email: string; password: string }) =>
@@ -400,6 +428,35 @@ export const wishlistAPI = {
   // Check if course is in wishlist
   checkWishlist: (courseId: string) =>
     api.get(`/wishlist/check/${courseId}`),
+};
+
+// ============================================
+// Sessions & Device Protection APIs
+// ============================================
+export const sessionsAPI = {
+  // Public - عرض حدود الأجهزة
+  getDeviceLimits: () => api.get('/sessions/limits'),
+
+  // Protected - الأجهزة النشطة
+  getActiveSessions: () => api.get('/sessions/active'),
+
+  // Protected - سجل الأجهزة هذا الشهر
+  getDeviceHistory: () => api.get('/sessions/devices'),
+
+  // Protected - تسجيل خروج من جهاز معين
+  revokeSession: (sessionId: string) =>
+    api.delete(`/sessions/${sessionId}`),
+
+  // Protected - تسجيل خروج من كل الأجهزة
+  revokeAllSessions: () => api.delete('/sessions/all'),
+
+  // Admin - عرض أجهزة مستخدم
+  adminGetUserDevices: (userId: string) =>
+    api.get(`/admin/users/${userId}/devices`),
+
+  // Admin - إعادة تعيين أجهزة مستخدم
+  adminResetUserDevices: (userId: string) =>
+    api.post(`/admin/users/${userId}/reset-devices`),
 };
 
 export default api;

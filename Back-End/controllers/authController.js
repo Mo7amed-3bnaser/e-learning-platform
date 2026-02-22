@@ -5,6 +5,7 @@ import { generateToken, generateRefreshToken, hashRefreshToken, formatUserRespon
 import { deleteImage } from '../config/cloudinary.js';
 import sendEmail, { getResetPasswordTemplate, getEmailVerificationTemplate } from '../utils/sendEmail.js';
 import logger from '../config/logger.js';
+import { enforceDeviceProtection, deactivateSession } from '../middleware/deviceProtection.js';
 
 /**
  * @desc    تسجيل مستخدم جديد (مع إرسال إيميل تأكيد)
@@ -12,12 +13,18 @@ import logger from '../config/logger.js';
  * @access  Public
  */
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, phone, password } = req.body;
+  const { name, email, phone, password, deviceAgreement } = req.body;
 
   // التحقق من وجود جميع البيانات
   if (!name || !email || !phone || !password) {
     res.status(400);
     throw new Error('برجاء إدخال جميع البيانات المطلوبة');
+  }
+
+  // التحقق من الموافقة على شروط الأجهزة
+  if (!deviceAgreement) {
+    res.status(400);
+    throw new Error('يجب الموافقة على شروط استخدام الأجهزة والحساب قبل التسجيل');
   }
 
   // التحقق من وجود المستخدم مسبقاً
@@ -33,7 +40,12 @@ export const register = asyncHandler(async (req, res) => {
     name,
     email,
     phone,
-    password // will be hashed automatically by pre-save hook
+    password, // will be hashed automatically by pre-save hook
+    deviceAgreement: {
+      agreed: true,
+      agreedAt: new Date(),
+      agreedFromIP: req.ip,
+    },
   });
 
   if (user) {
@@ -239,6 +251,19 @@ export const login = asyncHandler(async (req, res) => {
   // Generate access token + refresh token
   const token = generateToken(user);
   const refreshToken = generateRefreshToken();
+
+  // فرض حماية الأجهزة (للطلاب فقط)
+  if (user.role === 'student') {
+    try {
+      await enforceDeviceProtection(user._id, token, req);
+    } catch (error) {
+      return res.status(error.statusCode || 403).json({
+        success: false,
+        message: error.message,
+        errorCode: error.code,
+      });
+    }
+  }
 
   // Store hashed refresh token in DB
   user.refreshToken = hashRefreshToken(refreshToken);
@@ -584,6 +609,12 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const logout = asyncHandler(async (req, res) => {
+  // قفل الـ Active Session
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (token) {
+    await deactivateSession(token, req.user._id);
+  }
+
   // Clear refresh token from DB
   await User.findByIdAndUpdate(req.user._id, { $unset: { refreshToken: 1 } });
 

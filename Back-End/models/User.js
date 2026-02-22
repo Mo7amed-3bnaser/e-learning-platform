@@ -114,6 +114,21 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Device Protection Agreement
+    deviceAgreement: {
+      agreed: {
+        type: Boolean,
+        default: false,
+      },
+      agreedAt: {
+        type: Date,
+        default: undefined,
+      },
+      agreedFromIP: {
+        type: String,
+        default: undefined,
+      },
+    },
     emailVerificationToken: {
       type: String,
       default: undefined,

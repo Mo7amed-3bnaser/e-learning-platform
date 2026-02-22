@@ -8,6 +8,10 @@ import {
   getInstructors,
   demoteInstructor,
 } from '../controllers/adminController.js';
+import {
+  adminGetUserDevices,
+  adminResetUserDevices,
+} from '../controllers/sessionController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 import { validate, validateIdParam } from '../middleware/validation.js';
 
@@ -25,5 +29,9 @@ router.delete('/students/:id', validateIdParam, validate, deleteStudent);
 // Instructor management
 router.get('/instructors', getInstructors);
 router.patch('/instructors/:id/demote', validateIdParam, validate, demoteInstructor);
+
+// Device management
+router.get('/users/:userId/devices', adminGetUserDevices);
+router.post('/users/:userId/reset-devices', adminResetUserDevices);
 
 export default router;
