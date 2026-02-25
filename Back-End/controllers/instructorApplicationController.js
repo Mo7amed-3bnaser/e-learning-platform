@@ -100,14 +100,29 @@ export const getAllApplications = asyncHandler(async (req, res) => {
     filter.status = status;
   }
 
-  const applications = await InstructorApplication.find(filter)
-    .populate('reviewedBy', 'name')
-    .sort('-createdAt');
+  const page = parseInt(req.query.page) || 1;
+  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+  const skip = (page - 1) * limit;
+
+  const [applications, totalApplications] = await Promise.all([
+    InstructorApplication.find(filter)
+      .populate('reviewedBy', 'name')
+      .sort('-createdAt')
+      .skip(skip)
+      .limit(limit),
+    InstructorApplication.countDocuments(filter)
+  ]);
 
   res.json({
     success: true,
     data: applications,
     count: applications.length,
+    pagination: {
+      page,
+      limit,
+      total: totalApplications,
+      pages: Math.ceil(totalApplications / limit)
+    },
   });
 });
 

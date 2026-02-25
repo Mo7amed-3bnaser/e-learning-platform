@@ -75,6 +75,14 @@ const courseSchema = new mongoose.Schema(
   }
 );
 
+// ── Indexes for performance ──────────────────────────────────────
+courseSchema.index({ isPublished: 1, category: 1 });
+courseSchema.index({ instructor: 1 });
+courseSchema.index({ title: 'text', description: 'text' });
+courseSchema.index({ 'rating.average': -1 });
+courseSchema.index({ createdAt: -1 });
+courseSchema.index({ isPublished: 1, createdAt: -1 });
+
 // Virtual populate for videos
 courseSchema.virtual('videos', {
   ref: 'Video',

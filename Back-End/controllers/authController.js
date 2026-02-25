@@ -187,7 +187,7 @@ export const resendVerification = asyncHandler(async (req, res) => {
     user.emailVerificationExpire = undefined;
     await user.save({ validateBeforeSave: false });
 
-    console.error('Email send error:', error);
+    logger.error('Email send error:', error);
     res.status(500);
     throw new Error('فشل إرسال البريد الإلكتروني. حاول مرة أخرى لاحقاً');
   }
@@ -483,7 +483,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     user.resetPasswordExpire = undefined;
     await user.save({ validateBeforeSave: false });
 
-    console.error('Email send error:', error);
+    logger.error('Email send error:', error);
     // رسالة عامة حتى في حالة الخطأ
     res.json({
       success: true,
@@ -505,9 +505,15 @@ export const resetPassword = asyncHandler(async (req, res) => {
     throw new Error('برجاء إدخال جميع البيانات المطلوبة');
   }
 
-  if (password.length < 6) {
+  if (password.length < 8) {
     res.status(400);
-    throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    throw new Error('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+  }
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
+  if (!passwordRegex.test(password)) {
+    res.status(400);
+    throw new Error('كلمة المرور يجب أن تحتوي على حرف كبير وحرف صغير ورقم ورمز خاص (@$!%*?&)');
   }
 
   // تشفير التوكن المرسل ومقارنته بالمحفوظ في الداتابيز

@@ -6,6 +6,16 @@
 const REQUIRED_ENV_VARS = [
   'MONGODB_URI',
   'JWT_SECRET',
+  'JWT_REFRESH_SECRET',
+  'EMAIL_HOST',
+  'EMAIL_PORT',
+  'EMAIL_USER',
+  'EMAIL_PASS',
+  'EMAIL_FROM',
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET',
+  'CLIENT_URL',
 ];
 
 const OPTIONAL_WITH_DEFAULTS = {
@@ -18,6 +28,7 @@ export const validateEnv = () => {
   const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
+    // Use console here because logger may not be initialized yet at startup
     console.error('❌ Missing required environment variables:');
     missing.forEach((key) => console.error(`   - ${key}`));
     console.error('\nCopy .env.example to .env and fill in the required values.');

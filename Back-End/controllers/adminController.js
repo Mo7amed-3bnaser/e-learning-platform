@@ -59,12 +59,13 @@ export const getAllStudents = asyncHandler(async (req, res) => {
   // بناء الـ filter
   const filter = { role: 'student' };
 
-  // البحث
+  // البحث (مع حماية من ReDoS)
   if (req.query.search) {
+    const escapedSearch = req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { name: { $regex: req.query.search, $options: 'i' } },
-      { email: { $regex: req.query.search, $options: 'i' } },
-      { phone: { $regex: req.query.search, $options: 'i' } }
+      { name: { $regex: escapedSearch, $options: 'i' } },
+      { email: { $regex: escapedSearch, $options: 'i' } },
+      { phone: { $regex: escapedSearch, $options: 'i' } }
     ];
   }
 
@@ -157,12 +158,14 @@ export const searchStudents = asyncHandler(async (req, res) => {
     throw new Error('برجاء إدخال كلمة البحث');
   }
 
+  const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
   const filter = {
     role: 'student',
     $or: [
-      { name: { $regex: q, $options: 'i' } },
-      { email: { $regex: q, $options: 'i' } },
-      { phone: { $regex: q, $options: 'i' } }
+      { name: { $regex: escapedQ, $options: 'i' } },
+      { email: { $regex: escapedQ, $options: 'i' } },
+      { phone: { $regex: escapedQ, $options: 'i' } }
     ]
   };
 
@@ -186,9 +189,18 @@ export const searchStudents = asyncHandler(async (req, res) => {
  * @access  Private/Admin
  */
 export const getInstructors = asyncHandler(async (req, res) => {
-  const instructors = await User.find({ role: 'instructor' })
-    .select('-password')
-    .sort('-createdAt');
+  const page = parseInt(req.query.page) || 1;
+  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+  const skip = (page - 1) * limit;
+
+  const [instructors, totalInstructors] = await Promise.all([
+    User.find({ role: 'instructor' })
+      .select('-password')
+      .sort('-createdAt')
+      .skip(skip)
+      .limit(limit),
+    User.countDocuments({ role: 'instructor' })
+  ]);
 
   // Get course count for each instructor
   const instructorsWithStats = await Promise.all(
@@ -206,7 +218,13 @@ export const getInstructors = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data: instructorsWithStats,
-    count: instructorsWithStats.length
+    count: instructorsWithStats.length,
+    pagination: {
+      page,
+      limit,
+      total: totalInstructors,
+      pages: Math.ceil(totalInstructors / limit)
+    }
   });
 });
 

@@ -13,11 +13,12 @@ export const getCourses = asyncHandler(async (req, res) => {
   // بناء الـ filter
   const filter = { isPublished: true };
   
-  // البحث بالعنوان أو الوصف
+  // البحث بالعنوان أو الوصف (مع حماية من ReDoS)
   if (req.query.search) {
+    const escapedSearch = req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { title: { $regex: req.query.search, $options: 'i' } },
-      { description: { $regex: req.query.search, $options: 'i' } }
+      { title: { $regex: escapedSearch, $options: 'i' } },
+      { description: { $regex: escapedSearch, $options: 'i' } }
     ];
   }
   
@@ -255,11 +256,12 @@ export const getAllCoursesAdmin = asyncHandler(async (req, res) => {
   // بناء الـ filter
   const filter = {};
   
-  // البحث
+  // البحث (مع حماية من ReDoS)
   if (req.query.search) {
+    const escapedSearch = req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { title: { $regex: req.query.search, $options: 'i' } },
-      { description: { $regex: req.query.search, $options: 'i' } }
+      { title: { $regex: escapedSearch, $options: 'i' } },
+      { description: { $regex: escapedSearch, $options: 'i' } }
     ];
   }
   

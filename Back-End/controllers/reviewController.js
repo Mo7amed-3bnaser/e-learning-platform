@@ -152,10 +152,19 @@ export const getCourseReviews = asyncHandler(async (req, res) => {
     throw new Error("الكورس غير موجود");
   }
 
-  // Get all reviews for this course
-  const reviews = await Review.find({ courseId })
-    .sort({ createdAt: -1 })
-    .populate("userId", "name avatar");
+  // Get reviews for this course (with pagination)
+  const page = parseInt(req.query.page) || 1;
+  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+  const skip = (page - 1) * limit;
+
+  const [reviews, totalReviews] = await Promise.all([
+    Review.find({ courseId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("userId", "name avatar"),
+    Review.countDocuments({ courseId })
+  ]);
 
   res.json({
     success: true,
@@ -163,6 +172,12 @@ export const getCourseReviews = asyncHandler(async (req, res) => {
       reviews,
       averageRating: course.rating.average,
       totalReviews: course.rating.count,
+      pagination: {
+        page,
+        limit,
+        total: totalReviews,
+        pages: Math.ceil(totalReviews / limit)
+      }
     },
   });
 });

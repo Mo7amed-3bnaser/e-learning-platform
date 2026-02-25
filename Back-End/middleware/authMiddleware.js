@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
+import logger from '../config/logger.js';
 
 /**
  * Protect Routes - التأكد من وجود Token صحيح
@@ -42,7 +43,7 @@ export const protect = asyncHandler(async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      logger.error('Auth middleware error:', error);
       res.status(401);
       throw new Error('غير مصرح لك بالدخول - التوكن غير صحيح');
     }

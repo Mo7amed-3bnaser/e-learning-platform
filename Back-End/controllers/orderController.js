@@ -93,16 +93,11 @@ export const createOrder = asyncHandler(async (req, res) => {
 
     discount = coupon.calculateDiscount(course.price);
     appliedCouponCode = coupon.code;
-
-    // تسجيل استخدام الكوبون
-    coupon.usedCount += 1;
-    coupon.usedBy.push({ user: req.user._id });
-    await coupon.save();
   }
 
   const finalPrice = Math.round((course.price - discount) * 100) / 100;
 
-  // إنشاء الطلب
+  // إنشاء الطلب أولاً قبل تسجيل استخدام الكوبون
   const order = await Order.create({
     userId: req.user._id,
     courseId,
@@ -114,6 +109,16 @@ export const createOrder = asyncHandler(async (req, res) => {
     finalPrice,
     status: "pending",
   });
+
+  // تسجيل استخدام الكوبون بعد إنشاء الأوردر بنجاح
+  if (couponCode && appliedCouponCode) {
+    const coupon = await Coupon.findOne({ code: appliedCouponCode });
+    if (coupon) {
+      coupon.usedCount += 1;
+      coupon.usedBy.push({ user: req.user._id });
+      await coupon.save();
+    }
+  }
 
   res.status(201).json({
     success: true,
@@ -291,6 +296,17 @@ export const rejectOrder = asyncHandler(async (req, res) => {
   order.rejectionReason = rejectionReason || "لم يتم تحديد سبب";
   order.approvedBy = req.user._id;
   await order.save();
+
+  // استرجاع استخدام الكوبون لو كان مستخدم
+  if (order.couponCode) {
+    await Coupon.findOneAndUpdate(
+      { code: order.couponCode },
+      {
+        $inc: { usedCount: -1 },
+        $pull: { usedBy: { user: order.userId } }
+      }
+    );
+  }
 
   // إنشاء إشعار للطالب
   await createNotification({

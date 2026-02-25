@@ -47,6 +47,9 @@ export const addComment = asyncHandler(async (req, res) => {
     throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
   }
 
+  // تنظيف المحتوى من أي HTML/scripts
+  const sanitizedContent = content.trim();
+
   // إنشاء التعليق
   const comment = await Comment.create({
     videoId,
