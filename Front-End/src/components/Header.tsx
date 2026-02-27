@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
 import { useThemeStore } from '@/store/themeStore';
 import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck, FiHeart, FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
@@ -89,9 +90,9 @@ export default function Header() {
                   aria-expanded={showUserMenu}
                   aria-haspopup="true"
                 >
-                  <div className="w-7 h-7 bg-linear-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                  <div className="relative w-7 h-7 bg-linear-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                     {user?.avatar ? (
-                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      <Image src={user.avatar} alt={user.name || ''} fill sizes="28px" className="object-cover" />
                     ) : (
                       <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
                     )}
@@ -191,9 +192,9 @@ export default function Header() {
               <>
                 {/* User info */}
                 <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-100 dark:border-slate-700 mb-2">
-                  <div className="w-10 h-10 bg-linear-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+                  <div className="relative w-10 h-10 bg-linear-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
                     {user?.avatar ? (
-                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      <Image src={user.avatar} alt={user.name || ''} fill sizes="40px" className="object-cover" />
                     ) : (
                       <span>{user?.name?.charAt(0)?.toUpperCase()}</span>
                     )}

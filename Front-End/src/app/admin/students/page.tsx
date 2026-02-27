@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { FiSearch, FiShield, FiShieldOff, FiTrash2, FiUsers } from 'react-icons/fi';
 import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -173,9 +174,9 @@ export default function AdminStudentsPage() {
                                     <tr key={student._id}>
                                         <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                <div className="admin-table-avatar">
+                                                <div className="admin-table-avatar" style={{ position: 'relative', overflow: 'hidden' }}>
                                                     {student.avatar ? (
-                                                        <img src={student.avatar} alt={student.name} />
+                                                        <Image src={student.avatar} alt={student.name} fill sizes="36px" style={{ objectFit: 'cover' }} />
                                                     ) : (
                                                         <span>{student.name.charAt(0).toUpperCase()}</span>
                                                     )}

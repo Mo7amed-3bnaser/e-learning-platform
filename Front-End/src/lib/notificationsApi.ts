@@ -1,35 +1,8 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
-// Create axios instance with default config
-const api = axios.create({
-    baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-// Read token from Zustand persist storage (auth-storage key)
-const getAuthToken = (): string | null => {
-    try {
-        const raw = localStorage.getItem('auth-storage');
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        return parsed?.state?.token ?? null;
-    } catch {
-        return null;
-    }
-};
-
-// Add token to requests - unified with the rest of the app
-api.interceptors.request.use((config) => {
-    const token = getAuthToken();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+/**
+ * Notifications API — uses the central `api` instance
+ * so all interceptors (auth, device fingerprint, token refresh, retry) apply.
+ */
+import api from './api';
 
 export interface Notification {
     _id: string;

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { captureError } from '@/lib/errorMonitoring';
 
 interface Props {
     children: ReactNode;
@@ -45,8 +46,11 @@ class ErrorBoundary extends Component<Props, State> {
             errorInfo,
         });
 
-        // TODO: Send error to logging service (e.g., Sentry)
-        // logErrorToService(error, errorInfo);
+        // Send error to monitoring service (Sentry / custom endpoint)
+        captureError(error, 'fatal', {
+            componentStack: errorInfo.componentStack || undefined,
+            source: 'ErrorBoundary',
+        });
     }
 
     handleReset = () => {

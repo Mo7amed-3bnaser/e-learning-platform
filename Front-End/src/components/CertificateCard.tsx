@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { FiAward, FiDownload, FiRefreshCw, FiPrinter } from 'react-icons/fi';
 import { certificatesAPI } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -259,7 +260,7 @@ export default function CertificateCard({ courseId, courseName, courseProgress }
               </div>
               <div style={{ width: 2, height: 32, background: '#e2e8f0' }} />
               <div style={{ textAlign: 'center' }}>
-                <img src="/images/logo.png" alt="مسار" style={{ width: 56, height: 56, objectFit: 'contain', margin: '0 auto 2px' }} />
+                <Image src="/images/logo.png" alt="مسار" width={56} height={56} unoptimized style={{ objectFit: 'contain', margin: '0 auto 2px' }} />
                 <p style={{ fontSize: 10, color: '#94a3b8' }}>مسار</p>
               </div>
               <div style={{ width: 2, height: 32, background: '#e2e8f0' }} />

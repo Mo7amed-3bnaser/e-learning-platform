@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -212,7 +213,7 @@ export default function CreateCoursePage() {
                                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-slate-900"
                                 />
                                 {formData.thumbnail && (
-                                    <img src={formData.thumbnail} alt="Preview" className="mt-4 w-full h-48 object-cover rounded-lg" />
+                                    <Image src={formData.thumbnail} alt="Preview" width={800} height={192} unoptimized className="mt-4 w-full h-48 object-cover rounded-lg" />
                                 )}
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { FiSearch, FiEye, FiCheck, FiX, FiTrash2, FiImage } from 'react-icons/fi';
 import { ordersAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -273,7 +274,7 @@ export default function AdminOrdersPage() {
                 <div className="admin-modal-overlay" onClick={() => setScreenshotUrl(null)}>
                     <div className="admin-modal admin-screenshot-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                         <h3>إثبات الدفع</h3>
-                        <img src={screenshotUrl} alt="Payment Screenshot" />
+                        <Image src={screenshotUrl} alt="Payment Screenshot" width={560} height={400} unoptimized style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
                         <div className="admin-modal-actions" style={{ marginTop: '1rem' }}>
                             <button className="admin-btn ghost" onClick={() => setScreenshotUrl(null)}>إغلاق</button>
                         </div>

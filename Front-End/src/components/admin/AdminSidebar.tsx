@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import {
@@ -89,9 +90,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             {/* User info + Logout */}
             <div className="admin-sidebar-footer">
                 <div className="admin-user-info">
-                    <div className="admin-user-avatar">
+                    <div className="admin-user-avatar" style={{ position: 'relative', overflow: 'hidden' }}>
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user.name} />
+                            <Image src={user.avatar} alt={user.name || ''} fill sizes="40px" style={{ objectFit: 'cover' }} />
                         ) : (
                             <span>{user?.name?.charAt(0).toUpperCase()}</span>
                         )}

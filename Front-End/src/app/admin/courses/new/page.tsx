@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FiUpload, FiPlus, FiX, FiArrowRight } from 'react-icons/fi';
 import { coursesAPI, uploadAPI } from '@/lib/api';
@@ -229,7 +230,7 @@ export default function NewCoursePage() {
                             onClick={() => fileInputRef.current?.click()}
                         >
                             {thumbnailPreview || form.thumbnail ? (
-                                <img src={thumbnailPreview || form.thumbnail} alt="Thumbnail" />
+                                <Image src={thumbnailPreview || form.thumbnail} alt="Thumbnail" width={800} height={400} unoptimized style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (
                                 <div className="admin-thumbnail-placeholder">
                                     <FiUpload size={32} />
