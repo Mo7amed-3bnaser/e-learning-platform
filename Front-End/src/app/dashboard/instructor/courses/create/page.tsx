@@ -159,6 +159,7 @@ export default function CreateCoursePage() {
                                     >
                                         <option value="">اختر التصنيف</option>
                                         <option value="programming">برمجة</option>
+                                        <option value="web">تطوير ويب</option>
                                         <option value="design">تصميم</option>
                                         <option value="marketing">تسويق</option>
                                         <option value="business">أعمال</option>

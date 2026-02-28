@@ -337,6 +337,7 @@ export default function InstructorEditCoursePage({
                                         <option value="programming">
                                             برمجة
                                         </option>
+                                        <option value="web">تطوير ويب</option>
                                         <option value="design">تصميم</option>
                                         <option value="marketing">
                                             تسويق
