@@ -81,7 +81,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
   };
 
   return (
-    <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-primary/30 hover:-translate-y-1 hover-lift">
+    <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-primary/30 hover:-translate-y-1 hover-lift h-full flex flex-col">
       {/* صورة الكورس */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 dark:from-primary/20 dark:to-primary-dark/20 image-zoom-container">
         {course.thumbnail ? (
@@ -101,7 +101,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
 
         {/* Category Badge */}
         <div className="absolute top-3 right-3">
-          <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary badge-pulse">
+          <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary dark:text-orange-400 badge-pulse">
             {course.category || 'عام'}
           </span>
         </div>
@@ -152,7 +152,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
       </div>
 
       {/* معلومات الكورس */}
-      <div className="p-5">
+      <div className="p-5 flex flex-col flex-1">
         {/* عنوان الكورس */}
         <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 line-clamp-2 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
           {course.title}
@@ -181,7 +181,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
                 alt={course.instructor.name}
                 width={32}
                 height={32}
-                className="rounded-full object-cover"
+                className="rounded object-cover"
                 loading="lazy"
               />
             ) : (
@@ -199,7 +199,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
         )}
 
         {/* إحصائيات */}
-        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto">
           {course.studentsCount !== undefined && (
             <div className="flex items-center gap-1">
               <FiUsers className="w-4 h-4" />
