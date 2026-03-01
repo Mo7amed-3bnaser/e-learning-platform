@@ -3,6 +3,7 @@ import DeviceLog from '../models/DeviceLog.js';
 import { UAParser } from 'ua-parser-js';
 import crypto from 'crypto';
 import logger from '../config/logger.js';
+import { hashToken } from '../utils/authHelpers.js';
 
 // ===================== الإعدادات =====================
 export const DEVICE_CONFIG = {
@@ -135,7 +136,7 @@ export const enforceDeviceProtection = async (userId, token, req) => {
 
   const newSession = await ActiveSession.create({
     userId,
-    token,
+    token: hashToken(token),
     deviceFingerprint,
     deviceInfo,
   });
@@ -160,7 +161,7 @@ export const enforceDeviceProtection = async (userId, token, req) => {
  */
 export const validateActiveSession = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = req.cookies?.access_token || req.headers.authorization?.replace('Bearer ', '');
 
     if (!token || !req.user) {
       return next();
@@ -171,8 +172,9 @@ export const validateActiveSession = async (req, res, next) => {
       return next();
     }
 
+    const tokenHashed = hashToken(token);
     const session = await ActiveSession.findOne({
-      token,
+      token: tokenHashed,
       userId: req.user._id,
       isActive: true,
     });
@@ -209,7 +211,7 @@ export const validateActiveSession = async (req, res, next) => {
  */
 export const deactivateSession = async (token, userId) => {
   await ActiveSession.findOneAndUpdate(
-    { token, userId },
+    { token: hashToken(token), userId },
     { isActive: false }
   );
 };

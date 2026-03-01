@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
+import { authAPI } from '@/lib/api';
 import { useThemeStore } from '@/store/themeStore';
 import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck, FiHeart, FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import Logo from './Logo';
@@ -36,7 +37,12 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout(); // clear HttpOnly cookies on server
+    } catch {
+      // proceed with local cleanup even if API call fails
+    }
     logout();
     setShowUserMenu(false);
     setShowMobileMenu(false);

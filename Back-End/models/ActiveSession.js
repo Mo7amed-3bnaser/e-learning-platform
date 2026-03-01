@@ -7,6 +7,7 @@ const activeSessionSchema = new mongoose.Schema({
     required: true,
     index: true,
   },
+  // Stored as SHA-256 hash — never store raw JWT tokens at rest
   token: {
     type: String,
     required: true,

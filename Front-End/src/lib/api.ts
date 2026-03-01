@@ -86,7 +86,7 @@ api.interceptors.response.use(
         errorMessage.includes('مصرح') ||
         errorMessage.includes('unauthorized');
 
-      if (isTokenExpired && useAuthStore.getState().token) {
+      if (isTokenExpired && useAuthStore.getState().isAuthenticated) {
         try {
           // Try to refresh the access token silently
           config._isRefreshRetry = true;
@@ -95,6 +95,7 @@ api.interceptors.response.use(
 
           if (newToken) {
             useAuthStore.getState().setToken(newToken);
+            // Cookie is set by the server; also set header as fallback
             config.headers.Authorization = `Bearer ${newToken}`;
             return api(config); // retry original request
           }
@@ -149,6 +150,9 @@ export const authAPI = {
 
   resendVerification: (email: string) =>
     api.post('/auth/resend-verification', { email }),
+
+  logout: () =>
+    api.post('/auth/logout'),
 };
 
 // ============================================

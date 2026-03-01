@@ -110,13 +110,28 @@ export const createOrder = asyncHandler(async (req, res) => {
     status: "pending",
   });
 
-  // تسجيل استخدام الكوبون بعد إنشاء الأوردر بنجاح
+  // تسجيل استخدام الكوبون بعد إنشاء الأوردر بنجاح (atomic update لمنع race condition)
   if (couponCode && appliedCouponCode) {
-    const coupon = await Coupon.findOne({ code: appliedCouponCode });
-    if (coupon) {
-      coupon.usedCount += 1;
-      coupon.usedBy.push({ user: req.user._id });
-      await coupon.save();
+    const updatedCoupon = await Coupon.findOneAndUpdate(
+      {
+        code: appliedCouponCode,
+        $or: [
+          { usageLimit: null },
+          { $expr: { $lt: ['$usedCount', '$usageLimit'] } }
+        ]
+      },
+      {
+        $inc: { usedCount: 1 },
+        $push: { usedBy: { user: req.user._id } }
+      },
+      { new: true }
+    );
+
+    if (!updatedCoupon) {
+      // الكوبون وصل للحد الأقصى بين التحقق والاستخدام — حذف الطلب
+      await order.deleteOne();
+      res.status(400);
+      throw new Error('تم استنفاد عدد الاستخدامات المتاحة للكوبون');
     }
   }
 
@@ -354,6 +369,30 @@ export const deleteOrder = asyncHandler(async (req, res) => {
   if (!order) {
     res.status(404);
     throw new Error("الطلب غير موجود");
+  }
+
+  // لو الطلب كان معتمد، لازم نعكس التسجيل
+  if (order.status === 'approved') {
+    // إزالة الطالب من الكورس
+    await User.findByIdAndUpdate(order.userId, {
+      $pull: { enrolledCourses: { course: order.courseId } }
+    });
+
+    // تنقيص عدد الطلاب المسجلين
+    await Course.findByIdAndUpdate(order.courseId, {
+      $inc: { enrolledStudents: -1 }
+    });
+  }
+
+  // استرجاع استخدام الكوبون لو كان مستخدم
+  if (order.couponCode) {
+    await Coupon.findOneAndUpdate(
+      { code: order.couponCode },
+      {
+        $inc: { usedCount: -1 },
+        $pull: { usedBy: { user: order.userId } }
+      }
+    );
   }
 
   await order.deleteOne();

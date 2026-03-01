@@ -21,18 +21,41 @@ const INSTRUCTOR_ROUTES = ['/dashboard/instructor'];
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password'];
 
 /**
- * Reads the persisted Zustand auth-storage cookie/token.
- * The auth store persists to localStorage, but we also look for
- * the token in cookies set by the app (auth-token).
+ * Decode the JWT payload WITHOUT verification.
+ * This runs in Edge middleware for routing decisions only.
+ * Actual authorization is enforced by the backend’s protect middleware.
+ */
+function decodeJwtPayload(token: string): { role?: string; id?: string } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    // JWT uses base64url encoding — convert to standard base64 for atob
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64));
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Read auth info from the HttpOnly access_token cookie (set by server).
+ * The role is extracted by decoding the JWT payload.
+ * This replaces the old spoofable auth-role cookie.
  */
 function getAuthFromRequest(request: NextRequest) {
-  // Read from cookie set by the app
-  const tokenCookie = request.cookies.get('auth-token');
-  const roleCookie = request.cookies.get('auth-role');
+  const tokenCookie = request.cookies.get('access_token');
+  const token = tokenCookie?.value || null;
+
+  let role: string | null = null;
+  if (token) {
+    const payload = decodeJwtPayload(token);
+    role = payload?.role || null;
+  }
 
   return {
-    token: tokenCookie?.value || null,
-    role: roleCookie?.value || null,
+    token,
+    role,
   };
 }
 

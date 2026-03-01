@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import crypto from 'crypto';
 import User from '../models/User.js';
-import { generateToken, generateRefreshToken, hashRefreshToken, formatUserResponse } from '../utils/authHelpers.js';
+import { generateToken, generateRefreshToken, hashRefreshToken, formatUserResponse, ACCESS_TOKEN_COOKIE_OPTIONS } from '../utils/authHelpers.js';
 import { deleteImage } from '../config/cloudinary.js';
 import sendEmail, { getResetPasswordTemplate, getEmailVerificationTemplate } from '../utils/sendEmail.js';
 import logger from '../config/logger.js';
@@ -277,6 +277,9 @@ export const login = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
+  // Send access token as HttpOnly cookie (1 hour)
+  res.cookie('access_token', token, ACCESS_TOKEN_COOKIE_OPTIONS);
+
   res.json({
     success: true,
     message: 'تم تسجيل الدخول بنجاح',
@@ -362,6 +365,9 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save();
     const token = generateToken(updatedUser);
+
+    // Update access token cookie
+    res.cookie('access_token', token, ACCESS_TOKEN_COOKIE_OPTIONS);
 
     res.json({
       success: true,
@@ -602,6 +608,9 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   // Issue new access token
   const newAccessToken = generateToken(user);
 
+  // Set new access token as HttpOnly cookie
+  res.cookie('access_token', newAccessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+
   res.json({
     success: true,
     message: 'تم تجديد التوكن بنجاح',
@@ -616,7 +625,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
  */
 export const logout = asyncHandler(async (req, res) => {
   // قفل الـ Active Session
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token = req.cookies?.access_token || req.headers.authorization?.replace('Bearer ', '');
   if (token) {
     await deactivateSession(token, req.user._id);
   }
@@ -624,11 +633,17 @@ export const logout = asyncHandler(async (req, res) => {
   // Clear refresh token from DB
   await User.findByIdAndUpdate(req.user._id, { $unset: { refreshToken: 1 } });
 
-  // Clear the cookie
+  // Clear all auth cookies
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
+  });
+  res.clearCookie('access_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
   });
 
   res.json({ success: true, message: 'تم تسجيل الخروج بنجاح' });

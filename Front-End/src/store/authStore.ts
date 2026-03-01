@@ -1,19 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-// ── Cookie helpers for middleware auth ──
-function setAuthCookies(token: string, role: string) {
-  if (typeof document === 'undefined') return;
-  const maxAge = 60 * 60 * 24 * 30; // 30 days
-  document.cookie = `auth-token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
-  document.cookie = `auth-role=${role}; path=/; max-age=${maxAge}; SameSite=Lax`;
-}
-
-function clearAuthCookies() {
-  if (typeof document === 'undefined') return;
-  document.cookie = 'auth-token=; path=/; max-age=0';
-  document.cookie = 'auth-role=; path=/; max-age=0';
-}
+// No more client-side auth cookies — the server sets HttpOnly cookies.
+// This eliminates XSS token theft and prevents auth-role cookie spoofing.
 
 interface User {
   id: string;
@@ -26,7 +15,7 @@ interface User {
 
 interface AuthState {
   user: User | null;
-  token: string | null;
+  token: string | null;  // in-memory only — NOT persisted to localStorage
   isAuthenticated: boolean;
   _hasHydrated: boolean;
   
@@ -40,7 +29,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -48,11 +37,10 @@ export const useAuthStore = create<AuthState>()(
 
       login: (token: string, user: User) => {
         set({
-          token,
+          token,  // kept in memory for Authorization header fallback
           user,
           isAuthenticated: true,
         });
-        setAuthCookies(token, user.role);
       },
 
       logout: () => {
@@ -61,7 +49,6 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           isAuthenticated: false,
         });
-        clearAuthCookies();
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth-storage');
           localStorage.removeItem('remembered-login');
@@ -70,19 +57,10 @@ export const useAuthStore = create<AuthState>()(
 
       updateUser: (user: User) => {
         set({ user });
-        // Sync role cookie when user is updated
-        const currentToken = get().token;
-        if (currentToken) {
-          setAuthCookies(currentToken, user.role);
-        }
       },
 
       setToken: (token: string) => {
         set({ token, isAuthenticated: true });
-        const currentUser = get().user;
-        if (currentUser) {
-          setAuthCookies(token, currentUser.role);
-        }
       },
 
       setHasHydrated: (state: boolean) => {
@@ -93,20 +71,18 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        token: state.token,
+        // Only persist user data — token is NOT persisted (lives in memory only).
+        // The HttpOnly access_token cookie handles auth across page reloads.
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
       // عند انتهاء تحميل البيانات من localStorage
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // التأكد من أن isAuthenticated متزامن مع وجود token و user
-          if (state.token && state.user) {
+          if (state.user) {
             state.isAuthenticated = true;
-            // Sync cookies on rehydration so middleware has fresh data
-            setAuthCookies(state.token, state.user.role);
           } else {
-            clearAuthCookies();
+            state.isAuthenticated = false;
           }
           state._hasHydrated = true;
         }

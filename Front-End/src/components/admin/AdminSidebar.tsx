@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import { authAPI } from '@/lib/api';
 import {
     FiHome,
     FiBook,
@@ -39,7 +40,12 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         return pathname.startsWith(href);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch {
+            // proceed with local cleanup even if API call fails
+        }
         logout();
         window.location.href = '/login';
     };

@@ -29,6 +29,26 @@ export const hashRefreshToken = (token) => {
 };
 
 /**
+ * Hash any token (access/session) with SHA-256 before storing in DB.
+ * Used to protect tokens at rest — if the DB is breached, raw tokens are not exposed.
+ */
+export const hashToken = (token) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
+};
+
+/**
+ * Cookie options for the HttpOnly access-token cookie.
+ * maxAge matches the JWT expiry (1 hour).
+ */
+export const ACCESS_TOKEN_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  maxAge: 60 * 60 * 1000, // 1 hour
+  path: '/',
+};
+
+/**
  * Format response data for user
  */
 export const formatUserResponse = (user, token) => {
