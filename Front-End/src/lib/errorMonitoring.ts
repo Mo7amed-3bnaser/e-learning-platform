@@ -38,6 +38,7 @@ async function getSentry() {
   if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return null;
 
   try {
+    // @ts-ignore - Sentry is an optional dependency
     const Sentry = await import('@sentry/nextjs');
     Sentry.init({
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
