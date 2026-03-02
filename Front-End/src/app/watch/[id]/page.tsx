@@ -66,7 +66,7 @@ export default function WatchCoursePage() {
       return;
     }
 
-    if (courseId) {
+    if (courseId && isAuthenticated) {
       checkEnrollmentAndFetch();
     }
   }, [courseId, isAuthenticated]);

@@ -90,15 +90,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ── Protected routes: require authentication ──
-  if (PROTECTED_ROUTES.some((route) => pathname.startsWith(route))) {
-    if (!isAuthenticated) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-    return NextResponse.next();
-  }
+  // ── Protected routes ──
+  // Auth check is handled CLIENT-SIDE by the <ProtectedRoute> wrapper.
+  // The middleware no longer redirects here because the HttpOnly cookie
+  // lives on the API domain and is invisible to Edge middleware.
+  // This prevents false redirects to /login for authenticated users.
 
   // ── Auth routes: redirect to dashboard if already logged in ──
   if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {

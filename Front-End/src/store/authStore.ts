@@ -8,13 +8,16 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 // for routing decisions only — actual authorisation is enforced by the backend.
 function setClientAuthCookie(token: string) {
   if (typeof document === 'undefined') return;
-  // maxAge = 1 hour (matches JWT expiry)
-  document.cookie = `access_token=${token}; path=/; max-age=3600; SameSite=Lax`;
+  const isSecure = window.location.protocol === 'https:';
+  const secure = isSecure ? '; Secure' : '';
+  document.cookie = `access_token=${token}; path=/; max-age=3600; SameSite=Lax${secure}`;
 }
 
 function clearClientAuthCookie() {
   if (typeof document === 'undefined') return;
-  document.cookie = 'access_token=; path=/; max-age=0; SameSite=Lax';
+  const isSecure = window.location.protocol === 'https:';
+  const secure = isSecure ? '; Secure' : '';
+  document.cookie = `access_token=; path=/; max-age=0; SameSite=Lax${secure}`;
 }
 
 interface User {
