@@ -48,7 +48,7 @@ const allowedOrigins = [
   "http://localhost:3001",
   process.env.CLIENT_URL,
   process.env.CLIENT_URL_PROD,
-].filter(Boolean);
+].filter(Boolean).map(url => url.replace(/\/+$/, ''));  // strip trailing slashes
 
 // Security & Middleware
 app.use(helmet());
