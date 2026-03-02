@@ -15,9 +15,12 @@ export default function ProtectedRoute({
   requireAdmin = false,
 }: ProtectedRouteProps) {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, _hasHydrated } = useAuthStore();
 
   useEffect(() => {
+    // انتظر اكتمال تحميل البيانات من localStorage قبل التحقق
+    if (!_hasHydrated) return;
+
     // التحقق من تسجيل الدخول
     if (!isAuthenticated) {
       router.push('/login');
@@ -29,10 +32,10 @@ export default function ProtectedRoute({
       router.push('/');
       return;
     }
-  }, [isAuthenticated, user, requireAdmin, router]);
+  }, [_hasHydrated, isAuthenticated, user, requireAdmin, router]);
 
-  // عرض loading أثناء التحقق
-  if (!isAuthenticated) {
+  // عرض loading أثناء التحقق أو التحميل
+  if (!_hasHydrated || !isAuthenticated) {
     return <PageLoader message="جاري التحقق من الصلاحيات..." />;
   }
 

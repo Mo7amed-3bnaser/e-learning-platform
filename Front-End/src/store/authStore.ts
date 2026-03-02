@@ -1,8 +1,21 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-// No more client-side auth cookies — the server sets HttpOnly cookies.
-// This eliminates XSS token theft and prevents auth-role cookie spoofing.
+// ─── Client-side cookie helpers for Next.js middleware ───
+// The backend sets an HttpOnly access_token cookie on its own domain.
+// Next.js middleware runs on the *frontend* domain so it can't see that cookie.
+// We mirror the token into a non-HttpOnly cookie that the middleware can read
+// for routing decisions only — actual authorisation is enforced by the backend.
+function setClientAuthCookie(token: string) {
+  if (typeof document === 'undefined') return;
+  // maxAge = 1 hour (matches JWT expiry)
+  document.cookie = `access_token=${token}; path=/; max-age=3600; SameSite=Lax`;
+}
+
+function clearClientAuthCookie() {
+  if (typeof document === 'undefined') return;
+  document.cookie = 'access_token=; path=/; max-age=0; SameSite=Lax';
+}
 
 interface User {
   id: string;
@@ -36,6 +49,7 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
 
       login: (token: string, user: User) => {
+        setClientAuthCookie(token);
         set({
           token,  // kept in memory for Authorization header fallback
           user,
@@ -44,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        clearClientAuthCookie();
         set({
           user: null,
           token: null,
@@ -60,6 +75,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setToken: (token: string) => {
+        setClientAuthCookie(token);
         set({ token, isAuthenticated: true });
       },
 
