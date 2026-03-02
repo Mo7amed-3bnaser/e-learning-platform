@@ -69,7 +69,10 @@ const corsOptions = {
 };
 
 // Security & Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginOpenerPolicy: { policy: 'unsafe-none' },
+}));
 
 // Handle preflight OPTIONS requests explicitly
 app.options('*', cors(corsOptions));
