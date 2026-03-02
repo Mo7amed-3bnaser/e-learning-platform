@@ -74,7 +74,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https://res.cloudinary.com https://img.youtube.com https://i.ytimg.com https://*.googleusercontent.com",
               "media-src 'self' https://www.youtube.com https://youtube.com",
               "frame-src 'self' https://www.youtube.com https://youtube.com",
-              "connect-src 'self' " + (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000') + " https://res.cloudinary.com",
+              "connect-src 'self' " + (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/api\/?$/, '') + " https://res.cloudinary.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
