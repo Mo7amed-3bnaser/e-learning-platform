@@ -70,8 +70,10 @@ const corsOptions = {
 
 // Security & Middleware
 app.use(helmet({
+  contentSecurityPolicy: false,              // API doesn't serve HTML — CSP not needed
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   crossOriginOpenerPolicy: { policy: 'unsafe-none' },
+  crossOriginEmbedderPolicy: false,
 }));
 
 // Handle preflight OPTIONS requests explicitly
