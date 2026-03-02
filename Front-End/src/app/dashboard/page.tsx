@@ -72,8 +72,8 @@ export default function DashboardPage() {
       }));
 
       // إزالة الكورسات المكررة بناءً على _id
-      const uniqueCourses = enrolledCoursesData.filter((course, index, self) =>
-        index === self.findIndex((c) => c._id === course._id)
+      const uniqueCourses = enrolledCoursesData.filter((course: EnrolledCourse, index: number, self: EnrolledCourse[]) =>
+        index === self.findIndex((c: EnrolledCourse) => c._id === course._id)
       );
 
       setEnrolledCourses(uniqueCourses);
