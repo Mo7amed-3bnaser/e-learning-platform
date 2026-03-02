@@ -20,12 +20,13 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
-  const { user, updateUser } = useAuthStore();
+  const { user, updateUser, setToken } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
+    currentPassword: '',
     password: '',
     confirmPassword: '',
   });
@@ -39,6 +40,11 @@ function ProfileContent() {
       return;
     }
 
+    if (formData.password && !formData.currentPassword) {
+      showError('برجاء إدخال كلمة المرور الحالية');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -48,9 +54,10 @@ function ProfileContent() {
         phone: formData.phone,
       };
 
-      // إضافة كلمة المرور فقط لو المستخدم كتبها
+      // إضافة كلمة المرور لو المستخدم كتبها (مع كلمة المرور الحالية)
       if (formData.password) {
-        updateData.password = formData.password;
+        updateData.newPassword = formData.password;
+        updateData.currentPassword = formData.currentPassword;
       }
 
       const response = await authAPI.updateProfile(updateData);
@@ -66,11 +73,17 @@ function ProfileContent() {
         });
       }
 
+      // لو الباسورد اتغير، حدّث التوكن في الـ Store والـ cookie
+      if (updatedUser.token && formData.password) {
+        setToken(updatedUser.token);
+      }
+
       showSuccess('تم تحديث البيانات بنجاح! ✨');
 
       // مسح حقول كلمة المرور
       setFormData(prev => ({
         ...prev,
+        currentPassword: '',
         password: '',
         confirmPassword: '',
       }));
@@ -197,6 +210,27 @@ function ProfileContent() {
             {/* Divider */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">تغيير كلمة المرور (اختياري)</h3>
+            </div>
+
+            {/* Current Password Field */}
+            <div>
+              <label htmlFor="currentPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                كلمة المرور الحالية
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <FiLock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
+                </div>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleChange}
+                  className="block w-full pr-10 pl-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="ادخل كلمة المرور الحالية"
+                />
+              </div>
             </div>
 
             {/* Password Field */}

@@ -1,11 +1,12 @@
 import asyncHandler from 'express-async-handler';
 import crypto from 'crypto';
 import User from '../models/User.js';
-import { generateToken, generateRefreshToken, hashRefreshToken, formatUserResponse, ACCESS_TOKEN_COOKIE_OPTIONS } from '../utils/authHelpers.js';
+import { generateToken, generateRefreshToken, hashRefreshToken, hashToken, formatUserResponse, ACCESS_TOKEN_COOKIE_OPTIONS } from '../utils/authHelpers.js';
 import { deleteImage } from '../config/cloudinary.js';
 import sendEmail, { getResetPasswordTemplate, getEmailVerificationTemplate } from '../utils/sendEmail.js';
 import logger from '../config/logger.js';
 import { enforceDeviceProtection, deactivateSession } from '../middleware/deviceProtection.js';
+import ActiveSession from '../models/ActiveSession.js';
 
 /**
  * @desc    تسجيل مستخدم جديد (مع إرسال إيميل تأكيد)
@@ -319,65 +320,82 @@ export const getMe = asyncHandler(async (req, res) => {
 export const updateProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select('+password');
 
-  if (user) {
-    user.name = req.body.name || user.name;
-    user.avatar = req.body.avatar || user.avatar;
-
-    // إذا أراد تغيير البريد أو الهاتف، تحقق من عدم وجودهم
-    if (req.body.email && req.body.email !== user.email) {
-      const emailExists = await User.findOne({ email: req.body.email });
-      if (emailExists) {
-        res.status(400);
-        throw new Error('البريد الإلكتروني مستخدم من قبل');
-      }
-      user.email = req.body.email;
-      // New email must be verified again
-      user.isEmailVerified = false;
-    }
-
-    if (req.body.phone && req.body.phone !== user.phone) {
-      const phoneExists = await User.findOne({ phone: req.body.phone });
-      if (phoneExists) {
-        res.status(400);
-        throw new Error('رقم الهاتف مستخدم من قبل');
-      }
-      user.phone = req.body.phone;
-    }
-
-    // تغيير كلمة المرور (إذا أراد) - مع التحقق من كلمة المرور الحالية
-    if (req.body.newPassword) {
-      // التحقق من وجود كلمة المرور الحالية
-      if (!req.body.currentPassword) {
-        res.status(400);
-        throw new Error('برجاء إدخال كلمة المرور الحالية لتغيير كلمة المرور');
-      }
-
-      // التحقق من صحة كلمة المرور الحالية
-      const isPasswordMatch = await user.matchPassword(req.body.currentPassword);
-      if (!isPasswordMatch) {
-        res.status(401);
-        throw new Error('كلمة المرور الحالية غير صحيحة');
-      }
-
-      // تعيين كلمة المرور الجديدة
-      user.password = req.body.newPassword;
-    }
-
-    const updatedUser = await user.save();
-    const token = generateToken(updatedUser);
-
-    // Update access token cookie
-    res.cookie('access_token', token, ACCESS_TOKEN_COOKIE_OPTIONS);
-
-    res.json({
-      success: true,
-      message: 'تم تحديث البيانات بنجاح',
-      data: formatUserResponse(updatedUser, token)
-    });
-  } else {
+  if (!user) {
     res.status(404);
     throw new Error('المستخدم غير موجود');
   }
+
+  user.name = req.body.name || user.name;
+  user.avatar = req.body.avatar || user.avatar;
+
+  // إذا أراد تغيير البريد أو الهاتف، تحقق من عدم وجودهم
+  if (req.body.email && req.body.email !== user.email) {
+    const emailExists = await User.findOne({ email: req.body.email });
+    if (emailExists) {
+      res.status(400);
+      throw new Error('البريد الإلكتروني مستخدم من قبل');
+    }
+    user.email = req.body.email;
+    // New email must be verified again
+    user.isEmailVerified = false;
+  }
+
+  if (req.body.phone && req.body.phone !== user.phone) {
+    const phoneExists = await User.findOne({ phone: req.body.phone });
+    if (phoneExists) {
+      res.status(400);
+      throw new Error('رقم الهاتف مستخدم من قبل');
+    }
+    user.phone = req.body.phone;
+  }
+
+  // تغيير كلمة المرور (إذا أراد)
+  // يقبل newPassword أو password من الفرونت إند
+  const newPwd = req.body.newPassword || req.body.password;
+  let passwordChanged = false;
+  if (newPwd) {
+    // التحقق من وجود كلمة المرور الحالية
+    if (!req.body.currentPassword) {
+      res.status(400);
+      throw new Error('برجاء إدخال كلمة المرور الحالية لتغيير كلمة المرور');
+    }
+
+    // التحقق من صحة كلمة المرور الحالية
+    const isPasswordMatch = await user.matchPassword(req.body.currentPassword);
+    if (!isPasswordMatch) {
+      res.status(401);
+      throw new Error('كلمة المرور الحالية غير صحيحة');
+    }
+
+    // تعيين كلمة المرور الجديدة
+    user.password = newPwd;
+    passwordChanged = true;
+  }
+
+  const updatedUser = await user.save({ validateModifiedOnly: true });
+
+  // أنشئ token جديد فقط لو الباسورد اتغير (عشان الـ ActiveSession تفضل صالحة)
+  const oldToken = req.cookies?.access_token || req.headers.authorization?.replace('Bearer ', '');
+  let token = oldToken;
+
+  if (passwordChanged) {
+    token = generateToken(updatedUser);
+    res.cookie('access_token', token, ACCESS_TOKEN_COOKIE_OPTIONS);
+
+    // حدّث الـ ActiveSession بالتوكن الجديد عشان الـ session ما تتقطعش
+    if (oldToken) {
+      await ActiveSession.findOneAndUpdate(
+        { token: hashToken(oldToken), userId: user._id, isActive: true },
+        { token: hashToken(token) }
+      );
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'تم تحديث البيانات بنجاح',
+    data: formatUserResponse(updatedUser, token)
+  });
 });
 
 /**
@@ -585,14 +603,14 @@ export const getUserById = asyncHandler(async (req, res) => {
  * @access  Public (cookie required)
  */
 export const refreshAccessToken = asyncHandler(async (req, res) => {
-  const token = req.cookies?.refreshToken;
+  const refreshTokenValue = req.cookies?.refreshToken;
 
-  if (!token) {
+  if (!refreshTokenValue) {
     res.status(401);
     throw new Error('لا يوجد Refresh Token');
   }
 
-  const hashed = hashRefreshToken(token);
+  const hashed = hashRefreshToken(refreshTokenValue);
   const user = await User.findOne({ refreshToken: hashed }).select('+refreshToken');
 
   if (!user) {
@@ -605,11 +623,22 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new Error('تم حظر حسابك');
   }
 
+  // الـ access_token القديم (قبل التجديد)
+  const oldAccessToken = req.cookies?.access_token || req.headers.authorization?.replace('Bearer ', '');
+
   // Issue new access token
   const newAccessToken = generateToken(user);
 
   // Set new access token as HttpOnly cookie
   res.cookie('access_token', newAccessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+
+  // حدّث الـ ActiveSession بالتوكن الجديد عشان الـ session تفضل صالحة
+  if (oldAccessToken) {
+    await ActiveSession.findOneAndUpdate(
+      { token: hashToken(oldAccessToken), userId: user._id, isActive: true },
+      { token: hashToken(newAccessToken) }
+    );
+  }
 
   res.json({
     success: true,

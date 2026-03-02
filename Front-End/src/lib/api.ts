@@ -128,7 +128,7 @@ export const authAPI = {
 
   getProfile: () => api.get('/auth/me'),
 
-  updateProfile: (data: { name?: string; email?: string; phone?: string; avatar?: string }) =>
+  updateProfile: (data: { name?: string; email?: string; phone?: string; avatar?: string; newPassword?: string; currentPassword?: string }) =>
     api.put('/auth/profile', data),
 
   updateAvatar: (file: File) => {
