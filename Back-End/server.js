@@ -50,21 +50,30 @@ const allowedOrigins = [
   process.env.CLIENT_URL_PROD,
 ].filter(Boolean).map(url => url.replace(/\/+$/, ''));  // strip trailing slashes
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    // Normalize origin (lowercase, no trailing slash)
+    const normalizedOrigin = origin.toLowerCase().replace(/\/+$/, '');
+    const isAllowed = allowedOrigins.some(
+      (allowed) => allowed.toLowerCase() === normalizedOrigin
+    );
+    if (isAllowed) return callback(null, true);
+    logger.warn(`CORS blocked origin: ${origin} | Allowed: ${allowedOrigins.join(', ')}`);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Device-Fingerprint'],
+};
+
 // Security & Middleware
 app.use(helmet());
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, Postman)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      callback(new Error(`CORS: origin ${origin} not allowed`));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Device-Fingerprint'],
-  }),
-);
+
+// Handle preflight OPTIONS requests explicitly
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cookieParser());
