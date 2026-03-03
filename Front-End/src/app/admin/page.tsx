@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FiUsers, FiBook, FiDollarSign, FiClock, FiEye } from 'react-icons/fi';
-import { adminAPI, ordersAPI } from '@/lib/api';
+import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 interface Stats {
@@ -34,13 +34,11 @@ export default function AdminDashboard() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [statsRes, ordersRes] = await Promise.all([
-                adminAPI.getDashboardStats(),
-                ordersAPI.getAllOrders(),
-            ]);
+            const statsRes = await adminAPI.getDashboardStats();
+            const dashboardData = statsRes.data.data;
 
-            setStats(statsRes.data.data);
-            setRecentOrders((ordersRes.data.data || []).slice(0, 10));
+            setStats(dashboardData.stats);
+            setRecentOrders(dashboardData.recentOrders || []);
         } catch (error: unknown) {
             console.error('Error fetching dashboard data:', error);
             toast.error('حدث خطأ في تحميل البيانات');
