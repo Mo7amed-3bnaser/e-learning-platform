@@ -76,17 +76,23 @@ export const sandboxPayment = asyncHandler(async (req, res) => {
     approvedAt: new Date(),
   });
 
-  // إضافة الكورس للمستخدم
-  user.enrolledCourses.push({
-    course: courseId,
-    enrolledAt: new Date(),
-    videoProgress: [],
-  });
-  await user.save();
+  // إضافة الكورس للمستخدم (atomic update to avoid full validation on legacy data)
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $push: {
+        enrolledCourses: {
+          course: courseId,
+          enrolledAt: new Date(),
+          videoProgress: [],
+        },
+      },
+    },
+    { runValidators: false }
+  );
 
   // تحديث عدد الطلاب
-  course.enrolledStudents += 1;
-  await course.save();
+  await Course.findByIdAndUpdate(courseId, { $inc: { enrolledStudents: 1 } });
 
   res.status(201).json({
     success: true,

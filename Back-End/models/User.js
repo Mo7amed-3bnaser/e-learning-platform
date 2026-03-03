@@ -186,6 +186,30 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// Auto-migrate legacy enrolledCourses entries (plain ObjectId → { course: ObjectId })
+// This prevents validation errors when saving users with old-format enrollment data
+userSchema.pre("validate", function (next) {
+  if (this.enrolledCourses && this.enrolledCourses.length > 0) {
+    let migrated = false;
+    this.enrolledCourses = this.enrolledCourses.map((entry) => {
+      // If entry is a plain ObjectId (old format), convert to new format
+      if (!entry.course && entry._id === undefined && entry.enrolledAt === undefined) {
+        migrated = true;
+        return {
+          course: entry,
+          enrolledAt: new Date(),
+          videoProgress: [],
+        };
+      }
+      return entry;
+    });
+    if (migrated) {
+      this.markModified('enrolledCourses');
+    }
+  }
+  next();
+});
+
 // Compare password method
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
