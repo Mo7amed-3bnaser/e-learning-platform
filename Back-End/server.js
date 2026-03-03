@@ -42,6 +42,10 @@ import sessionRoutes from "./routes/sessionRoutes.js";
 // Initialize Express
 const app = express();
 
+// Trust first proxy (required for production behind reverse proxies like Render, Railway, etc.)
+// This ensures req.ip returns the real client IP and secure cookies work correctly
+app.set('trust proxy', 1);
+
 // 5.8 — CORS: build allowed origins dynamically from env
 const allowedOrigins = [
   "http://localhost:3000",

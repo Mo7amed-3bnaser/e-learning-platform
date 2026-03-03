@@ -11,12 +11,7 @@ import Coupon from "../models/Coupon.js";
  * @note    هذا الـ endpoint للتجربة فقط - يقبل الدفع تلقائياً بدون تحقق حقيقي
  */
 export const sandboxPayment = asyncHandler(async (req, res) => {
-  // Sandbox only allowed in development/test environments
-  if (process.env.NODE_ENV === 'production') {
-    res.status(403);
-    throw new Error('Sandbox payment is disabled in production');
-  }
-
+  // Sandbox allowed in all environments (demo/test project)
   const { courseId, paymentMethod = "sandbox", couponCode } = req.body;
 
   // التحقق من وجود الكورس
