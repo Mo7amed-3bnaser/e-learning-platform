@@ -96,10 +96,16 @@ export function middleware(request: NextRequest) {
   // lives on the API domain and is invisible to Edge middleware.
   // This prevents false redirects to /login for authenticated users.
 
-  // ── Auth routes: redirect to dashboard if already logged in ──
+  // ── Auth routes: redirect to role-specific page if already logged in ──
   if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      if (role === 'admin') {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      } else if (role === 'instructor') {
+        return NextResponse.redirect(new URL('/dashboard/instructor', request.url));
+      } else {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
     }
     return NextResponse.next();
   }

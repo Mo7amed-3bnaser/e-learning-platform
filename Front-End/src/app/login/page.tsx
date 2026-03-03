@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiHome } from "react-icons/fi";
 import Logo from "@/components/Logo";
 import LoadingButton from "@/components/LoadingButton";
@@ -12,6 +12,7 @@ import { showSuccess, showError, handleApiError } from "@/lib/toast";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,10 +79,15 @@ export default function LoginPage() {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // التوجيه حسب نوع المستخدم
-      if (data.role === 'admin') {
+      const redirectUrl = searchParams.get('redirect');
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else if (data.role === 'admin') {
         window.location.href = '/admin';
+      } else if (data.role === 'instructor') {
+        window.location.href = '/dashboard/instructor';
       } else {
-        window.location.href = '/';
+        window.location.href = '/dashboard';
       }
     } catch (error: unknown) {
       // التحقق من أن الإيميل غير مؤكد
