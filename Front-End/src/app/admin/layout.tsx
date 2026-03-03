@@ -12,31 +12,29 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
-    const { user, isAuthenticated, token } = useAuthStore();
+    const { user, isAuthenticated, _hasHydrated } = useAuthStore();
     const [isLoading, setIsLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
-        // Wait for hydration
-        const timeout = setTimeout(() => {
-            const currentUser = useAuthStore.getState().user;
-            const currentToken = useAuthStore.getState().token;
+        // انتظر اكتمال تحميل البيانات من localStorage
+        if (!_hasHydrated) return;
 
-            if (!currentToken || !currentUser) {
-                router.replace('/login');
-                return;
-            }
+        const currentUser = useAuthStore.getState().user;
+        const currentIsAuthenticated = useAuthStore.getState().isAuthenticated;
 
-            if (currentUser.role !== 'admin') {
-                router.replace('/');
-                return;
-            }
+        if (!currentIsAuthenticated || !currentUser) {
+            router.replace('/login');
+            return;
+        }
 
-            setIsLoading(false);
-        }, 100);
+        if (currentUser.role !== 'admin') {
+            router.replace('/');
+            return;
+        }
 
-        return () => clearTimeout(timeout);
-    }, [router, isAuthenticated, token]);
+        setIsLoading(false);
+    }, [_hasHydrated, isAuthenticated, user, router]);
 
     if (isLoading) {
         return (
