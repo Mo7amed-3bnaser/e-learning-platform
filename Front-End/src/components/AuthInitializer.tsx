@@ -7,6 +7,7 @@ import { initErrorMonitoring, setErrorUser } from '@/lib/errorMonitoring';
 import BrandLoader from './BrandLoader';
 
 const FALLBACK_READY_MS = 4000;
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function AuthInitializer({
   children,
@@ -23,6 +24,11 @@ export default function AuthInitializer({
   // Initialize error monitoring once
   useEffect(() => {
     initErrorMonitoring();
+  }, []);
+
+  // Wake up the backend on app start (for free-tier cold starts)
+  useEffect(() => {
+    fetch(BACKEND_URL, { signal: AbortSignal.timeout(15000) }).catch(() => {});
   }, []);
 
   useEffect(() => {

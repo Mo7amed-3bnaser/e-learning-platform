@@ -28,69 +28,99 @@ export const register = asyncHandler(async (req, res) => {
     throw new Error('يجب الموافقة على شروط استخدام الأجهزة والحساب قبل التسجيل');
   }
 
-  // التحقق من وجود المستخدم مسبقاً
-  const userExists = await User.findOne({ $or: [{ email }, { phone }] });
+  // البحث عن مستخدم موجود بنفس الإيميل أو الهاتف
+  const existingByEmail = await User.findOne({ email });
+  const existingByPhone = await User.findOne({ phone });
 
-  if (userExists) {
+  // إذا الإيميل مسجل وحساب مفعل → رفض
+  if (existingByEmail && existingByEmail.isEmailVerified) {
     res.status(400);
-    throw new Error('البريد الإلكتروني أو رقم الهاتف مستخدم من قبل');
+    throw new Error('البريد الإلكتروني مسجل بالفعل. يمكنك تسجيل الدخول أو استعادة كلمة المرور');
   }
 
-  // إنشاء المستخدم
-  const user = await User.create({
-    name,
-    email,
-    phone,
-    password, // will be hashed automatically by pre-save hook
-    deviceAgreement: {
+  // إذا الهاتف مستخدم من حساب تاني (مش نفس اليوزر اللي بيحاول يسجل تاني)
+  if (existingByPhone) {
+    const isSameUser = existingByEmail && existingByPhone._id.toString() === existingByEmail._id.toString();
+    if (!isSameUser) {
+      res.status(400);
+      throw new Error(
+        existingByPhone.isEmailVerified
+          ? 'رقم الهاتف مسجل بالفعل في حساب آخر'
+          : 'رقم الهاتف مستخدم من قبل في حساب آخر. إذا كان حسابك، استخدم نفس البريد الإلكتروني'
+      );
+    }
+  }
+
+  let user;
+
+  if (existingByEmail && !existingByEmail.isEmailVerified) {
+    // إعادة تسجيل: تحديث بيانات الحساب الغير مفعل بدل ما نرفض
+    existingByEmail.name = name;
+    existingByEmail.phone = phone;
+    existingByEmail.password = password; // هيتعمله hash تلقائي بالـ pre-save hook
+    existingByEmail.deviceAgreement = {
       agreed: true,
       agreedAt: new Date(),
       agreedFromIP: req.ip,
-    },
-  });
+    };
+    user = await existingByEmail.save();
+  } else {
+    // تسجيل جديد
+    user = await User.create({
+      name,
+      email,
+      phone,
+      password, // will be hashed automatically by pre-save hook
+      deviceAgreement: {
+        agreed: true,
+        agreedAt: new Date(),
+        agreedFromIP: req.ip,
+      },
+    });
+  }
 
-  if (user) {
-    // إنشاء توكن التأكيد
-    const verificationToken = user.getEmailVerificationToken();
+  // إنشاء توكن التأكيد
+  const verificationToken = user.getEmailVerificationToken();
+  await user.save({ validateBeforeSave: false });
+
+  // إنشاء رابط التأكيد
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
+
+  try {
+    // إرسال إيميل التأكيد مع timeout لمنع التعليق
+    const emailTimeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Email send timeout')), 20000)
+    );
+
+    await Promise.race([
+      sendEmail({
+        to: user.email,
+        subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+        html: getEmailVerificationTemplate(user.name, verificationUrl),
+      }),
+      emailTimeout,
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: 'تم إنشاء الحساب بنجاح! تم إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
+      requiresVerification: true,
+    });
+  } catch (error) {
+    // فشل إرسال الإيميل - الحساب اتعمل بنجاح لكن الإيميل مبعتش
+    // نمسح التوكن بس نخلي اليوزر ونرجع success عشان اليوزر يقدر يعيد الإرسال
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
     await user.save({ validateBeforeSave: false });
 
-    // إنشاء رابط التأكيد
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
-    const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
+    logger.error('Email send error:', error);
 
-    try {
-      // إرسال إيميل التأكيد مع timeout لمنع التعليق
-      const emailTimeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Email send timeout')), 20000)
-      );
-      
-      await Promise.race([
-        sendEmail({
-          to: user.email,
-          subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
-          html: getEmailVerificationTemplate(user.name, verificationUrl),
-        }),
-        emailTimeout,
-      ]);
-
-      res.status(201).json({
-        success: true,
-        message: 'تم إنشاء الحساب بنجاح! تم إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
-        requiresVerification: true,
-      });
-    } catch (error) {
-      // في حالة فشل إرسال الإيميل، نحذف التوكن لكن لا نحذف اليوزر
-      user.emailVerificationToken = undefined;
-      user.emailVerificationExpire = undefined;
-      await user.save({ validateBeforeSave: false });
-
-      logger.error('Email send error:', error);
-      res.status(500);
-      throw new Error('تم إنشاء الحساب لكن فشل إرسال البريد الإلكتروني. حاول إعادة إرسال رابط التأكيد');
-    }
-  } else {
-    res.status(400);
-    throw new Error('فشل إنشاء الحساب. حاول مرة أخرى');
+    res.status(201).json({
+      success: true,
+      message: 'تم إنشاء الحساب بنجاح! لكن فشل إرسال رابط التأكيد. اضغط على إعادة إرسال رابط التأكيد',
+      requiresVerification: true,
+    });
   }
 });
 
