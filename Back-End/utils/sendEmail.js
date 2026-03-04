@@ -1,30 +1,41 @@
-import { Resend } from 'resend';
 import logger from '../config/logger.js';
 
-// ── Resend HTTP email client ──────────────────
-const resend = new Resend(process.env.RESEND_API_KEY);
+// ── Brevo HTTP email client (no domain verification needed) ──────────────────
 
 /**
- * Send email using Resend HTTP API
+ * Send email using Brevo (Sendinblue) HTTP API
  * @param {Object} options - Email options
  * @param {string} options.to - Recipient email
  * @param {string} options.subject - Email subject
  * @param {string} options.html - Email HTML content
  */
 const sendEmail = async (options) => {
-  const { data, error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM || `Masar | مسار <onboarding@resend.dev>`,
-    to: options.to,
-    subject: options.subject,
-    html: options.html,
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': process.env.BREVO_API_KEY,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: {
+        name: process.env.EMAIL_FROM_NAME || 'Masar | مسار',
+        email: process.env.EMAIL_FROM_ADDRESS,
+      },
+      to: [{ email: options.to }],
+      subject: options.subject,
+      htmlContent: options.html,
+    }),
   });
 
-  if (error) {
-    logger.error(`Resend email error to ${options.to}:`, error.message);
-    throw new Error(error.message);
+  const data = await response.json();
+
+  if (!response.ok) {
+    logger.error(`Brevo email error to ${options.to}:`, data.message || JSON.stringify(data));
+    throw new Error(data.message || 'Failed to send email');
   }
 
-  logger.info(`Email sent to ${options.to} - id: ${data.id}`);
+  logger.info(`Email sent to ${options.to} - messageId: ${data.messageId}`);
   return data;
 };
 
