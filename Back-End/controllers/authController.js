@@ -87,41 +87,20 @@ export const register = asyncHandler(async (req, res) => {
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
   const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
 
-  try {
-    // إرسال إيميل التأكيد مع timeout لمنع التعليق
-    const emailTimeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Email send timeout')), 20000)
-    );
+  // إرسال إيميل التأكيد في الخلفية - لا ننتظر النتيجة حتى لا يحدث timeout
+  sendEmail({
+    to: user.email,
+    subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+    html: getEmailVerificationTemplate(user.name, verificationUrl),
+  }).catch((error) => {
+    logger.error(`Registration verification email failed for ${user.email}:`, error.message);
+  });
 
-    await Promise.race([
-      sendEmail({
-        to: user.email,
-        subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
-        html: getEmailVerificationTemplate(user.name, verificationUrl),
-      }),
-      emailTimeout,
-    ]);
-
-    res.status(201).json({
-      success: true,
-      message: 'تم إنشاء الحساب بنجاح! تم إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
-      requiresVerification: true,
-    });
-  } catch (error) {
-    // فشل إرسال الإيميل - الحساب اتعمل بنجاح لكن الإيميل مبعتش
-    // نمسح التوكن بس نخلي اليوزر ونرجع success عشان اليوزر يقدر يعيد الإرسال
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    logger.error('Email send error:', error);
-
-    res.status(201).json({
-      success: true,
-      message: 'تم إنشاء الحساب بنجاح! لكن فشل إرسال رابط التأكيد. اضغط على إعادة إرسال رابط التأكيد',
-      requiresVerification: true,
-    });
-  }
+  res.status(201).json({
+    success: true,
+    message: 'تم إنشاء الحساب بنجاح! جاري إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
+    requiresVerification: true,
+  });
 });
 
 /**
@@ -207,35 +186,19 @@ export const resendVerification = asyncHandler(async (req, res) => {
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
   const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
 
-  try {
-    // إرسال إيميل التأكيد مع timeout لمنع التعليق
-    const emailTimeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Email send timeout')), 20000)
-    );
-    
-    await Promise.race([
-      sendEmail({
-        to: user.email,
-        subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
-        html: getEmailVerificationTemplate(user.name, verificationUrl),
-      }),
-      emailTimeout,
-    ]);
+  // إرسال إيميل التأكيد في الخلفية - لا ننتظر النتيجة حتى لا يحدث timeout
+  sendEmail({
+    to: user.email,
+    subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+    html: getEmailVerificationTemplate(user.name, verificationUrl),
+  }).catch((error) => {
+    logger.error(`Resend verification email failed for ${user.email}:`, error.message);
+  });
 
-    res.json({
-      success: true,
-      message: 'تم إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
-    });
-  } catch (error) {
-    // في حالة فشل إرسال الإيميل، نحذف التوكن
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    logger.error('Email send error:', error);
-    res.status(500);
-    throw new Error('فشل إرسال البريد الإلكتروني. حاول مرة أخرى لاحقاً');
-  }
+  res.json({
+    success: true,
+    message: 'جاري إرسال رابط تأكيد البريد الإلكتروني إلى بريدك 📧',
+  });
 });
 
 /**
@@ -533,38 +496,19 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
   const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
 
-  try {
-    // إرسال البريد الإلكتروني مع timeout لمنع التعليق
-    const emailTimeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Email send timeout')), 20000)
-    );
-    
-    await Promise.race([
-      sendEmail({
-        to: user.email,
-        subject: '🔐 إعادة تعيين كلمة المرور - E-Learning Platform',
-        html: getResetPasswordTemplate(user.name, resetUrl),
-      }),
-      emailTimeout,
-    ]);
+  // إرسال البريد الإلكتروني في الخلفية - لا ننتظر النتيجة حتى لا يحدث timeout
+  sendEmail({
+    to: user.email,
+    subject: '🔐 إعادة تعيين كلمة المرور - E-Learning Platform',
+    html: getResetPasswordTemplate(user.name, resetUrl),
+  }).catch((error) => {
+    logger.error(`Password reset email failed for ${user.email}:`, error.message);
+  });
 
-    res.json({
-      success: true,
-      message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
-    });
-  } catch (error) {
-    // في حالة فشل إرسال الإيميل، نحذف التوكن من الداتابيز
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    logger.error('Email send error:', error);
-    // رسالة عامة حتى في حالة الخطأ
-    res.json({
-      success: true,
-      message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
-    });
-  }
+  res.json({
+    success: true,
+    message: 'إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة إعادة تعيين كلمة المرور 📧',
+  });
 });
 
 /**
