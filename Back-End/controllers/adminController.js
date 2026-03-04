@@ -261,3 +261,35 @@ export const demoteInstructor = asyncHandler(async (req, res) => {
     message: 'تم تحويل المدرب إلى طالب وإخفاء كورساته'
   });
 });
+
+/**
+ * @desc    حظر/إلغاء حظر مدرب
+ * @route   PATCH /api/admin/instructors/:id/block
+ * @access  Private/Admin
+ */
+export const toggleBlockInstructor = asyncHandler(async (req, res) => {
+  const instructor = await User.findById(req.params.id);
+
+  if (!instructor) {
+    res.status(404);
+    throw new Error('المدرب غير موجود');
+  }
+
+  if (instructor.role === 'admin') {
+    res.status(400);
+    throw new Error('لا يمكن حظر مشرف');
+  }
+
+  instructor.isBlocked = !instructor.isBlocked;
+  await instructor.save();
+
+  res.json({
+    success: true,
+    message: instructor.isBlocked ? 'تم حظر المدرب' : 'تم إلغاء حظر المدرب',
+    data: {
+      id: instructor._id,
+      name: instructor.name,
+      isBlocked: instructor.isBlocked
+    }
+  });
+});

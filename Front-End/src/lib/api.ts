@@ -277,6 +277,16 @@ export const adminAPI = {
     api.patch(`/admin/students/${id}/block`, { isBlocked }),
 
   deleteStudent: (id: string) => api.delete(`/admin/students/${id}`),
+
+  // Instructors management
+  getInstructors: (params?: { page?: number; limit?: number }) =>
+    api.get('/admin/instructors', { params }),
+
+  blockInstructor: (id: string) =>
+    api.patch(`/admin/instructors/${id}/block`),
+
+  demoteInstructor: (id: string) =>
+    api.patch(`/admin/instructors/${id}/demote`),
 };
 
 // ============================================
