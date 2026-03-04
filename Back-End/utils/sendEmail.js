@@ -1,73 +1,31 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import logger from '../config/logger.js';
 
-// ── Transporter with connection pooling ──────────────────
-let _transporter = null;
-
-const createTransporter = () => {
-  const port = parseInt(process.env.EMAIL_PORT) || 587;
-
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port,
-    secure: port === 465,   // true for 465 (SSL), false for 587 (STARTTLS)
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    pool: true,              // reuse connections
-    maxConnections: 5,       // limit concurrent SMTP connections
-    maxMessages: 100,        // messages per connection before reconnect
-    connectionTimeout: 10000,  // 10 seconds to establish connection
-    greetingTimeout: 10000,    // 10 seconds for SMTP greeting
-    socketTimeout: 15000,      // 15 seconds for socket inactivity
-  });
-};
-
-const getTransporter = () => {
-  if (!_transporter) {
-    _transporter = createTransporter();
-  }
-  return _transporter;
-};
-
-const resetTransporter = () => {
-  if (_transporter) {
-    try { _transporter.close(); } catch (e) { /* ignore */ }
-  }
-  _transporter = null;
-};
+// ── Resend HTTP email client ──────────────────
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
- * Send email using Nodemailer + Gmail
+ * Send email using Resend HTTP API
  * @param {Object} options - Email options
  * @param {string} options.to - Recipient email
  * @param {string} options.subject - Email subject
  * @param {string} options.html - Email HTML content
  */
 const sendEmail = async (options) => {
-  const transporter = getTransporter();
-
-  // Email options
-  const mailOptions = {
-    from: process.env.EMAIL_FROM || `Masar | مسار <${process.env.EMAIL_USER}>`,
+  const { data, error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM || `Masar | مسار <onboarding@resend.dev>`,
     to: options.to,
     subject: options.subject,
     html: options.html,
-  };
+  });
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    logger.info(`Email sent to ${options.to} - messageId: ${info.messageId}`);
-    return info;
-  } catch (error) {
-    // Reset the transporter pool on failure to clear stale connections
-    resetTransporter();
-    throw error;
+  if (error) {
+    logger.error(`Resend email error to ${options.to}:`, error.message);
+    throw new Error(error.message);
   }
+
+  logger.info(`Email sent to ${options.to} - id: ${data.id}`);
+  return data;
 };
 
 /**
