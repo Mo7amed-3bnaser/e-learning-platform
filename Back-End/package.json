@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "create-admin": "node scripts/createAdmin.js",
+    "get-instructors": "node scripts/getInstructors.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose --forceExit --detectOpenHandles",
     "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose --forceExit --testPathPatterns=tests/unit",
     "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose --forceExit --detectOpenHandles --testPathPatterns=tests/integration",

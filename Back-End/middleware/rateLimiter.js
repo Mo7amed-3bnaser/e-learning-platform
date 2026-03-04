@@ -50,11 +50,11 @@ export const forgotPasswordLimiter = rateLimit({
 
 /**
  * Rate Limiter للتسجيل - منع إنشاء حسابات وهمية
- * 3 حسابات كل ساعة لكل IP
+ * 10 حسابات كل ساعة لكل IP
  */
 export const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // ساعة واحدة
-  max: 3, // 3 حسابات فقط
+  max: 10, // 10 حسابات
   message: {
     success: false,
     message: 'تم تجاوز الحد الأقصى لإنشاء الحسابات. حاول مرة أخرى بعد ساعة',

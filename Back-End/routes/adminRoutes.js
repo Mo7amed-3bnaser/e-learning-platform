@@ -7,7 +7,6 @@ import {
   searchStudents,
   getInstructors,
   demoteInstructor,
-  toggleBlockInstructor,
 } from '../controllers/adminController.js';
 import {
   adminGetUserDevices,
@@ -30,7 +29,6 @@ router.delete('/students/:id', validateIdParam, validate, deleteStudent);
 // Instructor management
 router.get('/instructors', getInstructors);
 router.patch('/instructors/:id/demote', validateIdParam, validate, demoteInstructor);
-router.patch('/instructors/:id/block', validateIdParam, validate, toggleBlockInstructor);
 
 // Device management
 router.get('/users/:userId/devices', adminGetUserDevices);
