@@ -1,25 +1,44 @@
 import nodemailer from 'nodemailer';
+import logger from '../config/logger.js';
 
-// ── Singleton transporter with connection pooling ──────────────────
+// ── Transporter with connection pooling ──────────────────
 let _transporter = null;
+
+const createTransporter = () => {
+  const port = parseInt(process.env.EMAIL_PORT) || 587;
+
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port,
+    secure: port === 465,   // true for 465 (SSL), false for 587 (STARTTLS)
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    pool: true,              // reuse connections
+    maxConnections: 5,       // limit concurrent SMTP connections
+    maxMessages: 100,        // messages per connection before reconnect
+    connectionTimeout: 10000,  // 10 seconds to establish connection
+    greetingTimeout: 10000,    // 10 seconds for SMTP greeting
+    socketTimeout: 15000,      // 15 seconds for socket inactivity
+  });
+};
 
 const getTransporter = () => {
   if (!_transporter) {
-    _transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      pool: true,          // reuse connections
-      maxConnections: 5,   // limit concurrent SMTP connections
-      maxMessages: 100,    // messages per connection before reconnect
-      connectionTimeout: 10000,  // 10 seconds to establish connection
-      greetingTimeout: 10000,    // 10 seconds for SMTP greeting
-      socketTimeout: 15000,      // 15 seconds for socket inactivity
-    });
+    _transporter = createTransporter();
   }
   return _transporter;
+};
+
+const resetTransporter = () => {
+  if (_transporter) {
+    try { _transporter.close(); } catch (e) { /* ignore */ }
+  }
+  _transporter = null;
 };
 
 /**
@@ -40,10 +59,15 @@ const sendEmail = async (options) => {
     html: options.html,
   };
 
-  // Send email
-  const info = await transporter.sendMail(mailOptions);
-
-  return info;
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    logger.info(`Email sent to ${options.to} - messageId: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    // Reset the transporter pool on failure to clear stale connections
+    resetTransporter();
+    throw error;
+  }
 };
 
 /**
