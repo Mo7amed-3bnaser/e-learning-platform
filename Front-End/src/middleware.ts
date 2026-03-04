@@ -18,7 +18,7 @@ const ADMIN_ROUTES = ['/admin'];
 const INSTRUCTOR_ROUTES = ['/dashboard/instructor'];
 
 // ─── Auth pages (redirect to dashboard if already logged in) ───
-const AUTH_ROUTES = ['/login', '/register', '/forgot-password'];
+const AUTH_ROUTES = ['/login', '/register'];
 
 /**
  * Decode the JWT payload WITHOUT verification.
@@ -104,7 +104,7 @@ export function middleware(request: NextRequest) {
       } else if (role === 'instructor') {
         return NextResponse.redirect(new URL('/dashboard/instructor', request.url));
       } else {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        return NextResponse.redirect(new URL('/', request.url));
       }
     }
     return NextResponse.next();

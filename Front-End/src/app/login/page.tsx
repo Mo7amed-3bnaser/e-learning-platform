@@ -87,7 +87,7 @@ export default function LoginPage() {
       } else if (data.role === 'instructor') {
         window.location.href = '/dashboard/instructor';
       } else {
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }
     } catch (error: unknown) {
       // التحقق من أن الإيميل غير مؤكد

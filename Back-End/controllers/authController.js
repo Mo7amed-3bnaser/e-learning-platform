@@ -137,11 +137,27 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   user.isEmailVerified = true;
   user.emailVerificationToken = undefined;
   user.emailVerificationExpire = undefined;
+
+  // تسجيل دخول تلقائي بعد التأكيد
+  const token = generateToken(user);
+  const refreshToken = generateRefreshToken();
+  user.refreshToken = hashRefreshToken(refreshToken);
+
   await user.save({ validateBeforeSave: false });
+
+  // إرسال الكوكيز
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+  res.cookie('access_token', token, ACCESS_TOKEN_COOKIE_OPTIONS);
 
   res.json({
     success: true,
-    message: 'تم تأكيد البريد الإلكتروني بنجاح! يمكنك تسجيل الدخول الآن 🎉',
+    message: 'تم تأكيد البريد الإلكتروني بنجاح! 🎉',
+    data: formatUserResponse(user, token),
   });
 });
 

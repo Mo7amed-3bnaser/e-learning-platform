@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, Suspense, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
     FiMail,
     FiHome,
@@ -14,10 +14,10 @@ import Logo from "@/components/Logo";
 import LoadingButton from "@/components/LoadingButton";
 import PageLoader from "@/components/PageLoader";
 import { authAPI } from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 import { showSuccess, showError, handleApiError } from "@/lib/toast";
 
 function VerifyEmailContent() {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const email = searchParams.get("email");
@@ -27,47 +27,54 @@ function VerifyEmailContent() {
     const [isVerified, setIsVerified] = useState(false);
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [countdown, setCountdown] = useState(5);
     const [resendCooldown, setResendCooldown] = useState(0);
+    const hasVerified = useRef(false);
+    const login = useAuthStore((state) => state.login);
 
-    // Verify token automatically if present
-    const verifyToken = useCallback(async () => {
-        if (!token) return;
-
-        setIsVerifying(true);
-        setIsError(false);
-
-        try {
-            const response = await authAPI.verifyEmail(token);
-            showSuccess(response.data.message || "تم تأكيد البريد الإلكتروني بنجاح!");
-            setIsVerified(true);
-        } catch (error: any) {
-            setIsError(true);
-            setErrorMessage(
-                error?.response?.data?.message || "حدث خطأ أثناء التأكيد"
-            );
-            handleApiError(error);
-        } finally {
-            setIsVerifying(false);
-        }
-    }, [token]);
-
+    // Verify token automatically if present (ref prevents double-call in StrictMode)
     useEffect(() => {
-        if (token) {
-            verifyToken();
-        }
-    }, [token, verifyToken]);
+        if (!token || hasVerified.current) return;
+        hasVerified.current = true;
 
-    // Countdown redirect after verification success
-    useEffect(() => {
-        if (isVerified && countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-        if (isVerified && countdown === 0) {
-            router.push("/login");
-        }
-    }, [isVerified, countdown, router]);
+        const verifyToken = async () => {
+            setIsVerifying(true);
+            setIsError(false);
+
+            try {
+                const response = await authAPI.verifyEmail(token);
+                showSuccess(response.data.message || "تم تأكيد البريد الإلكتروني بنجاح!");
+                setIsVerified(true);
+
+                // تسجيل دخول تلقائي
+                const { data } = response.data;
+                if (data?.token) {
+                    const userData = {
+                        id: data.id,
+                        name: data.name,
+                        email: data.email,
+                        phone: data.phone,
+                        role: data.role,
+                        avatar: data.avatar || null,
+                    };
+                    login(data.token, userData);
+
+                    // توجيه للصفحة الرئيسية
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    window.location.href = '/';
+                }
+            } catch (error: any) {
+                setIsError(true);
+                setErrorMessage(
+                    error?.response?.data?.message || "حدث خطأ أثناء التأكيد"
+                );
+                handleApiError(error);
+            } finally {
+                setIsVerifying(false);
+            }
+        };
+
+        verifyToken();
+    }, [token, login]);
 
     // Resend cooldown timer
     useEffect(() => {
@@ -107,14 +114,6 @@ function VerifyEmailContent() {
             <div className="min-h-screen flex">
                 {/* Left Side - Success Message */}
                 <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-slate-900 relative">
-                    <Link
-                        href="/"
-                        className="absolute top-6 right-6 inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors group"
-                    >
-                        <FiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        <span className="text-sm font-medium">العودة للرئيسية</span>
-                    </Link>
-
                     <div className="w-full max-w-md space-y-8">
                         {/* Logo */}
                         <div className="text-center">
@@ -133,25 +132,16 @@ function VerifyEmailContent() {
                                     تم التأكيد بنجاح! 🎉
                                 </h2>
                                 <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    تم تأكيد بريدك الإلكتروني بنجاح. يمكنك الآن تسجيل الدخول والاستمتاع بجميع خدمات المنصة.
+                                    تم تأكيد بريدك الإلكتروني بنجاح. جاري تحويلك للصفحة الرئيسية...
                                 </p>
                             </div>
 
-                            {/* Countdown */}
+                            {/* Loading indicator */}
                             <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4">
                                 <p className="text-primary text-sm">
-                                    سيتم توجيهك إلى صفحة تسجيل الدخول خلال{" "}
-                                    <span className="font-bold text-lg">{countdown}</span> ثوانٍ
+                                    جاري التحويل...
                                 </p>
                             </div>
-
-                            {/* Manual redirect */}
-                            <Link
-                                href="/login"
-                                className="block w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-l from-primary to-primary-dark text-white hover:shadow-lg transition-all duration-300 text-center"
-                            >
-                                تسجيل الدخول الآن
-                            </Link>
                         </div>
                     </div>
                 </div>
