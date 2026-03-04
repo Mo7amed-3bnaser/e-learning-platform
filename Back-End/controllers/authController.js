@@ -139,7 +139,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   user.emailVerificationExpire = undefined;
 
   // تسجيل دخول تلقائي بعد التأكيد
-  const token = generateToken(user);
+  const accessToken = generateToken(user);
   const refreshToken = generateRefreshToken();
   user.refreshToken = hashRefreshToken(refreshToken);
 
@@ -152,12 +152,12 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-  res.cookie('access_token', token, ACCESS_TOKEN_COOKIE_OPTIONS);
+  res.cookie('access_token', accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
 
   res.json({
     success: true,
     message: 'تم تأكيد البريد الإلكتروني بنجاح! 🎉',
-    data: formatUserResponse(user, token),
+    data: formatUserResponse(user, accessToken),
   });
 });
 
