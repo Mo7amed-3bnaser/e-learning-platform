@@ -65,7 +65,7 @@ export default function RegisterPage() {
     }
 
     // التأكد من أن الرقم يحتوي على 11 رقم فقط
-    const phoneRegex = /^01[0-2,5]{1}[0-9]{8}$/;
+    const phoneRegex = /^01[0125][0-9]{8}$/;
     if (formData.phone.length !== 11) {
       showError('رقم الموبايل يجب أن يكون 11 رقم');
       return false;
@@ -96,8 +96,28 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    if (formData.password.length < 8) {
+      showError('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+      return;
+    }
+
+    if (!/[A-Z]/.test(formData.password)) {
+      showError('كلمة المرور يجب أن تحتوي على حرف كبير (A-Z)');
+      return;
+    }
+
+    if (!/[a-z]/.test(formData.password)) {
+      showError('كلمة المرور يجب أن تحتوي على حرف صغير (a-z)');
+      return;
+    }
+
+    if (!/\d/.test(formData.password)) {
+      showError('كلمة المرور يجب أن تحتوي على رقم');
+      return;
+    }
+
+    if (!/[@$!%*?&]/.test(formData.password)) {
+      showError('كلمة المرور يجب أن تحتوي على رمز خاص (@$!%*?&)');
       return;
     }
 
@@ -387,7 +407,7 @@ export default function RegisterPage() {
                       )}
                     </button>
                   </div>
-                  {/* Password Strength */}
+                  {/* Password Requirements */}
                   {formData.password && (
                     <div className="space-y-2">
                       <div className="flex gap-1">
@@ -416,6 +436,23 @@ export default function RegisterPage() {
                           {getStrengthText(passwordStrength(formData.password))}
                         </span>
                       </p>
+                      <ul className="text-xs space-y-1 mt-1">
+                        <li className={formData.password.length >= 8 ? "text-green-600" : "text-slate-400"}>
+                          {formData.password.length >= 8 ? "✓" : "○"} 8 أحرف على الأقل
+                        </li>
+                        <li className={/[A-Z]/.test(formData.password) ? "text-green-600" : "text-slate-400"}>
+                          {/[A-Z]/.test(formData.password) ? "✓" : "○"} حرف كبير (A-Z)
+                        </li>
+                        <li className={/[a-z]/.test(formData.password) ? "text-green-600" : "text-slate-400"}>
+                          {/[a-z]/.test(formData.password) ? "✓" : "○"} حرف صغير (a-z)
+                        </li>
+                        <li className={/\d/.test(formData.password) ? "text-green-600" : "text-slate-400"}>
+                          {/\d/.test(formData.password) ? "✓" : "○"} رقم (0-9)
+                        </li>
+                        <li className={/[@$!%*?&]/.test(formData.password) ? "text-green-600" : "text-slate-400"}>
+                          {/[@$!%*?&]/.test(formData.password) ? "✓" : "○"} رمز خاص (@$!%*?&)
+                        </li>
+                      </ul>
                     </div>
                   )}
                 </div>

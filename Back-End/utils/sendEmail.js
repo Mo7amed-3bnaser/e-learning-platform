@@ -14,6 +14,9 @@ const getTransporter = () => {
       pool: true,          // reuse connections
       maxConnections: 5,   // limit concurrent SMTP connections
       maxMessages: 100,    // messages per connection before reconnect
+      connectionTimeout: 10000,  // 10 seconds to establish connection
+      greetingTimeout: 10000,    // 10 seconds for SMTP greeting
+      socketTimeout: 15000,      // 15 seconds for socket inactivity
     });
   }
   return _transporter;

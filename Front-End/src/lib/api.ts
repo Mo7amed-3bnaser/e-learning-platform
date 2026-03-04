@@ -9,6 +9,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true, // required for refresh token cookie
+  timeout: 30000, // 30 seconds timeout to prevent hanging requests
 });
 
 // Request interceptor - إضافة التوكن + بصمة الجهاز تلقائياً

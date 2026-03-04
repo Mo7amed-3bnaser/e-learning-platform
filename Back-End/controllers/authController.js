@@ -59,12 +59,19 @@ export const register = asyncHandler(async (req, res) => {
     const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
 
     try {
-      // إرسال إيميل التأكيد
-      await sendEmail({
-        to: user.email,
-        subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
-        html: getEmailVerificationTemplate(user.name, verificationUrl),
-      });
+      // إرسال إيميل التأكيد مع timeout لمنع التعليق
+      const emailTimeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Email send timeout')), 20000)
+      );
+      
+      await Promise.race([
+        sendEmail({
+          to: user.email,
+          subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+          html: getEmailVerificationTemplate(user.name, verificationUrl),
+        }),
+        emailTimeout,
+      ]);
 
       res.status(201).json({
         success: true,
@@ -171,12 +178,19 @@ export const resendVerification = asyncHandler(async (req, res) => {
   const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
 
   try {
-    // إرسال إيميل التأكيد
-    await sendEmail({
-      to: user.email,
-      subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
-      html: getEmailVerificationTemplate(user.name, verificationUrl),
-    });
+    // إرسال إيميل التأكيد مع timeout لمنع التعليق
+    const emailTimeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Email send timeout')), 20000)
+    );
+    
+    await Promise.race([
+      sendEmail({
+        to: user.email,
+        subject: '✅ تأكيد البريد الإلكتروني - E-Learning Platform',
+        html: getEmailVerificationTemplate(user.name, verificationUrl),
+      }),
+      emailTimeout,
+    ]);
 
     res.json({
       success: true,
@@ -490,12 +504,19 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
 
   try {
-    // إرسال البريد الإلكتروني
-    await sendEmail({
-      to: user.email,
-      subject: '🔐 إعادة تعيين كلمة المرور - E-Learning Platform',
-      html: getResetPasswordTemplate(user.name, resetUrl),
-    });
+    // إرسال البريد الإلكتروني مع timeout لمنع التعليق
+    const emailTimeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Email send timeout')), 20000)
+    );
+    
+    await Promise.race([
+      sendEmail({
+        to: user.email,
+        subject: '🔐 إعادة تعيين كلمة المرور - E-Learning Platform',
+        html: getResetPasswordTemplate(user.name, resetUrl),
+      }),
+      emailTimeout,
+    ]);
 
     res.json({
       success: true,
