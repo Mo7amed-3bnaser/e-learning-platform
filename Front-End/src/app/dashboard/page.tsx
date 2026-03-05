@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { useProgressStore } from '@/store/progressStore';
 import { ordersAPI } from '@/lib/api';
 import { handleApiError } from '@/lib/toast';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -37,6 +38,7 @@ interface Order {
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+  const { courseProgress } = useProgressStore();
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,11 +80,15 @@ export default function DashboardPage() {
 
       setEnrolledCourses(uniqueCourses);
 
-      // حساب الإحصائيات
+      // حساب الإحصائيات بناءً على بيانات التقدم المحفوظة
+      const completed = uniqueCourses.filter((course: EnrolledCourse) =>
+        courseProgress[course._id]?.overallProgress >= 100
+      ).length;
+
       setStats({
         totalCourses: uniqueCourses.length,
-        completedCourses: 0,
-        inProgressCourses: uniqueCourses.length,
+        completedCourses: completed,
+        inProgressCourses: uniqueCourses.length - completed,
       });
 
     } catch (error) {
@@ -212,7 +218,7 @@ export default function DashboardPage() {
                     {enrolledCourses.map((course) => (
                       <Link
                         key={course._id}
-                        href={`/courses/${course._id}/watch`}
+                        href={`/watch/${course._id}`}
                         className="flex gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border border-slate-100 dark:border-slate-700"
                       >
                         <div className="w-24 h-24 bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden flex-shrink-0">

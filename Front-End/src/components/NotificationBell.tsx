@@ -26,8 +26,11 @@ export default function NotificationBell() {
         try {
             const response = await getUnreadCount();
             setUnreadCount(response.data.unreadCount);
-        } catch (error) {
-            console.error('Error fetching unread count:', error);
+        } catch (error: any) {
+            // Silently ignore 429 (rate limit) - will retry on next interval
+            if (error?.response?.status !== 429) {
+                console.error('Error fetching unread count:', error);
+            }
         }
     };
 

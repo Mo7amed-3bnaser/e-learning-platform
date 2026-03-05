@@ -1,4 +1,4 @@
-"use client";
+لو "use client";
 
 import { useState } from 'react';
 import { FiLoader } from 'react-icons/fi';

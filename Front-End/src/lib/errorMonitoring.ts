@@ -38,8 +38,10 @@ async function getSentry() {
   if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return null;
 
   try {
+    // Use a variable to prevent bundler from statically resolving the module
+    const sentryPkg = '@sentry' + '/nextjs';
     // @ts-ignore - Sentry is an optional dependency
-    const Sentry = await import('@sentry/nextjs');
+    const Sentry = await import(/* webpackIgnore: true */ sentryPkg);
     Sentry.init({
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
       environment: process.env.NODE_ENV,
