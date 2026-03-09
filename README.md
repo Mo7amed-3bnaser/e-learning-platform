@@ -20,6 +20,12 @@
   <a href="#-team">Team</a>
 </p>
 
+<p align="center">
+  <a href="https://masar-zsel.onrender.com/" target="_blank">
+    <img src="https://img.shields.io/badge/🚀 Live Demo-Visit Now-brightgreen?style=for-the-badge" alt="Live Demo" />
+  </a>
+</p>
+
 ---
 
 ## 📋 Overview
