@@ -3,12 +3,20 @@ import Order from "../models/Order.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
 import Coupon from "../models/Coupon.js";
-import { paginateQuery } from '../utils/pagination.js';
-import { createNotification } from './notificationController.js';
-import sendEmail, { getOrderApprovedTemplate, getOrderRejectedTemplate } from '../utils/sendEmail.js';
-import logger from '../config/logger.js';
-import { isUserEnrolled } from '../utils/enrollmentHelper.js';
-import { ROLES, ORDER_STATUS, NOTIFICATION_TYPE, ERROR_MESSAGES } from '../utils/constants.js';
+import { paginateQuery } from "../utils/pagination.js";
+import { createNotification } from "./notificationController.js";
+import sendEmail, {
+  getOrderApprovedTemplate,
+  getOrderRejectedTemplate,
+} from "../utils/sendEmail.js";
+import logger from "../config/logger.js";
+import { isUserEnrolled } from "../utils/enrollmentHelper.js";
+import {
+  ROLES,
+  ORDER_STATUS,
+  NOTIFICATION_TYPE,
+  ERROR_MESSAGES,
+} from "../utils/constants.js";
 
 /**
  * @desc    إنشاء طلب شراء جديد
@@ -67,7 +75,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
     if (!coupon) {
       res.status(404);
-      throw new Error('كود الكوبون غير صحيح');
+      throw new Error("كود الكوبون غير صحيح");
     }
 
     const validity = coupon.isValid();
@@ -78,17 +86,19 @@ export const createOrder = asyncHandler(async (req, res) => {
 
     if (coupon.isUsedByUser(req.user._id)) {
       res.status(400);
-      throw new Error('لقد استخدمت هذا الكوبون من قبل');
+      throw new Error("لقد استخدمت هذا الكوبون من قبل");
     }
 
     if (!coupon.isApplicableToCourse(courseId)) {
       res.status(400);
-      throw new Error('هذا الكوبون لا ينطبق على هذا الكورس');
+      throw new Error("هذا الكوبون لا ينطبق على هذا الكورس");
     }
 
     if (course.price < coupon.minOrderAmount) {
       res.status(400);
-      throw new Error(`الحد الأدنى لاستخدام هذا الكوبون هو $${coupon.minOrderAmount}`);
+      throw new Error(
+        `الحد الأدنى لاستخدام هذا الكوبون هو $${coupon.minOrderAmount}`,
+      );
     }
 
     discount = coupon.calculateDiscount(course.price);
@@ -117,21 +127,21 @@ export const createOrder = asyncHandler(async (req, res) => {
         code: appliedCouponCode,
         $or: [
           { usageLimit: null },
-          { $expr: { $lt: ['$usedCount', '$usageLimit'] } }
-        ]
+          { $expr: { $lt: ["$usedCount", "$usageLimit"] } },
+        ],
       },
       {
         $inc: { usedCount: 1 },
-        $push: { usedBy: { user: req.user._id } }
+        $push: { usedBy: { user: req.user._id } },
       },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedCoupon) {
       // الكوبون وصل للحد الأقصى بين التحقق والاستخدام — حذف الطلب
       await order.deleteOne();
       res.status(400);
-      throw new Error('تم استنفاد عدد الاستخدامات المتاحة للكوبون');
+      throw new Error("تم استنفاد عدد الاستخدامات المتاحة للكوبون");
     }
   }
 
@@ -150,15 +160,15 @@ export const createOrder = asyncHandler(async (req, res) => {
  */
 export const getMyOrders = asyncHandler(async (req, res) => {
   const result = await paginateQuery(Order, { userId: req.user._id }, req, {
-    populate: { path: 'courseId', select: 'title thumbnail price' },
-    sort: '-createdAt',
-    defaultLimit: 10
+    populate: { path: "courseId", select: "title thumbnail price" },
+    sort: "-createdAt",
+    defaultLimit: 10,
   });
 
   res.json({
     success: true,
-    message: 'تم جلب طلباتك بنجاح',
-    ...result
+    message: "تم جلب طلباتك بنجاح",
+    ...result,
   });
 });
 
@@ -171,17 +181,17 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 export const getPendingOrders = asyncHandler(async (req, res) => {
   const result = await paginateQuery(Order, { status: "pending" }, req, {
     populate: [
-      { path: 'userId', select: 'name email phone' },
-      { path: 'courseId', select: 'title thumbnail price' }
+      { path: "userId", select: "name email phone" },
+      { path: "courseId", select: "title thumbnail price" },
     ],
-    sort: '-createdAt',
-    defaultLimit: 20
+    sort: "-createdAt",
+    defaultLimit: 20,
   });
 
   res.json({
     success: true,
-    message: 'تم جلب الطلبات المعلقة',
-    ...result
+    message: "تم جلب الطلبات المعلقة",
+    ...result,
   });
 });
 
@@ -198,18 +208,18 @@ export const getAllOrders = asyncHandler(async (req, res) => {
 
   const result = await paginateQuery(Order, filter, req, {
     populate: [
-      { path: 'userId', select: 'name email phone' },
-      { path: 'courseId', select: 'title thumbnail price' },
-      { path: 'approvedBy', select: 'name' }
+      { path: "userId", select: "name email phone" },
+      { path: "courseId", select: "title thumbnail price" },
+      { path: "approvedBy", select: "name" },
     ],
-    sort: '-createdAt',
-    defaultLimit: 20
+    sort: "-createdAt",
+    defaultLimit: 20,
   });
 
   res.json({
     success: true,
-    message: 'تم جلب جميع الطلبات',
-    ...result
+    message: "تم جلب جميع الطلبات",
+    ...result,
   });
 });
 
@@ -223,7 +233,7 @@ export const approveOrder = asyncHandler(async (req, res) => {
   const order = await Order.findOneAndUpdate(
     { _id: req.params.id, status: "pending" },
     { status: "approved", approvedBy: req.user._id, approvedAt: Date.now() },
-    { new: true }
+    { new: true },
   ).populate("userId courseId");
 
   if (!order) {
@@ -238,27 +248,26 @@ export const approveOrder = asyncHandler(async (req, res) => {
   }
 
   // إضافة الكورس لقائمة الطالب (atomic push with $addToSet to prevent duplicates)
-  await User.findByIdAndUpdate(
-    order.userId._id,
-    {
-      $addToSet: {
-        enrolledCourses: {
-          course: order.courseId._id,
-          enrolledAt: new Date(),
-          videoProgress: [],
-        },
+  await User.findByIdAndUpdate(order.userId._id, {
+    $addToSet: {
+      enrolledCourses: {
+        course: order.courseId._id,
+        enrolledAt: new Date(),
+        videoProgress: [],
       },
-    }
-  );
+    },
+  });
 
   // زيادة عدد الطلاب المسجلين
-  await Course.findByIdAndUpdate(order.courseId._id, { $inc: { enrolledStudents: 1 } });
+  await Course.findByIdAndUpdate(order.courseId._id, {
+    $inc: { enrolledStudents: 1 },
+  });
 
   // إنشاء إشعار للطالب
   await createNotification({
     user: order.userId._id,
-    type: 'order_approved',
-    title: 'تمت الموافقة على طلبك! 🎉',
+    type: "order_approved",
+    title: "تمت الموافقة على طلبك! 🎉",
     message: `تم قبول طلب شراء كورس "${order.courseId.title}" ويمكنك الآن البدء في التعلم`,
     link: `/courses/${order.courseId._id}`,
     metadata: {
@@ -269,14 +278,18 @@ export const approveOrder = asyncHandler(async (req, res) => {
 
   // إرسال إيميل للطالب
   try {
-    const courseUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/courses/${order.courseId._id}`;
+    const courseUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/courses/${order.courseId._id}`;
     await sendEmail({
       to: order.userId.email,
-      subject: '🎉 تمت الموافقة على طلبك - مسار',
-      html: getOrderApprovedTemplate(order.userId.name, order.courseId.title, courseUrl),
+      subject: "🎉 تمت الموافقة على طلبك - مسار",
+      html: getOrderApprovedTemplate(
+        order.userId.name,
+        order.courseId.title,
+        courseUrl,
+      ),
     });
   } catch (emailError) {
-    logger.error('خطأ في إرسال الإيميل:', emailError);
+    logger.error("خطأ في إرسال الإيميل:", emailError);
     // لا نرمي خطأ لأن العملية الأساسية نجحت
   }
 
@@ -318,18 +331,18 @@ export const rejectOrder = asyncHandler(async (req, res) => {
       { code: order.couponCode },
       {
         $inc: { usedCount: -1 },
-        $pull: { usedBy: { user: order.userId } }
-      }
+        $pull: { usedBy: { user: order.userId } },
+      },
     );
   }
 
   // إنشاء إشعار للطالب
   await createNotification({
     user: order.userId,
-    type: 'order_rejected',
-    title: 'تم رفض طلبك',
+    type: "order_rejected",
+    title: "تم رفض طلبك",
     message: `تم رفض طلب شراء الكورس. السبب: ${order.rejectionReason}`,
-    link: '/orders',
+    link: "/orders",
     metadata: {
       orderId: order._id,
     },
@@ -343,12 +356,16 @@ export const rejectOrder = asyncHandler(async (req, res) => {
     if (user && course) {
       await sendEmail({
         to: user.email,
-        subject: 'تحديث بشأن طلبك - مسار',
-        html: getOrderRejectedTemplate(user.name, course.title, order.rejectionReason),
+        subject: "تحديث بشأن طلبك - مسار",
+        html: getOrderRejectedTemplate(
+          user.name,
+          course.title,
+          order.rejectionReason,
+        ),
       });
     }
   } catch (emailError) {
-    logger.error('خطأ في إرسال الإيميل:', emailError);
+    logger.error("خطأ في إرسال الإيميل:", emailError);
   }
 
   res.json({
@@ -372,15 +389,15 @@ export const deleteOrder = asyncHandler(async (req, res) => {
   }
 
   // لو الطلب كان معتمد، لازم نعكس التسجيل
-  if (order.status === 'approved') {
+  if (order.status === "approved") {
     // إزالة الطالب من الكورس
     await User.findByIdAndUpdate(order.userId, {
-      $pull: { enrolledCourses: { course: order.courseId } }
+      $pull: { enrolledCourses: { course: order.courseId } },
     });
 
     // تنقيص عدد الطلاب المسجلين
     await Course.findByIdAndUpdate(order.courseId, {
-      $inc: { enrolledStudents: -1 }
+      $inc: { enrolledStudents: -1 },
     });
   }
 
@@ -390,8 +407,8 @@ export const deleteOrder = asyncHandler(async (req, res) => {
       { code: order.couponCode },
       {
         $inc: { usedCount: -1 },
-        $pull: { usedBy: { user: order.userId } }
-      }
+        $pull: { usedBy: { user: order.userId } },
+      },
     );
   }
 
@@ -400,5 +417,80 @@ export const deleteOrder = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: "تم حذف الطلب بنجاح",
+  });
+});
+
+/**
+ * @desc    إحصائيات الإيرادات الحقيقية للمدرب من الطلبات المعتمدة
+ * @route   GET /api/orders/instructor/revenue
+ * @access  Private/Instructor
+ */
+export const getInstructorRevenue = asyncHandler(async (req, res) => {
+  // جلب جميع الكورسات الخاصة بالمدرب
+  const instructorCourses = await Course.find(
+    { instructor: req.user._id },
+    "_id title price enrolledStudents",
+  );
+  const courseIds = instructorCourses.map((c) => c._id);
+
+  if (courseIds.length === 0) {
+    return res.json({
+      success: true,
+      data: {
+        totalRevenue: 0,
+        totalApprovedOrders: 0,
+        revenuePerCourse: [],
+      },
+    });
+  }
+
+  // تجميع الطلبات المعتمدة من هذه الكورسات
+  const revenueAgg = await Order.aggregate([
+    {
+      $match: {
+        courseId: { $in: courseIds },
+        status: "approved",
+      },
+    },
+    {
+      $group: {
+        _id: "$courseId",
+        revenue: { $sum: "$finalPrice" },
+        ordersCount: { $sum: 1 },
+      },
+    },
+  ]);
+
+  // دمج النتائج مع بيانات الكورسات
+  const revenueMap = {};
+  revenueAgg.forEach((r) => {
+    revenueMap[r._id.toString()] = {
+      revenue: r.revenue,
+      ordersCount: r.ordersCount,
+    };
+  });
+
+  const revenuePerCourse = instructorCourses.map((c) => ({
+    courseId: c._id,
+    title: c.title,
+    price: c.price,
+    enrolledStudents: c.enrolledStudents,
+    revenue: revenueMap[c._id.toString()]?.revenue || 0,
+    approvedOrders: revenueMap[c._id.toString()]?.ordersCount || 0,
+  }));
+
+  const totalRevenue = revenuePerCourse.reduce((sum, c) => sum + c.revenue, 0);
+  const totalApprovedOrders = revenuePerCourse.reduce(
+    (sum, c) => sum + c.approvedOrders,
+    0,
+  );
+
+  res.json({
+    success: true,
+    data: {
+      totalRevenue,
+      totalApprovedOrders,
+      revenuePerCourse,
+    },
   });
 });

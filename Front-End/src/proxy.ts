@@ -23,7 +23,7 @@ const AUTH_ROUTES = ['/login', '/register'];
 /**
  * Decode the JWT payload WITHOUT verification.
  * This runs in Edge middleware for routing decisions only.
- * Actual authorization is enforced by the backend’s protect middleware.
+ * Actual authorization is enforced by the backend's protect middleware.
  */
 function decodeJwtPayload(token: string): { role?: string; id?: string } | null {
   try {
@@ -59,7 +59,7 @@ function getAuthFromRequest(request: NextRequest) {
   };
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { token, role } = getAuthFromRequest(request);
   const isAuthenticated = !!token;

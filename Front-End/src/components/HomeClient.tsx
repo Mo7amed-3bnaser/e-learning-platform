@@ -32,6 +32,8 @@ import {
 } from "react-icons/fi";
 import { useAuthStore } from "@/store/authStore";
 import Logo from "@/components/Logo";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+
 
 /* ─────────────────────────────────────────────
    Static data
@@ -150,6 +152,7 @@ const STEPS = [
 ───────────────────────────────────────────── */
 export default function HomeClient() {
   const { isAuthenticated } = useAuthStore();
+  const { recentCourses } = useRecentlyViewed();
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -367,6 +370,68 @@ export default function HomeClient() {
           </StaggerContainer>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════
+          RECENTLY VIEWED
+      ══════════════════════════════════════ */}
+      {recentCourses.length > 0 && (
+        <section className="py-14 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+          <div className="container mx-auto px-6">
+            <ScrollReveal preset="fadeUp" className="mb-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-accent font-semibold text-sm tracking-widest uppercase mb-1">
+                    سجل مشاهداتك
+                  </p>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                    شاهدتها مؤخراً
+                  </h2>
+                </div>
+                <Link
+                  href="/courses"
+                  className="text-sm text-primary dark:text-primary-light font-medium hover:underline flex items-center gap-1"
+                >
+                  <FiArrowLeft className="w-4 h-4" />
+                  تصفح الكل
+                </Link>
+              </div>
+            </ScrollReveal>
+            <StaggerContainer
+              stagger={0.08}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+            >
+              {recentCourses.slice(0, 4).map((course) => (
+                <StaggerItem key={course._id} preset="fadeUp">
+                  <Link
+                    href={`/courses/${course._id}`}
+                    className="group flex flex-col rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-primary/40 dark:hover:border-primary/50 hover:shadow-lg transition-all hover-lift"
+                  >
+                    <div className="relative h-36 bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                      {course.thumbnail ? (
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <FiPlay className="w-8 h-8 text-slate-400" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                    </div>
+                    <div className="p-3">
+                      <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
+                        {course.title}
+                      </p>
+                    </div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </section>
+      )}
 
       {/* ══════════════════════════════════════
           CATEGORIES
@@ -660,121 +725,6 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════
-          FOOTER
-      ══════════════════════════════════════ */}
-      <footer className="bg-slate-900 dark:bg-slate-950 text-white relative overflow-hidden">
-        {/* Subtle top glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-linear-to-r from-transparent via-primary/50 to-transparent" />
-
-        <div className="container mx-auto px-6 pt-16 pb-8">
-
-          {/* Main grid */}
-          <StaggerContainer stagger={0.12} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
-
-            {/* Brand column */}
-            <StaggerItem preset="fadeUp">
-              <div className="space-y-5 lg:col-span-1">
-                <Logo size="md" showText className="text-white" />
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  منصة مسار — نحو تعليم عربي احترافي يصنع الفارق في حياتك المهنية.
-                </p>
-
-              </div>
-            </StaggerItem>
-
-            {/* Quick links */}
-            <StaggerItem preset="fadeUp">
-              <div>
-                <h4 className="font-bold text-slate-200 mb-5 text-sm uppercase tracking-wider">
-                  روابط سريعة
-                </h4>
-                <ul className="space-y-2.5">
-                  {[
-                    { href: "/courses", label: "تصفح الكورسات" },
-                    { href: "/about", label: "عن المنصة" },
-                    ...(!isAuthenticated ? [
-                      { href: "/register", label: "إنشاء حساب" },
-                      { href: "/login", label: "تسجيل الدخول" },
-                    ] : []),
-                  ].map((l) => (
-                    <li key={l.href}>
-                      <motion.div whileHover={{ x: -4 }} transition={{ type: "spring", stiffness: 400 }}>
-                        <Link
-                          href={l.href}
-                          className="group flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors duration-200"
-                        >
-                          <FiChevronLeft className="w-3 h-3 opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
-                          {l.label}
-                        </Link>
-                      </motion.div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </StaggerItem>
-
-            {/* Legal */}
-            <StaggerItem preset="fadeUp">
-              <div>
-                <h4 className="font-bold text-slate-200 mb-5 text-sm uppercase tracking-wider">
-                  قانوني
-                </h4>
-                <ul className="space-y-2.5">
-                  {[
-                    { href: "/privacy", label: "سياسة الخصوصية" },
-                    { href: "/terms", label: "الشروط والأحكام" },
-                  ].map((l) => (
-                    <li key={l.href}>
-                      <motion.div whileHover={{ x: -4 }} transition={{ type: "spring", stiffness: 400 }}>
-                        <Link
-                          href={l.href}
-                          className="group flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors duration-200"
-                        >
-                          <FiChevronLeft className="w-3 h-3 opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
-                          {l.label}
-                        </Link>
-                      </motion.div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </StaggerItem>
-
-            {/* Contact */}
-            <StaggerItem preset="fadeUp">
-              <div>
-                <h4 className="font-bold text-slate-200 mb-5 text-sm uppercase tracking-wider">
-                  تواصل معنا
-                </h4>
-                <ul className="space-y-3">
-                  {[
-                    { Icon: FiMail, text: "support@masar.edu" },
-                    { Icon: FiPhone, text: "+20 100 000 0000" },
-                    { Icon: FiMapPin, text: "سوهاج، مصر" },
-                  ].map(({ Icon, text }) => (
-                    <li key={text} className="flex items-center gap-3 text-slate-400 text-sm group">
-                      <span className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/40 transition-colors">
-                        <Icon className="w-3.5 h-3.5 text-primary" />
-                      </span>
-                      <span className="group-hover:text-slate-300 transition-colors">{text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </StaggerItem>
-          </StaggerContainer>
-
-          {/* Bottom bar */}
-          <ScrollReveal preset="fadeUp" delay={0.2}>
-            <div className="border-t border-slate-800 pt-7 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-xs">
-              <p>© 2026 منصة مسار — جميع الحقوق محفوظة</p>
-              <p>صُنع بواسطة يسي ومحمد</p>
-            </div>
-          </ScrollReveal>
-
-        </div>
-      </footer>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import AuthInitializer from "@/components/AuthInitializer";
 import ThemeProvider from "@/components/ThemeProvider";
 import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Footer from "@/components/Footer";
 import { SkipToMainContent } from "@/lib/accessibility";
 import "./globals.css";
 
@@ -90,6 +91,7 @@ export default function RootLayout({
             <SkipToMainContent />
             <AuthInitializer>
               {children}
+              <Footer />
             </AuthInitializer>
             <ScrollToTop />
             <Toaster

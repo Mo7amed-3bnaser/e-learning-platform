@@ -24,6 +24,7 @@ interface CourseProgress {
 interface ProgressState {
   // State
   courseProgress: Record<string, CourseProgress>; // courseId -> progress
+  _progressFetchedAt: Record<string, number>; // courseId -> timestamp
   isLoading: boolean;
   _hasHydrated: boolean;
 
@@ -43,10 +44,17 @@ export const useProgressStore = create<ProgressState>()(
   persist(
     (set, get) => ({
       courseProgress: {},
+      _progressFetchedAt: {},
       isLoading: false,
       _hasHydrated: false,
 
       fetchCourseProgress: async (courseId: string) => {
+        // Skip if fetched within the last 5 minutes
+        const lastFetch = get()._progressFetchedAt[courseId];
+        if (lastFetch && Date.now() - lastFetch < 5 * 60 * 1000 && get().courseProgress[courseId]) {
+          return;
+        }
+
         try {
           set({ isLoading: true });
 
@@ -67,6 +75,10 @@ export const useProgressStore = create<ProgressState>()(
                   completedVideos: progressData.completedVideos,
                   videoProgress: progressData.videoProgress
                 }
+              },
+              _progressFetchedAt: {
+                ...state._progressFetchedAt,
+                [courseId]: Date.now()
               },
               isLoading: false
             }));

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
 import { authAPI } from '@/lib/api';
 import { useThemeStore } from '@/store/themeStore';
-import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck, FiHeart, FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiGrid, FiBook, FiUserCheck, FiHeart, FiSun, FiMoon, FiMenu, FiX, FiBell } from 'react-icons/fi';
 import Logo from './Logo';
 import NotificationBell from './NotificationBell';
 import { useRouter } from 'next/navigation';
@@ -122,6 +122,7 @@ export default function Header() {
                     <div className="py-1">
                       {[
                         { href: '/my-courses', icon: FiBook, label: 'كورساتي' },
+                        { href: '/notifications', icon: FiBell, label: 'الإشعارات' },
                         { href: '/wishlist', icon: FiHeart, label: 'قائمة الرغبات' },
                         { href: '/profile', icon: FiUser, label: 'الملف الشخصي' },
                         { href: '/dashboard', icon: FiGrid, label: 'لوحة التحكم' },
@@ -214,6 +215,7 @@ export default function Header() {
                 {[
                   { href: '/dashboard', icon: FiGrid, label: 'لوحتي' },
                   { href: '/my-courses', icon: FiBook, label: 'كورساتي' },
+                  { href: '/notifications', icon: FiBell, label: 'الإشعارات' },
                   { href: '/wishlist', icon: FiHeart, label: 'قائمة الرغبات' },
                   { href: '/profile', icon: FiUser, label: 'الملف الشخصي' },
                 ].map(({ href, icon: Icon, label }) => (

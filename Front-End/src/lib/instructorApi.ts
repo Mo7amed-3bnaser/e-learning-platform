@@ -93,6 +93,12 @@ export const instructorApi = {
         const response = await api.delete(`/videos/${id}`);
         return response.data;
     },
+
+    // Get real revenue stats from approved orders
+    getRevenue: async () => {
+        const response = await api.get('/orders/instructor/revenue');
+        return response.data;
+    },
 };
 
 export const adminApi = {

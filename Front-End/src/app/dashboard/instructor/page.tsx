@@ -36,19 +36,21 @@ export default function InstructorDashboard() {
     const fetchCourses = async () => {
         try {
             setIsLoading(true);
-            const response = await instructorApi.getMyCourses();
-            setCourses(response.data || []);
+            const [coursesRes, revenueRes] = await Promise.all([
+                instructorApi.getMyCourses(),
+                instructorApi.getRevenue().catch(() => ({ data: { totalRevenue: 0 } })),
+            ]);
 
-            // Calculate stats
-            const published = response.data.filter((c: any) => c.isPublished).length;
-            const totalEnrolled = response.data.reduce((sum: number, c: any) => sum + (c.enrolledStudents || 0), 0);
-            const revenue = response.data.reduce((sum: number, c: any) => sum + ((c.enrolledStudents || 0) * c.price), 0);
+            setCourses(coursesRes.data || []);
+
+            const published = coursesRes.data.filter((c: any) => c.isPublished).length;
+            const totalEnrolled = coursesRes.data.reduce((sum: number, c: any) => sum + (c.enrolledStudents || 0), 0);
 
             setStats({
-                totalCourses: response.data.length,
+                totalCourses: coursesRes.data.length,
                 publishedCourses: published,
                 totalStudents: totalEnrolled,
-                totalRevenue: revenue,
+                totalRevenue: revenueRes.data?.totalRevenue ?? 0,
             });
         } catch (error: any) {
             toast.error(error.response?.data?.message || "حدث خطأ في جلب الكورسات");

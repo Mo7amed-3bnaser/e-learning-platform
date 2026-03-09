@@ -81,7 +81,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
   };
 
   return (
-    <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:border-primary/20 dark:hover:border-primary/30 hover:-translate-y-1 hover-lift h-full flex flex-col">
+    <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl dark:shadow-slate-900/50 transition-all duration-300 border border-slate-100 dark:border-slate-700 hover:border-primary/30 dark:hover:border-primary/40 hover:-translate-y-2 hover-lift h-full flex flex-col">
       {/* صورة الكورس */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-primary-dark/10 dark:from-primary/20 dark:to-primary-dark/20 image-zoom-container">
         {course.thumbnail ? (
@@ -101,7 +101,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
 
         {/* Category Badge */}
         <div className="absolute top-3 right-3">
-          <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary dark:text-orange-400 badge-pulse">
+          <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary dark:text-orange-400 transition-transform duration-200 group-hover:scale-105">
             {course.category || 'عام'}
           </span>
         </div>
@@ -228,7 +228,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
             /* زر اكمل المشاهدة للكورسات المشتراة */
             <button
               onClick={handleContinueWatching}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-l from-green-500 to-green-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all hover:from-green-600 hover:to-green-700"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-l from-green-500 to-green-600 text-white py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-green-500/30 transition-all duration-200 hover:from-green-600 hover:to-green-700 hover:scale-[1.02] active:scale-[0.98]"
             >
               <FiPlay className="w-5 h-5" />
               <span>اكمل المشاهدة</span>
@@ -239,7 +239,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
               {/* زر تفاصيل الكورس */}
               <button
                 onClick={handleViewDetails}
-                className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl font-medium transition-all"
+                className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <FiInfo className="w-4 h-4" />
                 <span>التفاصيل</span>
@@ -248,7 +248,7 @@ function CourseCard({ course, isPurchased = false }: CourseCardProps) {
               {/* زر اشتر الآن */}
               <button
                 onClick={handleBuyNow}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-l from-primary to-primary-dark dark:from-accent dark:to-accent-dark text-white py-2.5 rounded-xl font-medium hover:shadow-lg transition-all animate-pulse-slow hover:scale-105"
+                className="flex-1 flex items-center justify-center gap-2 bg-linear-to-l from-primary to-primary-dark dark:from-accent dark:to-accent-dark text-white py-2.5 rounded-xl font-medium hover:shadow-lg hover:shadow-primary/30 dark:hover:shadow-accent/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <FiShoppingCart className="w-4 h-4" />
                 <span>اشتر الآن</span>

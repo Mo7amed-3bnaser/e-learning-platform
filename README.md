@@ -11,10 +11,6 @@
 </p>
 
 <p align="center">
-  <em>80+ REST API endpoints · 37+ React components · 35+ pages · 11 database models · 4-layer device protection · Dark/Light mode · Full RTL Arabic UI</em>
-</p>
-
-<p align="center">
   <a href="#-features">Features</a> •
   <a href="#-tech-stack">Tech Stack</a> •
   <a href="#-architecture">Architecture</a> •
@@ -42,6 +38,7 @@
 ## ✨ Features
 
 ### 🔐 Authentication & Security
+
 - **JWT Authentication** with HttpOnly cookie-based token storage (access + refresh tokens)
 - **Email Verification** flow with tokenized verification links
 - **Password Recovery** with secure reset tokens sent via email
@@ -50,24 +47,25 @@
 - **Role-Based Access Control (RBAC)** — Student, Instructor, Admin with granular permissions
 - **Rate Limiting** — 5 distinct rate limiters:
   - Login: `5 requests / 15 min`
-  - Registration: `10 requests / hour`
+  - Registration: `3 requests / hour`
   - Forgot Password: `3 requests / hour`
-  - Order Creation: `5 requests / hour` (admin exempt)
-  - Global API: `100 requests / 15 min`
+  - Order Creation: `5 requests / hour`
+  - Global API: `300 requests / 15 min` (per-user key; falls back to IP for guests)
 - **Security Headers** via Helmet (X-Frame-Options, X-Content-Type-Options, Referrer-Policy, etc.)
 - **NoSQL Injection Prevention** with `express-mongo-sanitize`
 - **XSS Sanitization** on all user inputs
 - **File Upload Validation** — 5MB limit, jpg/png/webp only
 
 ### 🛡️ 4-Layer Device Protection System
+
 A sophisticated anti-piracy mechanism applied to student accounts:
 
-| Layer | Protection | Details |
-|-------|-----------|---------|
-| 1 | **Device Agreement** | Students must accept terms before first login |
-| 2 | **Monthly Device Limit** | Maximum 2 unique devices per month |
-| 3 | **Cooldown Period** | 4-hour cooldown between device switches |
-| 4 | **Active Session Limit** | Only 1 concurrent session allowed; old sessions auto-deactivated |
+| Layer | Protection               | Details                                                          |
+| ----- | ------------------------ | ---------------------------------------------------------------- |
+| 1     | **Device Agreement**     | Students must accept terms before first login                    |
+| 2     | **Monthly Device Limit** | Maximum 2 unique devices per month                               |
+| 3     | **Cooldown Period**      | 4-hour cooldown between device switches                          |
+| 4     | **Active Session Limit** | Only 1 concurrent session allowed; old sessions auto-deactivated |
 
 - Device fingerprinting uses SHA-256 hash of User-Agent + client fingerprint
 - Admin and Instructor accounts are **exempt** from device restrictions
@@ -75,6 +73,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - `validateActiveSession` middleware validates session on video playback endpoints
 
 ### 📚 Course Management
+
 - **Full CRUD** for courses by instructors and admins
 - **Course Categories:** Programming, Design, Business, Marketing, Language, Science, Other
 - **Course Levels:** Beginner, Intermediate, Advanced
@@ -87,6 +86,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Optional Authentication** — unauthenticated users can browse; enrolled students see full content
 
 ### 🎬 Video System
+
 - **Dual Video Provider Support:**
   - **YouTube** (primary for demo) — embeds with `youtubeVideoId`
   - **Bunny.net** (secondary, production-ready) — streaming via `bunnyVideoId`
@@ -97,6 +97,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Video Watermark** component on the frontend to deter screen recording
 
 ### 💰 Payment & Order System
+
 - **Manual Payment Flow (Production Mode):**
   1. Student selects a course and uploads a payment screenshot (Vodafone Cash / InstaPay / Bank Transfer)
   2. Admin reviews the screenshot in the admin dashboard
@@ -111,6 +112,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Rejection Reasons** — admin can provide rejection reason sent to the student
 
 ### 🎟️ Coupon System
+
 - **Discount Types:** Percentage-based or Fixed amount
 - **Usage Limits** — per-coupon cap with atomic `usedCount` increment
 - **Per-User Tracking** — prevents reuse by the same user
@@ -122,6 +124,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Student Application** — `applyCoupon` endpoint with real-time discount calculation
 
 ### 📊 Progress Tracking
+
 - **Video Completion Tracking** — mark videos as complete/incomplete
 - **Watch Duration Tracking** — `updateWatchDuration` for analytics
 - **Course Progress Percentage** — calculated from completed vs. total videos
@@ -129,6 +132,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Progress stored per-enrollment** in the User model for atomic updates
 
 ### 📝 Reviews & Ratings
+
 - **Star Rating System** (1-5) with text reviews
 - **Completion Gate** — only students who completed 100% of a course can leave a review
 - **One Review Per User Per Course** — enforced at model level
@@ -137,12 +141,14 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Review Notifications** — instructors notified of new reviews
 
 ### 💬 Comments System
+
 - **Video-Level Comments** — students can discuss individual videos
 - **Enrollment Check** — only enrolled students (or instructors/admins) can comment
 - **Comment CRUD** — users can edit/delete their own comments
 - **Paginated Display** with newest-first sorting
 
 ### 🏆 Certificate System
+
 - **Auto-Generation** at 100% course completion
 - **PDF Certificates** built with `pdf-lib` and custom Arabic fonts via `@pdf-lib/fontkit`
 - **Unique Certificate ID** — each certificate has a verifiable UUID
@@ -152,6 +158,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 - **Notification + Email** sent on certificate issuance
 
 ### 🔔 Notification System
+
 - **9 Notification Types:**
   - `order_approved`, `order_rejected`
   - `course_enrolled`, `course_published`
@@ -159,18 +166,27 @@ A sophisticated anti-piracy mechanism applied to student accounts:
   - `comment_reply`
   - `instructor_approved`, `instructor_rejected`
   - `new_review`
-- **Real-Time Badge** — unread count displayed in the notification bell
+- **Real-Time Badge** — unread count polled every 30 seconds and displayed in the notification bell
+- **Notification Bell Dropdown** — quick-view of latest 10 notifications with per-item mark-as-read & delete
+- **Dedicated Notifications Page** (`/notifications`) — full-featured page with:
+  - Filter tabs: All / Unread / Read
+  - Paginated list (15 per page) with staggered entrance animations
+  - Mark all as read in one click
+  - Delete all read notifications
+  - Hover-reveal delete button per notification
+  - Distinct empty states per filter type
 - **Mark as Read** — individual and bulk operations
 - **Auto-Cleanup** — daily cron job at 2:00 AM deletes notifications older than 30 days
-- **Paginated Listing** with filtering support
 
 ### ❤️ Wishlist
+
 - **Add/Remove Courses** with toggle functionality
 - **Enrollment Check** — removes wishlisted courses automatically after enrollment
 - **Persisted Per-User** in the database
 - **Quick Check Endpoint** — `GET /api/wishlist/check/:courseId`
 
 ### 👨‍🏫 Instructor Application Flow
+
 1. **Public Application Form** — no authentication required
 2. **Duplicate Detection** — checks for existing user or pending application
 3. **Admin Review Dashboard** — view, approve, or reject applications
@@ -179,6 +195,7 @@ A sophisticated anti-piracy mechanism applied to student accounts:
 6. **Email Notifications** at each stage
 
 ### 🛠️ Admin Dashboard
+
 - **Analytics Dashboard:**
   - Total revenue with period aggregation
   - Enrolled students count
@@ -191,7 +208,6 @@ A sophisticated anti-piracy mechanism applied to student accounts:
   - Delete student accounts (cascading cleanup)
 - **Instructor Management:**
   - View all instructors with course counts
-  - Block/unblock instructors
   - Demote instructor to student role
 - **Order Management:**
   - View pending orders with payment screenshots
@@ -199,123 +215,82 @@ A sophisticated anti-piracy mechanism applied to student accounts:
   - Filter by status
 - **Course Management:**
   - View all courses across instructors
-  - Create new courses from admin panel
-  - Full CRUD capabilities (edit, delete, manage videos)
+  - Full CRUD capabilities
 - **Coupon Management:**
   - Create, edit, delete coupons
-  - Toggle coupon active/inactive
   - Usage analytics
 - **Instructor Application Review:**
   - Review pending applications
   - Approve or reject with feedback
-  - Delete applications
 - **Device & Session Management:**
   - View device logs per user
-  - Reset user device limits
   - Manage active sessions
 
-### 👨‍🏫 Instructor Dashboard
-- **Instructor Profile** with specialization, bio, and stats
-- **Course Management:**
-  - Create new courses with thumbnail upload
-  - Edit existing courses
-  - Toggle publish/unpublish status
-  - View course statistics (enrolled students, revenue, ratings)
-- **Video Management:**
-  - Add/edit/delete videos per course
-  - Set video order and free preview flags
-  - Support for YouTube and Bunny.net video providers
-- **Dashboard Analytics** — overview of own courses, students, and revenue
-
 ### 🌙 UI/UX Features
+
 - **Full Arabic RTL Layout** — `dir="rtl"` with `lang="ar"` throughout
 - **Dark/Light Mode** — theme toggle with persistence (Zustand store)
 - **Dark Mode Flash Prevention** — inline script in layout prevents FOUC
 - **Responsive Design** — mobile-first approach with Tailwind CSS v4
-- **Animated Brand Splash Screen** — custom `BrandLoader` with particle effects on initial load
-- **Animated SVG Hero Section** — `MasarRoadHero` with M-shaped road, milestone animations, and parallax
-- **Smooth Animations** — Framer Motion page transitions, scroll reveals, typing effects
-- **Toast Notifications** — react-hot-toast for user feedback (success, error, info, warning, loading)
-- **Skeleton Loading** — shimmer placeholders for all data-fetching states (7+ skeleton variants)
-- **Breadcrumb Navigation** — contextual path display with dark/light/auto variants
-- **Empty States** — 7 illustrated empty state variants (no courses, no orders, no comments, no students, no videos, no enrolled, search no results)
-- **Loading Variants** — 10 loading states (spinner, dots, bar, full-page, inline, button, card overlay, pulse, progress bar, skeleton pulse)
-- **Scroll to Top** — smooth scroll-to-top floating button
-- **Recently Viewed Courses** — client-side tracking hook (max 10 courses)
-- **Video Timestamp Bookmarks** — resume video playback from exact timestamp via `useVideoBookmark` hook
-- **Custom 404 Page** — branded not-found page
-- **Responsive Tables** — desktop table + mobile card layout pattern for admin pages
-- **Animated Counters** — `AnimatedCounter` with easeOutExpo easing
-
-### ♿ Accessibility
-- **Arabic ARIA Labels** — comprehensive ARIA label system for all interactive elements in Arabic
-- **Screen Reader Support** — `ScreenReaderOnly` component and live announcer utility
-- **Focus Trap** — keyboard focus management for modals and overlays
-- **Keyboard Navigation** — full keyboard support with arrow keys, Enter, Escape handlers
-- **Skip to Main Content** — `SkipToMainContent` component for accessibility compliance
-
-### 🛡️ Error Monitoring & Resilience
-- **Error Monitoring System** — centralized error capture with optional Sentry integration
-- **In-Memory Error Buffer** — last 50 errors stored for debugging (custom `/api/errors` endpoint ready)
-- **Global Error Handlers** — unhandled rejection and error event listeners
-- **React Error Boundary** — graceful error UI with error reporting integration
-- **Axios Retry Logic** — automatic retry with exponential backoff (500ms, 1s) on network/500 errors, max 2 retries
-- **Backend Cold-Start Wake-Up** — `AuthInitializer` pings the backend on app init for free-tier hosting cold starts
-- **Certificate Auto-Retry** — auto-generate certificates on frontend if not found, with 3 retries and 3s delay
-
-### 🔀 Next.js Edge Middleware
-- **Route Protection** — JWT payload decoding in Edge middleware for role-based routing
-- **Admin Route Guard** — redirects non-admin users away from `/admin` routes
-- **Instructor Route Guard** — restricts `/dashboard/instructor` to instructor/admin roles
-- **Auth Route Redirect** — logged-in users redirected from `/login`, `/register` to role-specific dashboards
-- **Session Revoke Detection** — automatic redirect to `/login?reason=session_revoked` on session invalidation
-
-### 📄 Static Pages
-- **About Page** (`/about`) — platform mission, vision, values, stats, and contact info
-- **Privacy Policy** (`/privacy`) — comprehensive privacy policy page
-- **Terms of Service** (`/terms`) — detailed terms and conditions page
-- **Public Instructor Profiles** (`/instructors/[id]`) — view instructor info and courses
+- **Smooth Animations** — Framer Motion page transitions + custom CSS keyframe library:
+  - `page-enter` wrapper for full-page rise-in
+  - `animate-fadeInUp`, `animate-scale-in`, `animate-slide-in-right`, `animate-pop-in`
+  - Staggered row helpers `.stagger-1` … `.stagger-8`
+  - `animate-float` for idle icons, `animate-ping-once` for badge attention
+- **Enhanced CourseCard Hover** — deeper lift (`-translate-y-2`), richer colored shadows, button press feedback
+- **Toast Notifications** — react-hot-toast for user feedback
+- **Skeleton Loading** — shimmer placeholders for all data-fetching states
+- **Breadcrumb Navigation** — contextual path display
+- **Empty States** — illustrated empty state components
+- **Scroll to Top** — smooth scroll-to-top button
+- **Recently Viewed Courses** — client-side tracking hook
+- **Global Footer** — site-wide footer with quick links, categories, and social links
+- **Contact Page** (`/contact`) — contact form with client-side validation
+- **Sitemap** — auto-generated `sitemap.xml` for SEO crawlers
+- **Dynamic Page Metadata** — `generateMetadata` server functions on course detail, checkout, and watch pages for accurate browser tab titles and Open Graph tags
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-| Technology | Purpose |
-|-----------|---------|
-| **Node.js** | Runtime environment |
-| **Express.js 4.18** | HTTP framework (ES Modules) |
-| **MongoDB + Mongoose 8** | Database + ODM |
-| **JSON Web Tokens** | Authentication (access + refresh) |
-| **bcryptjs** | Password hashing |
-| **Cloudinary + Multer** | File upload pipeline (images, certificates) |
-| **Brevo (Sendinblue) HTTP API** | Transactional email delivery (no SMTP) |
-| **pdf-lib + @pdf-lib/fontkit** | Certificate PDF generation |
-| **express-validator** | Input validation |
-| **express-rate-limit** | Rate limiting |
-| **Helmet** | Security headers |
-| **express-mongo-sanitize** | NoSQL injection prevention |
-| **xss** | Cross-site scripting protection |
-| **ua-parser-js** | Device/browser fingerprinting |
-| **node-cron** | Scheduled cleanup tasks |
-| **Winston + Morgan** | Logging (file rotation + HTTP) |
-| **Jest 30 + Supertest** | Testing |
+
+| Technology                     | Purpose                                     |
+| ------------------------------ | ------------------------------------------- |
+| **Node.js**                    | Runtime environment                         |
+| **Express.js 4.18**            | HTTP framework (ES Modules)                 |
+| **MongoDB + Mongoose 8**       | Database + ODM                              |
+| **JSON Web Tokens**            | Authentication (access + refresh)           |
+| **bcryptjs**                   | Password hashing                            |
+| **Cloudinary + Multer**        | File upload pipeline (images, certificates) |
+| **Nodemailer**                 | SMTP email delivery (pooled transporter)    |
+| **pdf-lib + @pdf-lib/fontkit** | Certificate PDF generation                  |
+| **express-validator**          | Input validation                            |
+| **express-rate-limit**         | Rate limiting                               |
+| **Helmet**                     | Security headers                            |
+| **express-mongo-sanitize**     | NoSQL injection prevention                  |
+| **xss**                        | Cross-site scripting protection             |
+| **ua-parser-js**               | Device/browser fingerprinting               |
+| **node-cron**                  | Scheduled cleanup tasks                     |
+| **Winston + Morgan**           | Logging (file rotation + HTTP)              |
+| **Jest 30 + Supertest**        | Testing                                     |
 
 ### Frontend
-| Technology | Purpose |
-|-----------|---------|
-| **Next.js 16** | React framework (App Router) |
-| **React 19** | UI library |
-| **TypeScript 5** | Type safety |
-| **Tailwind CSS v4** | Utility-first styling |
-| **Zustand 5** | Global state management |
-| **SWR 2.4** | Data fetching with caching |
-| **Axios** | HTTP client with interceptors |
-| **Framer Motion 12** | Animations & transitions |
-| **react-hot-toast** | Toast notifications |
-| **react-icons** | Icon library |
-| **clsx + tailwind-merge** | Class utility functions |
-| **Jest + Testing Library** | Component testing |
+
+| Technology                 | Purpose                       |
+| -------------------------- | ----------------------------- |
+| **Next.js 16**             | React framework (App Router)  |
+| **React 19**               | UI library                    |
+| **TypeScript 5**           | Type safety                   |
+| **Tailwind CSS v4**        | Utility-first styling         |
+| **Zustand 5**              | Global state management       |
+| **SWR 2.4**                | Data fetching with caching    |
+| **Axios**                  | HTTP client with interceptors |
+| **Framer Motion 12**       | Animations & transitions      |
+| **react-hot-toast**        | Toast notifications           |
+| **react-icons**            | Icon library                  |
+| **clsx + tailwind-merge**  | Class utility functions       |
+| **Jest + Testing Library** | Component testing             |
 
 ---
 
@@ -413,24 +388,28 @@ DeviceLog ─────── userId ─────────────�
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js** v18+ 
+
+- **Node.js** v18+
 - **MongoDB** (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
 - **Cloudinary** account ([Sign up](https://cloudinary.com/))
 - **SMTP Email** service (Gmail, SendGrid, etc.)
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Mo7amed-3bnaser/e-learning-platform.git
 cd e-learning-platform
 ```
 
 ### 2. Backend Setup
+
 ```bash
 cd Back-End
 npm install
 ```
 
 Create a `.env` file in the `Back-End/` directory:
+
 ```env
 # Server
 PORT=5000
@@ -450,22 +429,24 @@ CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
-# Email (Brevo HTTP API)
-BREVO_API_KEY=your_brevo_api_key
-EMAIL_FROM_ADDRESS=your_email@domain.com
-EMAIL_FROM_NAME=Masar | مسار
+# Email (SMTP)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+EMAIL_FROM=your_email@gmail.com
 
 # Frontend URL (for CORS & email links)
-CLIENT_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3000
+ALLOWED_ORIGINS=http://localhost:3000
 
-# Bunny.net (optional — for DRM video hosting)
+# Bunny.net (optional - for DRM video hosting)
 BUNNY_API_KEY=your_bunny_api_key
 BUNNY_LIBRARY_ID=your_library_id
 ```
 
-> 💡 **Note:** Environment variables are validated at startup via `validateEnv.js`. Missing required vars will cause the server to exit with a descriptive error message.
-
 Start the backend:
+
 ```bash
 # Development
 npm run dev
@@ -475,22 +456,26 @@ npm start
 ```
 
 ### 3. Create Admin Account
+
 ```bash
 npm run create-admin
 ```
 
 ### 4. Frontend Setup
+
 ```bash
 cd ../Front-End
 npm install
 ```
 
 Create a `.env.local` file in the `Front-End/` directory:
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
 Start the frontend:
+
 ```bash
 # Development
 npm run dev
@@ -501,94 +486,97 @@ npm start
 ```
 
 ### 5. Access the Platform
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:5000/api |
+
+| Service      | URL                              |
+| ------------ | -------------------------------- |
+| Frontend     | http://localhost:3000            |
+| Backend API  | http://localhost:5000/api        |
 | Health Check | http://localhost:5000/api/health |
 
 ---
 
 ## 📡 API Reference
 
-The platform exposes **80+ RESTful endpoints** across 16 route modules with full input validation, rate limiting, and role-based access control. Below is a summary:
+The platform exposes **80+ RESTful endpoints** across 16 route modules. Below is a summary:
 
 ### Authentication — `/api/auth`
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/register` | Register new account + email verification |
-| `POST` | `/login` | Login with device protection |
-| `POST` | `/logout` | Logout + clear cookies |
-| `GET` | `/me` | Get current user profile |
-| `PUT` | `/update-profile` | Update name, email, phone, password |
-| `PUT` | `/update-avatar` | Upload/update avatar image |
-| `GET` | `/verify-email/:token` | Verify email address |
-| `POST` | `/resend-verification` | Resend verification email |
-| `POST` | `/forgot-password` | Request password reset |
-| `PUT` | `/reset-password/:token` | Reset password with token |
-| `POST` | `/refresh` | Refresh access token |
+
+| Method | Endpoint                 | Description                               |
+| ------ | ------------------------ | ----------------------------------------- |
+| `POST` | `/register`              | Register new account + email verification |
+| `POST` | `/login`                 | Login with device protection              |
+| `POST` | `/logout`                | Logout + clear cookies                    |
+| `GET`  | `/me`                    | Get current user profile                  |
+| `PUT`  | `/update-profile`        | Update name, email, phone, password       |
+| `PUT`  | `/update-avatar`         | Upload/update avatar image                |
+| `GET`  | `/verify-email/:token`   | Verify email address                      |
+| `POST` | `/resend-verification`   | Resend verification email                 |
+| `POST` | `/forgot-password`       | Request password reset                    |
+| `PUT`  | `/reset-password/:token` | Reset password with token                 |
+| `POST` | `/refresh`               | Refresh access token                      |
 
 ### Courses — `/api/courses`
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `GET` | `/` | List courses (paginated, filterable, sortable) |
-| `GET` | `/:id` | Get course details |
-| `GET` | `/my-courses` | Student's enrolled courses |
-| `GET` | `/instructor/courses` | Instructor's own courses |
-| `GET` | `/instructor/courses/:id/stats` | Course statistics |
-| `POST` | `/` | Create course (instructor/admin) |
-| `PUT` | `/:id` | Update course |
-| `DELETE` | `/:id` | Delete course (cascading) |
-| `PATCH` | `/:id/publish` | Toggle publish status |
+
+| Method   | Endpoint                        | Description                                    |
+| -------- | ------------------------------- | ---------------------------------------------- |
+| `GET`    | `/`                             | List courses (paginated, filterable, sortable) |
+| `GET`    | `/:id`                          | Get course details                             |
+| `GET`    | `/my-courses`                   | Student's enrolled courses                     |
+| `GET`    | `/instructor/courses`           | Instructor's own courses                       |
+| `GET`    | `/instructor/courses/:id/stats` | Course statistics                              |
+| `POST`   | `/`                             | Create course (instructor/admin)               |
+| `PUT`    | `/:id`                          | Update course                                  |
+| `DELETE` | `/:id`                          | Delete course (cascading)                      |
+| `PATCH`  | `/:id/publish`                  | Toggle publish status                          |
 
 ### Videos — `/api/videos`
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/:courseId` | Add video to course |
-| `GET` | `/course/:courseId` | Get course videos (enrollment check) |
-| `GET` | `/:id` | Get single video |
-| `PUT` | `/:id` | Update video |
-| `DELETE` | `/:id` | Delete video |
+
+| Method   | Endpoint            | Description                          |
+| -------- | ------------------- | ------------------------------------ |
+| `POST`   | `/:courseId`        | Add video to course                  |
+| `GET`    | `/course/:courseId` | Get course videos (enrollment check) |
+| `GET`    | `/:id`              | Get single video                     |
+| `PUT`    | `/:id`              | Update video                         |
+| `DELETE` | `/:id`              | Delete video                         |
 
 ### Orders — `/api/orders`
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `POST` | `/` | Create order with payment screenshot |
-| `GET` | `/my-orders` | Student's order history |
-| `GET` | `/pending` | Pending orders (admin) |
-| `GET` | `/all` | All orders (admin) |
-| `PUT` | `/:id/approve` | Approve order (admin, atomic) |
-| `PUT` | `/:id/reject` | Reject order (admin) |
-| `POST` | `/sandbox` | Sandbox payment (dev only) |
-| `GET` | `/check-enrollment/:courseId` | Check enrollment status |
+
+| Method | Endpoint                      | Description                          |
+| ------ | ----------------------------- | ------------------------------------ |
+| `POST` | `/`                           | Create order with payment screenshot |
+| `GET`  | `/my-orders`                  | Student's order history              |
+| `GET`  | `/pending`                    | Pending orders (admin)               |
+| `GET`  | `/all`                        | All orders (admin)                   |
+| `PUT`  | `/:id/approve`                | Approve order (admin, atomic)        |
+| `PUT`  | `/:id/reject`                 | Reject order (admin)                 |
+| `POST` | `/sandbox`                    | Sandbox payment (dev only)           |
+| `GET`  | `/check-enrollment/:courseId` | Check enrollment status              |
 
 ### Admin — `/api/admin`
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `GET` | `/dashboard` | Dashboard analytics & stats |
-| `GET` | `/students` | List students (paginated + searchable) |
-| `PUT` | `/students/:id/block` | Block/unblock student |
-| `DELETE` | `/students/:id` | Delete student (cascade) |
-| `GET` | `/instructors` | List instructors |
-| `PUT` | `/instructors/:id/block` | Block/unblock instructor |
-| `PUT` | `/instructors/:id/demote` | Demote instructor to student |
-| `GET` | `/users/:id/devices` | View user device logs |
-| `PUT` | `/users/:id/devices/reset` | Reset user device limits |
+
+| Method   | Endpoint                  | Description                 |
+| -------- | ------------------------- | --------------------------- |
+| `GET`    | `/dashboard`              | Dashboard analytics & stats |
+| `GET`    | `/students`               | List students (paginated)   |
+| `PUT`    | `/students/:id/block`     | Block/unblock student       |
+| `DELETE` | `/students/:id`           | Delete student (cascade)    |
+| `GET`    | `/instructors`            | List instructors            |
+| `PUT`    | `/instructors/:id/demote` | Demote instructor           |
 
 ### Additional Endpoints
-| Module | Base Path | Key Operations |
-|--------|----------|----------------|
-| **Progress** | `/api/progress` | Mark complete, watch duration, course progress, last watched |
-| **Reviews** | `/api/reviews` | CRUD + `canReview` gate (100% completion) |
-| **Comments** | `/api/comments` | CRUD on video comments (enrollment check) |
-| **Certificates** | `/api/certificates` | Download, generate, public verify |
-| **Coupons** | `/api/coupons` | Admin CRUD + toggle + student apply |
-| **Notifications** | `/api/notifications` | List, unread count, mark read, mark all read, delete, bulk ops |
-| **Sessions** | `/api/sessions` | Active sessions, device history, device limits, revoke, revoke all |
-| **Wishlist** | `/api/wishlist` | Get, add, remove, check |
-| **Instructor Apps** | `/api/instructor-applications` | Submit, admin review, delete |
-| **Uploads** | `/api/upload` | File upload (Cloudinary) |
-| **Users** | `/api/users` | Public user profiles (instructor profiles) |
+
+| Module              | Base Path                      | Key Operations                                               |
+| ------------------- | ------------------------------ | ------------------------------------------------------------ |
+| **Progress**        | `/api/progress`                | Mark complete, watch duration, course progress, last watched |
+| **Reviews**         | `/api/reviews`                 | CRUD + `canReview` gate (100% completion)                    |
+| **Comments**        | `/api/comments`                | CRUD on video comments (enrollment check)                    |
+| **Certificates**    | `/api/certificates`            | Download, public verify                                      |
+| **Coupons**         | `/api/coupons`                 | Admin CRUD + student apply                                   |
+| **Notifications**   | `/api/notifications`           | List, unread count, mark read, bulk ops                      |
+| **Sessions**        | `/api/sessions`                | Active sessions, device history, revoke                      |
+| **Wishlist**        | `/api/wishlist`                | Get, add, remove, check                                      |
+| **Instructor Apps** | `/api/instructor-applications` | Submit, admin review                                         |
+| **Uploads**         | `/api/upload`                  | File upload (Cloudinary)                                     |
 
 > 📄 For detailed API documentation with request/response examples, see [`Back-End/API_DOCS.md`](Back-End/API_DOCS.md)
 
@@ -605,18 +593,18 @@ e-learning-platform/
 │   │   ├── cloudinary.js            # Cloudinary configuration
 │   │   └── logger.js                # Winston logger setup
 │   ├── controllers/                 # Business logic (15 controllers)
-│   │   ├── authController.js        # Auth, login, register, tokens, profile
+│   │   ├── authController.js        # Auth, login, register, tokens
 │   │   ├── courseController.js       # Course CRUD & management
 │   │   ├── videoController.js        # Video CRUD & provider logic
 │   │   ├── orderController.js        # Orders & enrollment
-│   │   ├── adminController.js        # Dashboard, student/instructor mgmt, device management
+│   │   ├── adminController.js        # Dashboard, student/instructor mgmt
 │   │   ├── sandboxController.js      # Dev-only sandbox payments
 │   │   ├── certificateController.js  # PDF generation & verification
-│   │   ├── couponController.js       # Coupon management & toggle
+│   │   ├── couponController.js       # Coupon management
 │   │   ├── reviewController.js       # Review system
 │   │   ├── commentController.js      # Video comments
-│   │   ├── progressController.js     # Progress tracking & watch duration
-│   │   ├── notificationController.js # Notification management & bulk ops
+│   │   ├── progressController.js     # Progress tracking
+│   │   ├── notificationController.js # Notification management
 │   │   ├── sessionController.js      # Session & device management
 │   │   ├── wishlistController.js     # Wishlist operations
 │   │   └── instructorApplicationController.js
@@ -642,106 +630,55 @@ e-learning-platform/
 │   │   ├── errorMiddleware.js       # Global error handler
 │   │   └── httpLogger.js            # Morgan HTTP logging
 │   ├── routes/                      # Express route definitions (16 modules)
-│   ├── utils/                       # Helper utilities (7 modules)
-│   │   ├── authHelpers.js           # JWT generation, token hashing, cookie options
-│   │   ├── certificateGenerator.js  # PDF certificate generation with custom fonts
-│   │   ├── constants.js             # Frozen enums (roles, status, error messages)
-│   │   ├── enrollmentHelper.js      # Enrollment check & migration helpers
-│   │   ├── pagination.js            # Pagination utilities & response formatter
-│   │   ├── sendEmail.js             # Brevo HTTP API + 5 branded HTML email templates
-│   │   └── validateEnv.js           # Startup environment variable validation
-│   ├── scripts/                     # CLI scripts (21 utility scripts)
-│   │   ├── createAdmin.js           # Create admin account
-│   │   ├── importYouTubePlaylist.js  # Import YouTube playlist as course videos
-│   │   ├── clearSessions.js         # Clear active sessions
-│   │   ├── migrateProgressSchema.js # Migrate to new progress schema format
-│   │   └── ...                      # Data fixes, instructor tools, verification scripts
+│   ├── utils/                       # Helper utilities
+│   ├── scripts/                     # CLI scripts (admin creation, data fixes)
 │   ├── tests/                       # Jest + Supertest test suites
-│   │   ├── unit/                    # Unit tests (controllers, middleware, utils)
-│   │   ├── integration/             # Integration tests (auth, courses, orders, admin)
-│   │   ├── helpers.js               # Test helper utilities
-│   │   └── setup.js                 # Test setup configuration
-│   └── logs/                        # Winston log files (auto-rotated)
+│   └── logs/                        # Winston log files
 │
 ├── Front-End/
 │   ├── next.config.ts               # Next.js configuration
 │   ├── src/
-│   │   ├── app/                     # App Router pages (35+ routes)
-│   │   │   ├── page.tsx             # Home page (animated hero, stats, features, CTA)
-│   │   │   ├── layout.tsx           # Root layout (RTL, theme, auth init)
-│   │   │   ├── not-found.tsx        # Custom branded 404 page
+│   │   ├── app/                     # App Router pages (23+ routes)
+│   │   │   ├── page.tsx             # Home page
 │   │   │   ├── login/               # Authentication pages
 │   │   │   ├── register/
-│   │   │   ├── forgot-password/     # Password recovery
-│   │   │   ├── reset-password/      # Password reset with token
-│   │   │   ├── verify-email/        # Email verification
 │   │   │   ├── courses/             # Course catalog & details
 │   │   │   ├── watch/[id]/          # Video player
 │   │   │   ├── my-courses/          # Enrolled courses
 │   │   │   ├── checkout/            # Payment flow
 │   │   │   ├── orders/              # Order history
+│   │   │   ├── notifications/       # Notifications page (full-featured)
 │   │   │   ├── profile/             # User profile
 │   │   │   ├── wishlist/            # Wishlist page
+│   │   │   ├── contact/             # Contact page
+│   │   │   ├── sitemap.ts           # Dynamic sitemap.xml
 │   │   │   ├── dashboard/           # Student dashboard
 │   │   │   │   └── instructor/      # Instructor panel
 │   │   │   ├── admin/               # Admin dashboard
 │   │   │   │   ├── students/        # Student management
-│   │   │   │   ├── instructors/     # Instructor management
 │   │   │   │   ├── orders/          # Order management
-│   │   │   │   ├── courses/         # Course management (+ new, edit, videos)
+│   │   │   │   ├── courses/         # Course management
 │   │   │   │   ├── coupons/         # Coupon management
 │   │   │   │   └── instructor-applications/
-│   │   │   ├── instructor-application/ # Public instructor signup
-│   │   │   ├── instructors/[id]/    # Public instructor profile
-│   │   │   ├── about/               # About the platform
-│   │   │   ├── privacy/             # Privacy policy
-│   │   │   └── terms/               # Terms of service
-│   │   ├── components/              # Reusable components (37+)
-│   │   │   ├── Header.tsx           # Main navigation + auth + theme toggle
-│   │   │   ├── HomeClient.tsx       # Home page client component (781 lines)
-│   │   │   ├── MasarRoadHero.tsx    # Animated M-road SVG hero section
-│   │   │   ├── BrandLoader.tsx      # Animated splash screen with particles
-│   │   │   ├── AuthInitializer.tsx  # Auth hydration + backend wake-up
-│   │   │   ├── ProtectedRoute.tsx   # Client-side auth guard
-│   │   │   ├── ErrorBoundary.tsx    # React error boundary + error reporting
-│   │   │   ├── CourseCard.tsx        # Course display card
-│   │   │   ├── CourseFilters.tsx     # Course filtering UI
-│   │   │   ├── YouTubePlayer.tsx     # YouTube embed + custom fullscreen + watermark
-│   │   │   ├── VideoComments.tsx     # Video comments CRUD (354 lines)
-│   │   │   ├── VideoWatermark.tsx    # Anti-piracy watermark overlay
-│   │   │   ├── CertificateCard.tsx   # Certificate display/download/print (282 lines)
-│   │   │   ├── NotificationBell.tsx  # Notification dropdown + unread badge (318 lines)
-│   │   │   ├── ResponsiveTable.tsx   # Desktop table + mobile card layout
-│   │   │   ├── ScrollReveal.tsx      # Scroll-triggered animations (7 presets + stagger)
-│   │   │   ├── Loading.tsx           # 10 loading variants
-│   │   │   ├── Skeleton.tsx          # 7 skeleton variants
-│   │   │   ├── EmptyState.tsx        # 7 empty state variants
-│   │   │   ├── admin/AdminSidebar.tsx # Admin dashboard sidebar
-│   │   │   └── ui/                   # Shared UI primitives + barrel exports
-│   │   ├── lib/                     # API client & utilities
-│   │   │   ├── api.ts               # Axios instance + 13 API modules (478 lines)
-│   │   │   ├── instructorApi.ts     # Instructor application + course CRUD API
-│   │   │   ├── notificationsApi.ts  # Notifications API + TypeScript interfaces
-│   │   │   ├── toast.ts             # Toast helpers (success, error, info, warning)
-│   │   │   ├── errorMonitoring.ts   # Sentry integration + in-memory error buffer (210 lines)
-│   │   │   └── accessibility.tsx    # ARIA labels, focus trap, keyboard nav, screen reader (190 lines)
-│   │   ├── store/                   # Zustand state stores
-│   │   │   ├── authStore.ts         # Auth state, tokens, cookie mirroring
-│   │   │   ├── themeStore.ts        # Dark/light mode with localStorage
-│   │   │   ├── wishlistStore.ts     # Wishlist state + API integration
-│   │   │   └── progressStore.ts     # Video progress + watch duration debouncing (243 lines)
+│   │   │   └── instructor-application/ # Public instructor signup
+│   │   ├── components/              # Reusable components (35+)
+│   │   │   ├── course/              # CourseCard, Filters, Progress
+│   │   │   ├── video/               # YouTubePlayer, Comments, Watermark
+│   │   │   ├── reviews/             # ReviewForm, ReviewsList, StarRating
+│   │   │   ├── certificates/        # CertificateCard
+│   │   │   ├── notifications/       # NotificationBell (dropdown + badge)
+│   │   │   ├── admin/               # AdminSidebar
+│   │   │   ├── Footer.tsx           # Global site footer
+│   │   │   └── ui/                  # Shared UI primitives
+│   │   ├── lib/                     # API client, utilities
+│   │   ├── stores/                  # Zustand state stores
+│   │   │   ├── authStore.ts         # Auth state & tokens
+│   │   │   ├── themeStore.ts        # Dark/light mode
+│   │   │   ├── wishlistStore.ts     # Wishlist state
+│   │   │   └── progressStore.ts     # Video progress
 │   │   ├── hooks/                   # Custom React hooks
-│   │   │   ├── useRecentlyViewed.ts # Recently viewed courses (max 10)
-│   │   │   ├── useSWRApi.ts         # 7 SWR data-fetching hooks with caching
-│   │   │   └── useVideoBookmark.ts  # Video timestamp bookmarking
-│   │   ├── utils/                   # Client utilities
-│   │   │   └── deviceFingerprint.ts # SHA-256 device fingerprint generator
 │   │   └── types/                   # TypeScript type definitions
-│   ├── proxy.ts                     # Next.js Edge middleware (JWT-based route protection)
 │   └── tests/                       # Jest + Testing Library tests
-│       ├── components/              # Component tests (5+ test files)
-│       ├── store/                   # Store tests
-│       └── setup.ts                 # Test setup configuration
 │
 └── README.md                        # You are here!
 ```
@@ -750,38 +687,35 @@ e-learning-platform/
 
 ## 🔑 Role-Based Access Control
 
-| Feature | Student | Instructor | Admin |
-|---------|:-------:|:----------:|:-----:|
-| Browse & search courses | ✅ | ✅ | ✅ |
-| View instructor profiles | ✅ | ✅ | ✅ |
-| Purchase & enroll in courses | ✅ | — | — |
-| Watch enrolled course videos | ✅ | ✅ (own) | ✅ |
-| Track video progress | ✅ | — | — |
-| Resume video from bookmark | ✅ | — | — |
-| Earn certificates | ✅ | — | — |
-| Leave reviews (100% completion) | ✅ | — | — |
-| Comment on videos | ✅ | ✅ | ✅ |
-| Wishlist courses | ✅ | ✅ | ✅ |
-| Create & manage own courses | — | ✅ | ✅ (all) |
-| Manage course videos | — | ✅ (own) | ✅ (all) |
-| Approve/reject orders | — | — | ✅ |
-| Block/unblock students | — | — | ✅ |
-| Block/unblock instructors | — | — | ✅ |
-| Demote instructors | — | — | ✅ |
-| Manage coupons | — | — | ✅ |
-| Review instructor applications | — | — | ✅ |
-| Reset user device limits | — | — | ✅ |
-| View analytics dashboard | — | ✅ (own) | ✅ (all) |
-| Device protection enforced | ✅ | — | — |
+| Feature                         | Student | Instructor |  Admin   |
+| ------------------------------- | :-----: | :--------: | :------: |
+| Browse & search courses         |   ✅    |     ✅     |    ✅    |
+| Purchase & enroll in courses    |   ✅    |     —      |    —     |
+| Watch enrolled course videos    |   ✅    |  ✅ (own)  |    ✅    |
+| Track video progress            |   ✅    |     —      |    —     |
+| Earn certificates               |   ✅    |     —      |    —     |
+| Leave reviews (100% completion) |   ✅    |     —      |    —     |
+| Comment on videos               |   ✅    |     ✅     |    ✅    |
+| Wishlist courses                |   ✅    |     ✅     |    ✅    |
+| Create & manage courses         |    —    |  ✅ (own)  | ✅ (all) |
+| Manage course videos            |    —    |  ✅ (own)  | ✅ (all) |
+| Approve/reject orders           |    —    |     —      |    ✅    |
+| Manage students & instructors   |    —    |     —      |    ✅    |
+| Manage coupons                  |    —    |     —      |    ✅    |
+| Review instructor applications  |    —    |     —      |    ✅    |
+| View analytics dashboard        |    —    |  ✅ (own)  | ✅ (all) |
+| Device protection enforced      |   ✅    |     —      |    —     |
 
 ---
 
 ## 🎥 Video Hosting & DRM Strategy
 
 ### Current Implementation (Demo)
+
 Videos are served via **YouTube embeds** for this demonstration project. This approach is cost-free and allows the platform to be fully functional without paid video infrastructure.
 
 ### Production-Ready Architecture
+
 The codebase is **architecturally prepared** for DRM-protected video delivery:
 
 ```javascript
@@ -794,6 +728,7 @@ The codebase is **architecturally prepared** for DRM-protected video delivery:
 ```
 
 For a production deployment, we would integrate with enterprise DRM platforms such as:
+
 - **[Bunny.net Stream](https://bunny.net/stream/)** — Built-in DRM, token authentication, adaptive bitrate
 - **[Vdocipher](https://www.vdocipher.com/)** — Hollywood-grade DRM (Widevine + FairPlay)
 - **[Mux](https://www.mux.com/)** — Streaming infrastructure with analytics
@@ -806,13 +741,17 @@ The dual-provider architecture ensures switching to a DRM solution requires **mi
 ## 💳 Payment Strategy
 
 ### Current Implementation (Demo)
+
 The payment system uses a **manual screenshot-based verification** flow:
+
 1. Student uploads a payment screenshot (supports Vodafone Cash, InstaPay, Bank Transfer)
 2. Admin reviews and approves/rejects in the dashboard
 3. A **sandbox mode** is available for development/testing (auto-approves without payment)
 
 ### Production Integration Path
+
 The order architecture is designed to seamlessly integrate with payment gateways:
+
 - **[Stripe](https://stripe.com/)** — International card payments
 - **[PayPal](https://www.paypal.com/)** — Global payment processing
 - **[Paymob](https://paymob.com/)** — Egyptian market (cards, wallets, installments)
@@ -824,59 +763,32 @@ The `Order` model already supports multiple payment methods and status tracking,
 
 ## 🧪 Testing
 
-The project includes comprehensive unit and integration tests:
-
 ```bash
 # Backend tests
 cd Back-End
-npm test                # Run all tests
-npm run test:unit       # Unit tests only
-npm run test:integration # Integration tests only
-npm run test:coverage   # Tests with coverage report
+npm test
 
 # Frontend tests
 cd Front-End
-npm test                # Run all component tests
-npm run test:coverage   # Tests with coverage report
+npm test
 ```
 
-### Backend Test Coverage
-| Category | Tests |
-|----------|-------|
-| **Unit — Controllers** | Auth, Course, Order, Admin, Video |
-| **Unit — Middleware** | Auth middleware, Validation rules |
-| **Unit — Utils** | Auth helpers, Pagination |
-| **Integration** | Auth flow, Courses API, Orders API, Admin API |
+The project includes unit and integration tests using:
 
-### Frontend Test Coverage
-| Category | Tests |
-|----------|-------|
-| **Components** | CourseProgressBar, EmptyState, Loading, LoadingButton, StarRating |
-| **Stores** | Auth store state management |
-
-Testing stack:
-- **Backend:** Jest 30 + Supertest + ES Modules (`--experimental-vm-modules`)
-- **Frontend:** Jest 30 + React Testing Library + ts-jest
+- **Backend:** Jest 30 + Supertest for API endpoint testing
+- **Frontend:** Jest + React Testing Library for component testing
 
 ---
 
 ## 📧 Email System
 
-The platform sends transactional emails via **Brevo (Sendinblue) HTTP API** — no domain verification or SMTP configuration needed, works reliably on all cloud platforms including Render:
+The platform sends transactional emails via **Nodemailer** with SMTP (pooled transporter for performance):
 
-### 5 Branded HTML Email Templates
-All emails feature the **Masar** brand identity with hosted logo support (dark/light variants):
-
-| Template | Trigger | Content |
-|----------|---------|--------|
-| **Email Verification** | User registration | Tokenized verification link with expiry |
-| **Password Reset** | Forgot password request | Secure reset link with expiry |
-| **Order Approved** | Admin approves payment | Enrollment confirmation + course link |
-| **Order Rejected** | Admin rejects payment | Rejection reason + support info |
-| **Certificate Issued** | 100% course completion | Certificate download link + congratulations |
-
-- **Fire-and-forget delivery** — emails sent in background to prevent timeout on cloud platforms
-- **Instructor Application** notifications sent at each review stage
+- **Email Verification** — tokenized verification links on registration
+- **Password Reset** — secure reset links with expiry
+- **Order Approved/Rejected** — payment status notifications
+- **Certificate Issued** — certificate download link
+- **Instructor Application Updates** — approval/rejection notifications
 
 ---
 
@@ -885,53 +797,66 @@ All emails feature the **Masar** brand identity with hosted logo support (dark/l
 - **Winston Logger** — dual transport (file + console) with rotation (5MB, 5 files max)
   - `error.log` — error-level events
   - `combined.log` — all log levels
-- **Morgan HTTP Logger** — request/response logging with custom tokens (user-id, user-role) piped to Winston
-- **Health Check Endpoint** — `GET /api/health` with database connection status, uptime, and environment info
-- **Environment Validation** — 12 required env vars validated at startup with descriptive error messages
-- **Graceful Shutdown** — SIGTERM/SIGINT handlers for clean HTTP server and database disconnection
-- **Cron Jobs:**
-  - Daily at 2:00 AM — auto-delete read notifications older than 30 days
-- **Frontend Error Monitoring:**
-  - Optional Sentry integration (set `NEXT_PUBLIC_SENTRY_DSN`)
-  - In-memory error buffer (last 50 errors)
-  - Global unhandled error/rejection listeners
-  - React Error Boundary with error reporting
+- **Morgan HTTP Logger** — request/response logging piped to Winston
+- **Health Check Endpoint** — `GET /api/health` for uptime monitoring
+- **Graceful Shutdown** — SIGTERM/SIGINT handlers for clean database disconnection
 
 ---
 
 ## ⚙️ Environment Variables
 
 ### Backend (`Back-End/.env`)
-| Variable | Required | Description |
-|----------|:--------:|-------------|
-| `PORT` | ✅ | Server port (default: 5000) |
-| `NODE_ENV` | ✅ | `development` or `production` |
-| `MONGODB_URI` | ✅ | MongoDB connection string |
-| `JWT_SECRET` | ✅ | Access token signing secret (min 32 chars recommended) |
-| `JWT_REFRESH_SECRET` | ✅ | Refresh token signing secret |
-| `JWT_EXPIRE` | ✅ | Access token expiry (e.g., `1h`) |
-| `JWT_REFRESH_EXPIRE` | ✅ | Refresh token expiry (e.g., `7d`) |
-| `CLOUDINARY_CLOUD_NAME` | ✅ | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | ✅ | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | ✅ | Cloudinary API secret |
-| `BREVO_API_KEY` | ✅ | Brevo (Sendinblue) API key for email delivery |
-| `EMAIL_FROM_ADDRESS` | ✅ | Sender email address |
-| `EMAIL_FROM_NAME` | ❌ | Sender display name (default: `Masar \| مسار`) |
-| `EMAIL_LOGO_DARK` | ❌ | Email logo URL (dark variant) |
-| `EMAIL_LOGO_LIGHT` | ❌ | Email logo URL (light variant) |
-| `CLIENT_URL` | ✅ | Frontend URL (for CORS & email links) |
-| `CLIENT_URL_PROD` | ❌ | Production frontend URL |
-| `BUNNY_API_KEY` | ❌ | Bunny.net API key (for DRM video hosting) |
-| `BUNNY_LIBRARY_ID` | ❌ | Bunny.net library ID |
+
+| Variable                | Required | Description                       |
+| ----------------------- | :------: | --------------------------------- |
+| `PORT`                  |    ✅    | Server port (default: 5000)       |
+| `NODE_ENV`              |    ✅    | `development` or `production`     |
+| `MONGODB_URI`           |    ✅    | MongoDB connection string         |
+| `JWT_SECRET`            |    ✅    | Access token signing secret       |
+| `JWT_REFRESH_SECRET`    |    ✅    | Refresh token signing secret      |
+| `JWT_EXPIRE`            |    ✅    | Access token expiry (e.g., `1h`)  |
+| `JWT_REFRESH_EXPIRE`    |    ✅    | Refresh token expiry (e.g., `7d`) |
+| `CLOUDINARY_CLOUD_NAME` |    ✅    | Cloudinary cloud name             |
+| `CLOUDINARY_API_KEY`    |    ✅    | Cloudinary API key                |
+| `CLOUDINARY_API_SECRET` |    ✅    | Cloudinary API secret             |
+| `EMAIL_HOST`            |    ✅    | SMTP host                         |
+| `EMAIL_PORT`            |    ✅    | SMTP port                         |
+| `EMAIL_USER`            |    ✅    | SMTP username                     |
+| `EMAIL_PASS`            |    ✅    | SMTP password                     |
+| `EMAIL_FROM`            |    ✅    | Sender email address              |
+| `FRONTEND_URL`          |    ✅    | Frontend URL (CORS + emails)      |
+| `ALLOWED_ORIGINS`       |    ✅    | Comma-separated allowed origins   |
+| `BUNNY_API_KEY`         |    ❌    | Bunny.net API key                 |
+| `BUNNY_LIBRARY_ID`      |    ❌    | Bunny.net library ID              |
 
 ### Frontend (`Front-End/.env.local`)
-| Variable | Required | Description |
-|----------|:--------:|-------------|
-| `NEXT_PUBLIC_API_URL` | ✅ | Backend API URL |
+
+| Variable              | Required | Description     |
+| --------------------- | :------: | --------------- |
+| `NEXT_PUBLIC_API_URL` |    ✅    | Backend API URL |
 
 ---
 
-## 👥 Team
+## � Changelog
+
+### March 2026 — Feature & Polish Update
+
+| Area                      | Change                                                                                                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Notifications Page**    | New `/notifications` page: filter tabs (all / unread / read), paginated list (15/page), mark-all-read, delete-all-read, staggered entrance animations, empty states per filter                                     |
+| **Header Navigation**     | Added "الإشعارات" link to the desktop user dropdown and the mobile hamburger menu                                                                                                                                  |
+| **Dynamic Metadata**      | `generateMetadata` server functions on `/courses/[id]`, `/checkout/[id]`, and `/watch/[id]` — accurate browser tab titles + Open Graph tags                                                                        |
+| **Global Footer**         | Site-wide `Footer` component added to the root layout                                                                                                                                                              |
+| **Contact Page**          | New `/contact` page with client-side validation                                                                                                                                                                    |
+| **Sitemap**               | Auto-generated `sitemap.xml` for SEO crawlers (`sitemap.ts`)                                                                                                                                                       |
+| **Rate Limiting**         | Global API limiter raised 100 → 300 req/15 min; key is now per-user (falls back to IP for guests)                                                                                                                  |
+| **Progress Store Cache**  | `fetchCourseProgress` skips redundant API calls if data was fetched within the last 5 minutes — eliminates 429 bursts on the watch page                                                                            |
+| **CSS Animation Library** | New keyframes & utility classes in `globals.css`: `fadeInUp`, `scaleIn`, `slideInRight`, `popIn`, `float`, `pingOnce`; stagger helpers `.stagger-1`–`.stagger-8`; `page-enter` wrapper; `transition-smooth` preset |
+| **CourseCard Hover**      | Deeper lift (`-translate-y-2`), stronger colored shadows, button press/active scale feedback, category badge scales on card hover                                                                                  |
+
+---
+
+## �👥 Team
 
 This project was designed, developed, and brought to life by:
 
@@ -958,54 +883,6 @@ This project is licensed under the **ISC License** — see the [LICENSE](LICENSE
 
 ---
 
-## 🚀 Project Highlights
-
-<table>
-<tr>
-<td>
-
-**Backend**
-- 80+ REST API endpoints
-- 16 route modules
-- 15 controllers
-- 11 Mongoose models
-- 8 middleware layers
-- 7 utility modules
-- 21 CLI scripts
-- 15+ test files (unit + integration)
-
-</td>
-<td>
-
-**Frontend**
-- 35+ pages/routes
-- 37+ React components
-- 4 Zustand stores
-- 3 custom hooks
-- 13 API service modules
-- 7 SWR data-fetching hooks
-- Edge middleware route protection
-- Full TypeScript coverage
-
-</td>
-<td>
-
-**Security**
-- JWT with HttpOnly cookies
-- 4-layer device protection
-- 5 rate limiters
-- NoSQL injection prevention
-- XSS sanitization
-- Helmet security headers
-- Account lockout system
-- Refresh token rotation
-
-</td>
-</tr>
-</table>
-
----
-
 <p align="center">
-  <strong>Built with ❤️ by Yasa Jaber & Mohamed Abelnaser</strong>
+  <strong>Built  by Yasa Jaber & Mohamed Abelnaser</strong>
 </p>
