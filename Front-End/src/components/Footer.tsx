@@ -12,8 +12,14 @@ export default function Footer() {
   const pathname = usePathname();
   const { isAuthenticated } = useAuthStore();
 
-  // لا تظهر الـ Footer في صفحات الإدارة وصفحة المشاهدة
-  if (pathname.startsWith("/admin") || pathname.startsWith("/watch")) {
+  // لا تظهر الـ Footer في صفحات الإدارة وصفحة المشاهدة وصفحات تسجيل الدخول والتسجيل وطلب الانضمام
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/watch") ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/instructor-application"
+  ) {
     return null;
   }
 
@@ -110,7 +116,7 @@ export default function Footer() {
                 ].map(({ Icon, text, href }) => (
                   <li key={text} className="flex items-center gap-3 text-slate-400 text-sm group">
                     <span className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:border-primary/40 transition-colors">
-                      <Icon className="w-3.5 h-3.5 text-primary" />
+                      <Icon className="w-3.5 h-3.5 text-slate-200" />
                     </span>
                     {href ? (
                       <a href={href} className="group-hover:text-slate-300 transition-colors hover:text-white">
