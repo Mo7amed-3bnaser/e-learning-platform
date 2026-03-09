@@ -1,0 +1,22 @@
+name: Keep Render Services Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Every 10 minutes
+  workflow_dispatch:         # Allow manual trigger
+
+jobs:
+  ping:
+    name: Ping Frontend & Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Frontend
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://masar-zsel.onrender.com/)
+          echo "Frontend status: $STATUS"
+
+      - name: Ping Backend
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://masar-back.onrender.com)
+          echo "Backend status: $STATUS"
