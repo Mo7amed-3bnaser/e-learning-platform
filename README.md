@@ -27,9 +27,6 @@
 </p>
 
 ---
-<a href="https://masar-zsel.onrender.com/" target="_blank">
-  <img src="https://img.shields.io/badge/🚀 Live Demo-Visit Now-brightgreen?style=for-the-badge" alt="Live Demo" />
-</a>
 ## 📋 Overview
 
 **Masar** is a comprehensive, production-ready e-learning platform designed with a full Arabic RTL interface. It supports three user roles — **Student**, **Instructor**, and **Admin** — each with a tailored dashboard and feature set. The platform covers the complete e-learning lifecycle: from course creation and video delivery to payment processing, progress tracking, certificate generation, and more.
